@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { ShoppingBag, Menu, X, Search } from "lucide-react"
-import brandLogo from "@/data/542094736_18306674428223104_4549775929201968607_n.jpg"
+
 import { useCart } from "@/context/CartContext"
 
 interface NavbarProps {
@@ -29,11 +29,10 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
     <>
       <nav className={scrolled ? "scrolled" : ""}>
         <a href="#" className="nav-logo" aria-label="مفروشات عبداللطيف home">
-          <img
-            src={brandLogo}
-            alt="شعار مفروشات عبداللطيف"
-            style={{ height: 40, width: "auto", borderRadius: 8, objectFit: "cover", boxShadow: "0 3px 12px rgba(0,0,0,0.15)" }}
-          />
+         
+           
+           
+          
           <span style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
             مفروشات <strong>عبداللطيف</strong>
           </span>
