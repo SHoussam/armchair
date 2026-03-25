@@ -92,7 +92,7 @@ export default function SearchBar({ isOpen, query, onChange, onClose, onSelectPr
             <img className="search-result-img" src={p.img} alt={p.imgAlt} />
             <div>
               <div className="search-result-name">{p.name}</div>
-                <div className="search-result-price">${p.price.toLocaleString()} / m</div>
+                <div className="search-result-price">MAD {p.price.toLocaleString()} / m</div>
             </div>
           </div>
         ))}

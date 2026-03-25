@@ -88,9 +88,9 @@ export default function ProductCard({ product, onViewDetail }: ProductCardProps)
           {renderStars(product.rating)} <span>({product.reviews})</span>
         </div>
         <div className="product-price-row">
-          <span className="product-price">${product.price.toLocaleString()} / m</span>
+          <span className="product-price">MAD {product.price.toLocaleString()} / m</span>
           {product.oldPrice && (
-            <span className="product-price-old">${product.oldPrice.toLocaleString()}</span>
+            <span className="product-price-old">MAD {product.oldPrice.toLocaleString()}</span>
           )}
         </div>
         {/* Visual color swatches */}

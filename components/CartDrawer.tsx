@@ -81,7 +81,7 @@ export default function CartDrawer() {
                       {colorName} · {item.styleLabel} · {item.sizeMeters.toFixed(1)} m
                     </div>
                     <div className="cart-item-price">
-                      ${(item.unitPrice * item.qty).toLocaleString()}
+                      MAD {(item.unitPrice * item.qty).toLocaleString()}
                     </div>
                     <div className="cart-item-controls">
                       <button
@@ -123,21 +123,21 @@ export default function CartDrawer() {
             </div>
             <div className="shipping-notice" id="shippingNotice">
               {totalPrice < FREE_SHIPPING_THRESHOLD
-                ? `Add $${(FREE_SHIPPING_THRESHOLD - totalPrice).toLocaleString()} more for free shipping!`
+                ? `Add MAD ${(FREE_SHIPPING_THRESHOLD - totalPrice).toLocaleString()} more for free shipping!`
                 : "✓ You qualify for free shipping!"}
             </div>
 
             <div className="cart-subtotal">
               <span>Subtotal</span>
-              <span id="cartSubtotal">${totalPrice.toLocaleString()}</span>
+              <span id="cartSubtotal">MAD {totalPrice.toLocaleString()}</span>
             </div>
             <div className="cart-subtotal">
               <span>Shipping</span>
-              <span id="cartShipping">{shipping === 0 ? "Free" : `$${shipping}`}</span>
+              <span id="cartShipping">{shipping === 0 ? "Free" : `MAD ${shipping}`}</span>
             </div>
             <div className="cart-total">
               <span>Total</span>
-              <span id="cartTotal">${grandTotal.toLocaleString()}</span>
+              <span id="cartTotal">MAD {grandTotal.toLocaleString()}</span>
             </div>
             <button
               className="checkout-btn"

@@ -102,14 +102,14 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
 
             {/* Price */}
             <div className="modal-price-row">
-              <span className="modal-price">${customUnitPrice.toLocaleString()}</span>
+              <span className="modal-price">MAD {customUnitPrice.toLocaleString()}</span>
               {product.oldPrice && (
-                <span className="modal-price-old">${product.oldPrice.toLocaleString()} / m</span>
+                <span className="modal-price-old">MAD {product.oldPrice.toLocaleString()} / m</span>
               )}
             </div>
 
             <p className="modal-help">
-              Base price: ${pricePerMeter.toLocaleString()} per meter
+              Base price: MAD {pricePerMeter.toLocaleString()} per meter
             </p>
 
             <p className="modal-desc">{product.desc}</p>
@@ -198,11 +198,11 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
 
             {/* Add to Cart */}
             <button className="modal-add-btn" onClick={handleAddToCart}>
-              Add to Cart — ${(customUnitPrice * qty).toLocaleString()}
+              Add to Cart — MAD {(customUnitPrice * qty).toLocaleString()}
             </button>
 
             <p className="modal-note">
-              Free shipping on orders over $800 · 30-day returns
+              Free shipping on orders over MAD 800 · 30-day returns
             </p>
           </div>
         </div>
