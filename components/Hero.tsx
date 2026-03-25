@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import brandLogo from "@/data/542094736_18306674428223104_4549775929201968607_n.jpg"
 
 interface HeroProps {
   onShopClick: () => void
@@ -27,18 +26,6 @@ export default function Hero({ onShopClick }: HeroProps) {
           <strong style={{ color: "var(--gold)", fontWeight: 600 }}> مفروشات عبداللطيف</strong>.
           Quality you can feel, comfort that lasts a lifetime.
         </p>
-
-        <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "12px 0 6px" }}>
-          <img
-            src={brandLogo}
-            alt="شعار مفروشات عبداللطيف"
-            style={{ height: 52, width: "auto", borderRadius: 10, objectFit: "cover", boxShadow: "0 8px 24px rgba(0,0,0,0.18)" }}
-          />
-          <div style={{ lineHeight: 1.3, fontWeight: 600 }}>
-            مفروشات عبداللطيف
-            <div style={{ fontSize: 13, color: "var(--muted)" }}>صناعة وطنية · جودة مضمونة</div>
-          </div>
-        </div>
 
         <div className="hero-actions">
           <button onClick={onShopClick} className="btn-primary">
