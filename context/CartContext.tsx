@@ -2,6 +2,19 @@
 
 import React, { createContext, useContext, useReducer, useCallback, ReactNode } from "react"
 import { Product } from "@/data/products"
+import {
+  SofaPriceBreakdown,
+  MattressPriceBreakdown,
+  ChairPriceBreakdown,
+  AccessoryPriceBreakdown,
+  SeatSize,
+} from "@/src/utils/pricing"
+
+export type AnyPriceBreakdown =
+  | SofaPriceBreakdown
+  | MattressPriceBreakdown
+  | ChairPriceBreakdown
+  | AccessoryPriceBreakdown
 
 export interface CartItem {
   key: string
@@ -12,14 +25,26 @@ export interface CartItem {
   sizeMeters: number
   unitPrice: number
   qty: number
+  seatSize?: SeatSize
+  length1?: number
+  length2?: number
+  headrests?: number
+  chaiseOrientation?: "left" | "right"
+  priceBreakdown?: AnyPriceBreakdown
 }
 
-interface AddItemOptions {
+export interface AddItemOptions {
   qty?: number
   styleId?: string
   styleLabel?: string
   sizeMeters?: number
   unitPrice?: number
+  seatSize?: SeatSize
+  length1?: number
+  length2?: number
+  headrests?: number
+  chaiseOrientation?: "left" | "right"
+  priceBreakdown?: AnyPriceBreakdown
 }
 
 interface CartState {
@@ -40,6 +65,12 @@ type CartAction =
         styleLabel: string
         sizeMeters: number
         unitPrice: number
+        seatSize?: SeatSize
+        length1?: number
+        length2?: number
+        headrests?: number
+        chaiseOrientation?: "left" | "right"
+        priceBreakdown?: AnyPriceBreakdown
       }
     }
   | { type: "REMOVE_ITEM"; payload: { key: string } }
@@ -54,8 +85,37 @@ type CartAction =
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
     case "ADD_ITEM": {
-      const { product, colorIdx, qty, styleId, styleLabel, sizeMeters, unitPrice } = action.payload
-      const key = `${product.id}-${colorIdx}-${styleId}-${sizeMeters.toFixed(2)}`
+      const {
+        product,
+        colorIdx,
+        qty,
+        styleId,
+        styleLabel,
+        sizeMeters,
+        unitPrice,
+        seatSize,
+        length1,
+        length2,
+        headrests,
+        chaiseOrientation,
+        priceBreakdown,
+      } = action.payload
+
+      let key = `${product.id}-${colorIdx}-${styleId}`
+      if (priceBreakdown) {
+        if (priceBreakdown.type === "sofa") {
+          key += `-${seatSize || 70}-${length1?.toFixed(2) || "2.70"}-${length2?.toFixed(2) || "2.00"}-${headrests || 0}-${chaiseOrientation || "left"}`
+        } else if (priceBreakdown.type === "mattress") {
+          key += `-${priceBreakdown.sizeLabel}-${priceBreakdown.thicknessCm}-${priceBreakdown.coreLabel}`
+        } else if (priceBreakdown.type === "chair") {
+          key += `-${priceBreakdown.customWidth}-${priceBreakdown.legLabel}-${priceBreakdown.tuftingLabel}`
+        } else if (priceBreakdown.type === "accessory") {
+          key += `-${priceBreakdown.packLabel}-${priceBreakdown.sizeLabel}-${priceBreakdown.fillLabel}`
+        }
+      } else {
+        key += `-${sizeMeters.toFixed(2)}`
+      }
+
       const existing = state.items.find((i) => i.key === key)
       if (existing) {
         return {
@@ -69,7 +129,22 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
         ...state,
         items: [
           ...state.items,
-          { key, product, colorIdx, styleId, styleLabel, sizeMeters, unitPrice, qty },
+          {
+            key,
+            product,
+            colorIdx,
+            styleId,
+            styleLabel,
+            sizeMeters,
+            unitPrice,
+            qty,
+            seatSize,
+            length1,
+            length2,
+            headrests,
+            chaiseOrientation,
+            priceBreakdown,
+          },
         ],
       }
     }
@@ -140,11 +215,28 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const addItem = useCallback((product: Product, colorIdx: number, options: AddItemOptions = {}) => {
     const qty = options.qty ?? 1
     const styleId = options.styleId ?? "standard"
-    const styleLabel = options.styleLabel ?? "Standard Weave"
+    const styleLabel = options.styleLabel ?? "Standard Fabric"
     const sizeMeters = Math.max(0.5, Number(options.sizeMeters ?? 1))
-    const unitPrice = Number((options.unitPrice ?? product.price * sizeMeters).toFixed(2))
+    const unitPrice = Number((options.unitPrice ?? product.price).toFixed(2))
 
-    dispatch({ type: "ADD_ITEM", payload: { product, colorIdx, qty, styleId, styleLabel, sizeMeters, unitPrice } })
+    dispatch({
+      type: "ADD_ITEM",
+      payload: {
+        product,
+        colorIdx,
+        qty,
+        styleId,
+        styleLabel,
+        sizeMeters,
+        unitPrice,
+        seatSize: options.seatSize,
+        length1: options.length1,
+        length2: options.length2,
+        headrests: options.headrests,
+        chaiseOrientation: options.chaiseOrientation,
+        priceBreakdown: options.priceBreakdown,
+      },
+    })
   }, [])
 
   const removeItem = useCallback((key: string) => {

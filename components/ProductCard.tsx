@@ -14,23 +14,15 @@ function renderStars(rating: number): string {
 }
 
 export default function ProductCard({ product, onViewDetail }: ProductCardProps) {
-  const { addItem, toggleCart, toggleWishlist, isWishlisted, showToast } = useCart()
+  const { toggleWishlist, isWishlisted, showToast } = useCart()
   const [selectedColorIdx, setSelectedColorIdx] = useState(0)
   const [imgLoaded, setImgLoaded] = useState(false)
 
   const wished = isWishlisted(product.id)
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handlePersonalize = (e: React.MouseEvent) => {
     e.stopPropagation()
-    addItem(product, selectedColorIdx, {
-      qty: 1,
-      styleId: "standard",
-      styleLabel: "Standard Weave",
-      sizeMeters: 1,
-      unitPrice: product.price,
-    })
-    showToast(`${product.name} added to cart`)
-    toggleCart()
+    onViewDetail(product)
   }
 
   const handleWishlist = (e: React.MouseEvent) => {
@@ -48,6 +40,8 @@ export default function ProductCard({ product, onViewDetail }: ProductCardProps)
     product.badge === "Sale"
       ? "badge-sale"
       : product.badge === "Best Seller"
+      ? "badge-bestseller"
+      : product.badge === "Top Rated"
       ? "badge-bestseller"
       : "badge-new"
 
@@ -75,22 +69,27 @@ export default function ProductCard({ product, onViewDetail }: ProductCardProps)
           {wished ? "♥" : "♡"}
         </button>
 
-        {/* Quick Add */}
-        <button className="quick-add" onClick={handleAddToCart}>
-          + Add to Cart
+        {/* Quick Personalize Button */}
+        <button className="quick-add" onClick={handlePersonalize}>
+          ⚙ Personalize & Price
         </button>
       </div>
 
       <div className="product-card-body">
-        <div className="product-category">{product.category}</div>
+        <div className="product-category">
+          {product.category}
+          <span style={{ marginLeft: "6px", color: "var(--gold)", fontSize: "0.68rem" }}>· Bespoke</span>
+        </div>
         <div className="product-name">{product.name}</div>
         <div className="product-stars">
           {renderStars(product.rating)} <span>({product.reviews})</span>
         </div>
         <div className="product-price-row">
-          <span className="product-price">MAD {product.price.toLocaleString()} / m</span>
+          <span className="product-price">
+            From {product.price.toLocaleString()} DH
+          </span>
           {product.oldPrice && (
-            <span className="product-price-old">MAD {product.oldPrice.toLocaleString()}</span>
+            <span className="product-price-old">{product.oldPrice.toLocaleString()} DH</span>
           )}
         </div>
         {/* Visual color swatches */}

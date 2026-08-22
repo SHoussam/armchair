@@ -14,7 +14,7 @@ export default function CartDrawer() {
 
   const handleCheckout = () => {
     setCheckedOut(true)
-    showToast("Order submitted! We'll contact you to confirm measurements.")
+    showToast("Order submitted! We'll contact you on WhatsApp to confirm bespoke specifications.")
     setTimeout(() => {
       clearCart()
       closeCart()
@@ -62,12 +62,15 @@ export default function CartDrawer() {
               const p = item.product
               const colorName = p.colorNames[item.colorIdx]
               const colorHex = p.colors[item.colorIdx]
+              const breakdown = item.priceBreakdown
+
               return (
                 <div key={item.key} className="cart-item">
                   <img className="cart-item-img" src={p.img} alt={p.imgAlt} />
                   <div className="cart-item-info">
                     <div className="cart-item-name">{p.name}</div>
-                    <div className="cart-item-color" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+
+                    <div className="cart-item-color" style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
                       <span
                         style={{
                           display: "inline-block",
@@ -78,11 +81,74 @@ export default function CartDrawer() {
                           flexShrink: 0,
                         }}
                       />
-                      {colorName} · {item.styleLabel} · {item.sizeMeters.toFixed(1)} m
+                      <span>{colorName}</span>
+
+                      {breakdown?.type === "sofa" && (
+                        <>
+                          <span>·</span>
+                          <span style={{ color: "var(--gold)" }}>{item.seatSize} cm seat</span>
+                          <span>·</span>
+                          <span>{item.length1?.toFixed(2)}m × {item.length2?.toFixed(2)}m</span>
+                          {item.chaiseOrientation && (
+                            <>
+                              <span>·</span>
+                              <span>{item.chaiseOrientation === "left" ? "Left chaise" : "Right chaise"}</span>
+                            </>
+                          )}
+                          {item.headrests !== undefined && item.headrests > 0 && (
+                            <>
+                              <span>·</span>
+                              <span>{item.headrests} {item.headrests === 1 ? "headrest" : "headrests"}</span>
+                            </>
+                          )}
+                        </>
+                      )}
+
+                      {breakdown?.type === "mattress" && (
+                        <>
+                          <span>·</span>
+                          <span style={{ color: "var(--gold)" }}>{breakdown.sizeLabel}</span>
+                          <span>·</span>
+                          <span>{breakdown.thicknessCm} cm</span>
+                          <span>·</span>
+                          <span>{breakdown.coreLabel}</span>
+                        </>
+                      )}
+
+                      {breakdown?.type === "chair" && (
+                        <>
+                          <span>·</span>
+                          <span style={{ color: "var(--gold)" }}>{Math.round(breakdown.customWidth * 100)} cm wide</span>
+                          <span>·</span>
+                          <span>{breakdown.legLabel}</span>
+                          <span>·</span>
+                          <span>{breakdown.tuftingLabel}</span>
+                        </>
+                      )}
+
+                      {breakdown?.type === "accessory" && (
+                        <>
+                          <span>·</span>
+                          <span style={{ color: "var(--gold)" }}>{breakdown.packLabel}</span>
+                          <span>·</span>
+                          <span>{breakdown.sizeLabel}</span>
+                          <span>·</span>
+                          <span>{breakdown.fillLabel}</span>
+                        </>
+                      )}
+
+                      {!breakdown && (
+                        <>
+                          <span>·</span>
+                          <span>{item.styleLabel}</span>
+                        </>
+                      )}
                     </div>
+
                     <div className="cart-item-price">
                       MAD {(item.unitPrice * item.qty).toLocaleString()}
                     </div>
+
                     <div className="cart-item-controls">
                       <button
                         className="qty-btn"
@@ -117,14 +183,13 @@ export default function CartDrawer() {
         {/* Footer */}
         {state.items.length > 0 && (
           <div className="cart-footer" id="cartFooter">
-            {/* Shipping progress */}
             <div className="shipping-progress-track">
               <div className="shipping-progress-fill" style={{ width: `${progressPct}%` }} />
             </div>
             <div className="shipping-notice" id="shippingNotice">
               {totalPrice < FREE_SHIPPING_THRESHOLD
                 ? `Add MAD ${(FREE_SHIPPING_THRESHOLD - totalPrice).toLocaleString()} more for free shipping!`
-                : "✓ You qualify for free shipping!"}
+                : "✓ You qualify for free shipping in Tanger!"}
             </div>
 
             <div className="cart-subtotal">
