@@ -27,7 +27,7 @@ function ShopPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div>
       <Navbar onSearchClick={() => setSearchOpen(true)} />
 
       <main>

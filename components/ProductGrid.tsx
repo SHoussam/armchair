@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { products, categories, Product } from "@/data/products"
 import ProductCard from "./ProductCard"
 
@@ -14,7 +14,11 @@ type SortOption = "featured" | "price-asc" | "price-desc" | "rating"
 export default function ProductGrid({ searchQuery, onViewDetail }: ProductGridProps) {
   const [activeCategory, setActiveCategory] = useState("All")
   const [sortBy, setSortBy] = useState<SortOption>("featured")
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [catSearch, setCatSearch] = useState("")
   const sectionRef = useRef<HTMLElement>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   const filtered = products
     .filter((p) => {
@@ -35,6 +39,32 @@ export default function ProductGrid({ searchQuery, onViewDetail }: ProductGridPr
       return 0
     })
 
+  const filteredCategories = categories.filter((cat) =>
+    cat.toLowerCase().includes(catSearch.toLowerCase())
+  )
+
+  useEffect(() => {
+    if (mobileOpen) {
+      setCatSearch("")
+      setTimeout(() => searchInputRef.current?.focus(), 100)
+    }
+  }, [mobileOpen])
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setMobileOpen(false)
+      }
+    }
+    if (mobileOpen) document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [mobileOpen])
+
+  const handleSelectCategory = (cat: string) => {
+    setActiveCategory(cat)
+    setMobileOpen(false)
+  }
+
   return (
     <section id="shop" ref={sectionRef}>
       {/* Section header */}
@@ -46,6 +76,7 @@ export default function ProductGrid({ searchQuery, onViewDetail }: ProductGridPr
 
       {/* Filter bar */}
       <div className="filter-bar">
+        {/* Desktop tabs */}
         <div className="filter-tabs" id="filterTabs">
           {categories.map((cat) => (
             <button
@@ -57,6 +88,60 @@ export default function ProductGrid({ searchQuery, onViewDetail }: ProductGridPr
               {cat}
             </button>
           ))}
+        </div>
+
+        {/* Mobile dropdown trigger */}
+        <div className="cat-dropdown-wrap" ref={dropdownRef}>
+          <button
+            className="cat-dropdown-trigger"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="Filter by category"
+          >
+            <span>{activeCategory}</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+
+          {mobileOpen && (
+            <div className="cat-dropdown-panel">
+              <div className="cat-search-wrap">
+                <svg className="cat-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  className="cat-search-input"
+                  placeholder="Search category..."
+                  value={catSearch}
+                  onChange={(e) => setCatSearch(e.target.value)}
+                />
+              </div>
+              <ul className="cat-list">
+                {filteredCategories.length === 0 ? (
+                  <li className="cat-item cat-empty">No match found</li>
+                ) : (
+                  filteredCategories.map((cat) => (
+                    <li key={cat}>
+                      <button
+                        className={`cat-item ${activeCategory === cat ? "active" : ""}`}
+                        onClick={() => handleSelectCategory(cat)}
+                      >
+                        {cat}
+                        {activeCategory === cat && (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        )}
+                      </button>
+                    </li>
+                  ))
+                )}
+              </ul>
+            </div>
+          )}
         </div>
 
         <select
