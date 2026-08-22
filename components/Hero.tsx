@@ -18,29 +18,29 @@ export default function Hero({ onShopClick }: HeroProps) {
   return (
     <section className={`hero${animate ? " hero-animate" : ""}`}>
       <div className="hero-text">
-        <span className="hero-eyebrow">Tanger, Morocco · Since 1998</span>
-        <h1 className="hero-title">
+        <span className="hero-eyebrow hero-mob-order-1">Tanger, Morocco · Since 1998</span>
+        <h1 className="hero-title hero-mob-order-2">
           Your Home Deserves <em>True</em> Luxury
         </h1>
-        <p className="hero-desc">
+        <p className="hero-desc hero-mob-order-3">
           Premium Moroccan salons, custom mattresses, and fine upholstery — handcrafted in Tanger by
-          <strong style={{ color: "var(--gold)", fontWeight: 600 }}> مفروشات عبداللطيف</strong>.
+          <strong style={{ color: "var(--gold)", fontWeight: 600 }}> عبداللطيف مفروشات</strong>.
           Quality you can feel, comfort that lasts a lifetime.
         </p>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "12px 0 6px" }}>
+        <div className="hero-brand hero-mob-order-4">
           <img
             src={brandLogo}
-            alt="شعار مفروشات عبداللطيف"
-            style={{ height: 52, width: "auto", borderRadius: 10, objectFit: "cover", boxShadow: "0 8px 24px rgba(0,0,0,0.18)" }}
+            alt="شعار عبداللطيف مفروشات"
+            className="hero-brand-logo"
           />
-          <div style={{ lineHeight: 1.3, fontWeight: 600 }}>
-            مفروشات عبداللطيف
-            <div style={{ fontSize: 13, color: "var(--muted)" }}>صناعة وطنية · جودة مضمونة</div>
+          <div className="hero-brand-text">
+            عبداللطيف مفروشات
+            <div className="hero-brand-sub">صناعة راقية، جودة مضمونة</div>
           </div>
         </div>
 
-        <div className="hero-actions">
+        <div className="hero-actions hero-mob-order-5">
           <button onClick={onShopClick} className="btn-primary">
             Browse Collection
           </button>
@@ -52,7 +52,7 @@ export default function Hero({ onShopClick }: HeroProps) {
           </a>
         </div>
 
-        <div className="hero-stats">
+        <div className="hero-stats hero-mob-order-6">
           <div>
             <p className="stat-num">650+</p>
             <p className="stat-label">Products Listed</p>
@@ -68,7 +68,7 @@ export default function Hero({ onShopClick }: HeroProps) {
         </div>
       </div>
 
-      <div className="hero-image">
+      <div className="hero-image hero-mob-order-7">
         <img
           src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1200&q=85"
           alt="Luxury Moroccan salon sofa set in a beautifully decorated living room"
