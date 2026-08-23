@@ -77,7 +77,7 @@ export default function CartDrawer() {
                           width: 10, height: 10,
                           borderRadius: "50%",
                           background: colorHex,
-                          border: "1px solid rgba(255,255,255,.2)",
+                          border: "1px solid rgba(34,29,22,.2)",
                           flexShrink: 0,
                         }}
                       />

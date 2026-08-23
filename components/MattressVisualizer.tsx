@@ -119,7 +119,7 @@ export default function MattressVisualizer({
             <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="sofa-blueprint-svg">
               <defs>
                 <pattern id="mattress-grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(201, 168, 76, 0.05)" strokeWidth="1" />
+                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(201, 168, 76, 0.14)" strokeWidth="1" />
                 </pattern>
                 <pattern id="quilt-pattern" width="24" height="24" patternUnits="userSpaceOnUse">
                   <path d="M 0 12 L 12 0 L 24 12 L 12 24 Z" fill="none" stroke="rgba(201, 168, 76, 0.15)" strokeWidth="0.8" />
@@ -136,7 +136,7 @@ export default function MattressVisualizer({
                   <stop offset="100%" stopColor="#0b0d18" stopOpacity="0.9" />
                 </linearGradient>
                 <filter id="mattressShadow" x="-15%" y="-15%" width="130%" height="130%">
-                  <feDropShadow dx="0" dy="12" stdDeviation="12" floodColor="#000000" floodOpacity="0.6" />
+                  <feDropShadow dx="0" dy="12" stdDeviation="12" floodColor="#000000" floodOpacity="0.25" />
                 </filter>
               </defs>
 
@@ -148,14 +148,14 @@ export default function MattressVisualizer({
                 {/* Width badge (top right) */}
                 <g transform={`translate(${svgWidth - 90}, 45)`}>
                   <rect x="-42" y="-12" width="84" height="24" rx="12" fill="#13162a" stroke="#c9a84c" strokeWidth="1.2" />
-                  <text x="0" y="4" textAnchor="middle" fill="#e8c96a" fontSize="11.5" fontWeight="700" fontFamily="'DM Sans', sans-serif">
+                  <text x="0" y="4" textAnchor="middle" fill="#e8c96a" fontSize="11.5" fontWeight="700" fontFamily="'Inter', sans-serif">
                     {Math.round(width * 100)} cm Wide
                   </text>
                 </g>
                 {/* Length badge (top left) */}
                 <g transform={`translate(90, 45)`}>
                   <rect x="-42" y="-12" width="84" height="24" rx="12" fill="#13162a" stroke="#c9a84c" strokeWidth="1.2" />
-                  <text x="0" y="4" textAnchor="middle" fill="#e8c96a" fontSize="11.5" fontWeight="700" fontFamily="'DM Sans', sans-serif">
+                  <text x="0" y="4" textAnchor="middle" fill="#e8c96a" fontSize="11.5" fontWeight="700" fontFamily="'Inter', sans-serif">
                     {Math.round(length * 100)} cm Long
                   </text>
                 </g>
@@ -176,7 +176,7 @@ export default function MattressVisualizer({
               {/* Floating Feature Tags */}
               <g transform={`translate(${centerX}, ${centerY + 105})`}>
                 <rect x="-140" y="-14" width="280" height="28" rx="14" fill="#13162a" stroke="rgba(201, 168, 76, 0.5)" strokeWidth="1.2" />
-                <text x="0" y="4" textAnchor="middle" fill="#e8e2d6" fontSize="11" fontWeight="600" fontFamily="'DM Sans', sans-serif">
+                <text x="0" y="4" textAnchor="middle" fill="#e8e2d6" fontSize="11" fontWeight="600" fontFamily="'Inter', sans-serif">
                   {thicknessCm} cm Depth · {firmnessLabel} · {coreLabel}
                 </text>
               </g>

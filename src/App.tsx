@@ -51,40 +51,43 @@ function ShopPage() {
           <div className="testimonials-grid">
             <div className="testimonial-card">
               <div className="testimonial-quote">"</div>
+              <div className="testimonial-stars" aria-label="Rated 5 out of 5">★★★★★</div>
               <p className="testimonial-text">
                 The Moroccan salon we ordered is absolutely stunning. The quality of the fabric and the wood craftsmanship is exceptional. Delivered on time and perfectly fitted. شكراً جزيلاً!
               </p>
               <div className="testimonial-author">
+                <div className="testimonial-avatar">FB</div>
                 <div>
                   <div className="testimonial-name">Fatima B.</div>
                   <div className="testimonial-role">Tanger, Morocco</div>
-                  <div className="testimonial-stars">★★★★★</div>
                 </div>
               </div>
             </div>
             <div className="testimonial-card">
               <div className="testimonial-quote">"</div>
+              <div className="testimonial-stars" aria-label="Rated 5 out of 5">★★★★★</div>
               <p className="testimonial-text">
                 I bought the Ortho Comfort mattress and it completely changed my sleep. After years of back pain, I finally wake up refreshed. Highly recommend مفروشات عبداللطيف.
               </p>
               <div className="testimonial-author">
+                <div className="testimonial-avatar">KM</div>
                 <div>
                   <div className="testimonial-name">Karim M.</div>
                   <div className="testimonial-role">Tetouan, Morocco</div>
-                  <div className="testimonial-stars">★★★★★</div>
                 </div>
               </div>
             </div>
             <div className="testimonial-card">
               <div className="testimonial-quote">"</div>
+              <div className="testimonial-stars" aria-label="Rated 5 out of 5">★★★★★</div>
               <p className="testimonial-text">
                 Best furniture shop in Tanger without a doubt. The team was helpful on WhatsApp from day one and helped me choose the perfect salon for my living room. Very professional!
               </p>
               <div className="testimonial-author">
+                <div className="testimonial-avatar">NH</div>
                 <div>
                   <div className="testimonial-name">Nadia H.</div>
                   <div className="testimonial-role">Sidi Deris, Tanger</div>
-                  <div className="testimonial-stars">★★★★★</div>
                 </div>
               </div>
             </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo, useRef, useCallback } from "react"
+import { useState, useEffect, useMemo, useRef } from "react"
 import {
   Product,
   upholsteryStyles,
@@ -23,17 +23,6 @@ import MattressVisualizer from "./MattressVisualizer"
 import ChairVisualizer from "./ChairVisualizer"
 import AccessoryVisualizer from "./AccessoryVisualizer"
 
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false)
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768)
-    check()
-    window.addEventListener("resize", check)
-    return () => window.removeEventListener("resize", check)
-  }, [])
-  return isMobile
-}
-
 interface ProductModalProps {
   product: Product | null
   onClose: () => void
@@ -45,21 +34,6 @@ function renderStars(rating: number): string {
 
 export default function ProductModal({ product, onClose }: ProductModalProps) {
   const { addItem, toggleCart, showToast } = useCart()
-  const isMobile = useIsMobile()
-  const modalBodyRef = useRef<HTMLDivElement>(null)
-  const touchStartY = useRef(0)
-
-  // Swipe-down to close on mobile
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    touchStartY.current = e.touches[0].clientY
-  }, [])
-
-  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
-    const deltaY = e.changedTouches[0].clientY - touchStartY.current
-    if (deltaY > 100 && modalBodyRef.current && modalBodyRef.current.scrollTop <= 0) {
-      onClose()
-    }
-  }, [onClose])
 
   // Common options
   const [selectedColorIdx, setSelectedColorIdx] = useState(0)
@@ -342,11 +316,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
       aria-modal="true"
       aria-label={`Product configurator for ${product.name}`}
     >
-      <div
-        className="modal modal-sofa-wide"
-        onTouchStart={isMobile ? handleTouchStart : undefined}
-        onTouchEnd={isMobile ? handleTouchEnd : undefined}
-      >
+      <div className="modal modal-sofa-wide">
         <div className="modal-inner">
           {/* Left Column: Interactive Vector Visualizer */}
           <div className="modal-img-col">
@@ -435,7 +405,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
           </div>
 
           {/* Right Column: Customization Controls & Live Summary */}
-          <div className="modal-body" ref={modalBodyRef}>
+          <div className="modal-body">
             <button className="modal-close" onClick={onClose} aria-label="Close configurator">
               ✕
             </button>
@@ -471,36 +441,6 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
             {/* ───────────────── 1. SOFA CONFIGURATION CONTROLS ───────────────── */}
             {configType === "sofa" && (
               <>
-                <div className="sofa-base-info-banner">
-                  <div className="base-info-header">
-                    <span className="base-icon">📐</span>
-                    <span className="base-title">Reference Base Model</span>
-                  </div>
-                  <div className="base-info-grid">
-                    <div className="base-info-item">
-                      <span className="base-lbl">Standard Dimensions:</span>
-                      <span className="base-val">
-                        {(product.config as SofaConfig).baseLength1.toFixed(2)} m ×{" "}
-                        {(product.config as SofaConfig).baseLength2.toFixed(2)} m
-                      </span>
-                    </div>
-                    <div className="base-info-item">
-                      <span className="base-lbl">Base Seat Module:</span>
-                      <span className="base-val">{(product.config as SofaConfig).defaultSeatSize} cm</span>
-                    </div>
-                    <div className="base-info-item">
-                      <span className="base-lbl">Starting Price:</span>
-                      <span className="base-val gold">3,000 DH</span>
-                    </div>
-                    <div className="base-info-item">
-                      <span className="base-lbl">Current Rate / Meter:</span>
-                      <span className="base-val gold">
-                        {(product.config as SofaConfig).seatPricing[seatSize].pricePerMeter.toLocaleString()} DH / m
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
                 {/* Seat Size Selector */}
                 <div className="custom-section">
                   <div className="custom-section-header">
@@ -966,6 +906,39 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                     </option>
                   ))}
                 </select>
+              </div>
+            )}
+
+            {/* ───────────────── SOFA: REFERENCE BASE MODEL ───────────────── */}
+            {configType === "sofa" && (
+              <div className="sofa-base-info-banner">
+                <div className="base-info-header">
+                  <span className="base-icon">📐</span>
+                  <span className="base-title">Reference Base Model</span>
+                </div>
+                <div className="base-info-grid">
+                  <div className="base-info-item">
+                    <span className="base-lbl">Standard Dimensions:</span>
+                    <span className="base-val">
+                      {(product.config as SofaConfig).baseLength1.toFixed(2)} m ×{" "}
+                      {(product.config as SofaConfig).baseLength2.toFixed(2)} m
+                    </span>
+                  </div>
+                  <div className="base-info-item">
+                    <span className="base-lbl">Base Seat Module:</span>
+                    <span className="base-val">{(product.config as SofaConfig).defaultSeatSize} cm</span>
+                  </div>
+                  <div className="base-info-item">
+                    <span className="base-lbl">Starting Price:</span>
+                    <span className="base-val gold">3,000 DH</span>
+                  </div>
+                  <div className="base-info-item">
+                    <span className="base-lbl">Current Rate / Meter:</span>
+                    <span className="base-val gold">
+                      {(product.config as SofaConfig).seatPricing[seatSize].pricePerMeter.toLocaleString()} DH / m
+                    </span>
+                  </div>
+                </div>
               </div>
             )}
 

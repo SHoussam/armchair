@@ -110,7 +110,7 @@ export default function ChairVisualizer({
             <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="sofa-blueprint-svg">
               <defs>
                 <pattern id="chair-grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(201, 168, 76, 0.05)" strokeWidth="1" />
+                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(201, 168, 76, 0.14)" strokeWidth="1" />
                 </pattern>
                 <linearGradient id="chairFabricGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor={colorHex} stopOpacity="0.95" />
@@ -122,7 +122,7 @@ export default function ChairVisualizer({
                   <stop offset="100%" stopColor="#1a1a1a" stopOpacity="0.7" />
                 </linearGradient>
                 <filter id="chairShadow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feDropShadow dx="0" dy="10" stdDeviation="12" floodColor="#000000" floodOpacity="0.6" />
+                  <feDropShadow dx="0" dy="10" stdDeviation="12" floodColor="#000000" floodOpacity="0.25" />
                 </filter>
               </defs>
 
@@ -144,7 +144,7 @@ export default function ChairVisualizer({
 
                 <g transform={`translate(${cX}, ${backTop - 25})`}>
                   <rect x="-44" y="-13" width="88" height="26" rx="13" fill="#13162a" stroke="#c9a84c" strokeWidth="1.2" />
-                  <text x="0" y="4" textAnchor="middle" fill="#e8c96a" fontSize="12" fontWeight="700" fontFamily="'DM Sans', sans-serif">
+                  <text x="0" y="4" textAnchor="middle" fill="#e8c96a" fontSize="12" fontWeight="700" fontFamily="'Inter', sans-serif">
                     {Math.round(width * 100)} cm Width
                   </text>
                 </g>

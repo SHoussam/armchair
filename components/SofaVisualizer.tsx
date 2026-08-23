@@ -132,7 +132,7 @@ export default function SofaVisualizer({
               <defs>
                 {/* Blueprint grid background */}
                 <pattern id="blueprint-grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(201, 168, 76, 0.05)" strokeWidth="1" />
+                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(201, 168, 76, 0.14)" strokeWidth="1" />
                 </pattern>
 
                 {/* Fabric gradient fill */}
@@ -157,7 +157,7 @@ export default function SofaVisualizer({
 
                 {/* Soft shadow filter */}
                 <filter id="sofaShadow" x="-10%" y="-10%" width="130%" height="130%">
-                  <feDropShadow dx="0" dy="8" stdDeviation="10" floodColor="#000000" floodOpacity="0.55" />
+                  <feDropShadow dx="0" dy="8" stdDeviation="10" floodColor="#000000" floodOpacity="0.25" />
                   <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#c9a84c" floodOpacity="0.15" />
                 </filter>
                 <filter id="headrestShadow" x="-20%" y="-20%" width="140%" height="140%">
@@ -217,7 +217,7 @@ export default function SofaVisualizer({
                     fill="#e8c96a"
                     fontSize="12.5"
                     fontWeight="700"
-                    fontFamily="'DM Sans', sans-serif"
+                    fontFamily="'Inter', sans-serif"
                   >
                     {length1.toFixed(2)} m
                   </text>
@@ -276,7 +276,7 @@ export default function SofaVisualizer({
                         fill="#e8c96a"
                         fontSize="12.5"
                         fontWeight="700"
-                        fontFamily="'DM Sans', sans-serif"
+                        fontFamily="'Inter', sans-serif"
                       >
                         {length2.toFixed(2)} m
                       </text>
@@ -331,7 +331,7 @@ export default function SofaVisualizer({
                         fill="#e8c96a"
                         fontSize="12.5"
                         fontWeight="700"
-                        fontFamily="'DM Sans', sans-serif"
+                        fontFamily="'Inter', sans-serif"
                       >
                         {length2.toFixed(2)} m
                       </text>
@@ -606,7 +606,7 @@ export default function SofaVisualizer({
                     fill="#8a8aa8"
                     fontSize="10"
                     fontWeight="600"
-                    fontFamily="'DM Sans', sans-serif"
+                    fontFamily="'Inter', sans-serif"
                   >
                     {seatSize} cm seat
                   </text>

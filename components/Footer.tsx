@@ -71,7 +71,7 @@ export default function Footer() {
               </a>
             </li>
             <li>
-              <a href="https://wa.me/212666896776" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "8px", color: "#25D366" }}>
+              <a href="https://wa.me/212666896776" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--wa)" }}>
                 <MessageCircle size={13} /> WhatsApp
               </a>
             </li>
