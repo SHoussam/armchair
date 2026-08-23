@@ -39,7 +39,7 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
       <nav className={scrolled ? "scrolled" : ""}>
         <a href="#" className="nav-logo" aria-label="عبداللطيف مفروشات home">
           <span className="nav-logo-text">
-            عبداللطيف <strong>مفروشات</strong>
+             مفروشات <strong>عبد اللطيف</strong>
           </span>
         </a>
 
