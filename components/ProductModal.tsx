@@ -18,10 +18,10 @@ import {
   calculateAccessoryPrice,
   formatPriceDH,
 } from "@/src/utils/pricing"
-import SofaVisualizer from "./SofaVisualizer"
-import MattressVisualizer from "./MattressVisualizer"
-import ChairVisualizer from "./ChairVisualizer"
-import AccessoryVisualizer from "./AccessoryVisualizer"
+import SofaVisualizer from "./SVG/SofaVisualizer"
+import MattressVisualizer from "./SVG/MattressVisualizer"
+import ChairVisualizer from "./SVG/ChairVisualizer"
+import AccessoryVisualizer from "./SVG/AccessoryVisualizer"
 
 interface ProductModalProps {
   product: Product | null
@@ -308,6 +308,23 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
 
   const configType = product.config.type
 
+  // Build summary text for sticky bar
+  const summaryText = useMemo(() => {
+    if (configType === "sofa") {
+      return `${seatSize} cm · ${sofaL1.toFixed(2)} m × ${sofaL2.toFixed(2)} m · ${chaiseOrientation === "left" ? "Left" : "Right"} Chaise · ${headrests} Headrest${headrests !== 1 ? "s" : ""}`
+    }
+    if (configType === "mattress" && mattressPricing) {
+      return `${mattressPricing.sizeLabel} · ${mattressPricing.thicknessLabel}`
+    }
+    if (configType === "chair") {
+      return `${Math.round(chairWidth * 100)} cm · ${chairPricing?.legLabel || ""} · ${chairPricing?.tuftingLabel || ""}`
+    }
+    if (configType === "accessory" && accessoryPricing) {
+      return `${accessoryPricing.packLabel} · ${accessoryPricing.sizeLabel} · ${accessoryPricing.fillLabel}`
+    }
+    return ""
+  }, [configType, seatSize, sofaL1, sofaL2, chaiseOrientation, headrests, mattressPricing, chairWidth, chairPricing, accessoryPricing])
+
   return (
     <div
       className={`modal-overlay ${product ? "open" : ""}`}
@@ -404,15 +421,16 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
             )}
           </div>
 
-          {/* Right Column: Customization Controls & Live Summary */}
+          {/* Right Column: Configuration Controls */}
           <div className="modal-body">
             <button className="modal-close" onClick={onClose} aria-label="Close configurator">
               ✕
             </button>
 
+            {/* ── Header ── */}
             <div className="modal-category-row">
               <span className="modal-category">{product.category}</span>
-              <span className="modal-badge-custom">Bespoke Configurator</span>
+              <span className="modal-badge-custom">Bespoke</span>
             </div>
 
             <h2 className="modal-name">{product.name}</h2>
@@ -420,34 +438,34 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
             <div className="modal-stars">
               {renderStars(product.rating)}{" "}
               <span>
-                {product.rating} ({product.reviews} reviews)
+                {product.rating} · {product.reviews} reviews
               </span>
             </div>
 
-            {/* Price Header */}
             <div className="modal-price-row">
               <span className="modal-price">{formatPriceDH(currentUnitPrice)}</span>
               <span className="modal-price-tag">
                 {configType === "sofa" && sofaPricing &&
                   (sofaPricing.extraMeters > 0
-                    ? `Base ${formatPriceDH(sofaPricing.basePrice)} + ${formatPriceDH(sofaPricing.dimensionSupplement)} extra`
-                    : `Base for ${seatSize} cm modules`)}
-                {configType === "mattress" && mattressPricing && `${mattressPricing.sizeLabel}`}
-                {configType === "chair" && `${Math.round(chairWidth * 100)} cm wide with custom legs`}
-                {configType === "accessory" && accessoryPricing && `${accessoryPricing.packLabel}`}
+                    ? `Base ${formatPriceDH(sofaPricing.basePrice)} + extras`
+                    : `Starting price · ${seatSize} cm module`)}
+                {configType === "mattress" && mattressPricing && mattressPricing.sizeLabel}
+                {configType === "chair" && `${Math.round(chairWidth * 100)} cm wide`}
+                {configType === "accessory" && accessoryPricing && accessoryPricing.packLabel}
               </span>
             </div>
 
-            {/* ───────────────── 1. SOFA CONFIGURATION CONTROLS ───────────────── */}
+            {/* ───────────────── SOFA CONFIGURATION ───────────────── */}
             {configType === "sofa" && (
               <>
-                {/* Seat Size Selector */}
-                <div className="custom-section">
-                  <div className="custom-section-header">
-                    <div className="modal-label">
-                      1. Seat Module Size — <span className="highlight-gold">{seatSize} cm</span>
+                {/* Step 1: Module Size */}
+                <div className="config-step">
+                  <div className="config-step-header">
+                    <div>
+                      <span className="config-step-number">01</span>
+                      <h3 className="config-step-title">Module Size</h3>
+                      <p className="config-step-desc">Determines the starting price and per-meter rate.</p>
                     </div>
-                    <span className="sub-helper">Dictates base price & rate / extra meter</span>
                   </div>
                   <div className="seat-size-grid">
                     {([70, 80, 90] as SeatSize[]).map((size) => {
@@ -462,9 +480,9 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                         >
                           <div className="seat-card-top">
                             <span className="seat-size-number">{tier.label}</span>
-                            {isSelected && <span className="seat-check">✓</span>}
+                            <span className="seat-check">✓</span>
                           </div>
-                          <div className="seat-card-base">Base: {tier.basePrice.toLocaleString()} DH</div>
+                          <div className="seat-card-base">{tier.basePrice.toLocaleString()} DH</div>
                           <div className="seat-card-rate">{tier.pricePerMeter.toLocaleString()} DH / m</div>
                         </button>
                       )
@@ -472,14 +490,17 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                   </div>
                 </div>
 
-                {/* Overall Dimensions */}
-                <div className="custom-section">
-                  <div className="custom-section-header">
-                    <div className="modal-label">
-                      2. Overall Dimensions —{" "}
-                      <span className="highlight-gold">
-                        {sofaL1.toFixed(2)} m × {sofaL2.toFixed(2)} m
-                      </span>
+                {/* Step 2: Dimensions */}
+                <div className="config-step">
+                  <div className="config-step-header">
+                    <div>
+                      <span className="config-step-number">02</span>
+                      <h3 className="config-step-title">
+                        Dimensions
+                        <span style={{ color: 'var(--gold)', fontWeight: 600, marginLeft: 8, fontSize: '.95rem' }}>
+                          {sofaL1.toFixed(2)} m × {sofaL2.toFixed(2)} m
+                        </span>
+                      </h3>
                     </div>
                     {(sofaL1 !== (product.config as SofaConfig).baseLength1 ||
                       sofaL2 !== (product.config as SofaConfig).baseLength2) && (
@@ -491,14 +512,14 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                           setSofaL2((product.config as SofaConfig).baseLength2)
                         }}
                       >
-                        ↺ Reset Base
+                        Reset
                       </button>
                     )}
                   </div>
 
                   <div className="dimension-control-row">
                     <div className="dim-header">
-                      <span className="dim-name">Horizontal Length (Top side)</span>
+                      <span className="dim-name">Horizontal Length</span>
                       <span className="dim-badge">{sofaL1.toFixed(2)} m</span>
                     </div>
                     <input
@@ -510,11 +531,15 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                       onChange={(e) => setSofaL1(Number(e.target.value))}
                       className="dimension-range-slider"
                     />
+                    <div className="dim-slider-ticks">
+                      <span>{(product.config as SofaConfig).minLength1.toFixed(2)} m</span>
+                      <span>{(product.config as SofaConfig).maxLength1.toFixed(2)} m</span>
+                    </div>
                   </div>
 
                   <div className="dimension-control-row">
                     <div className="dim-header">
-                      <span className="dim-name">Chaise / Vertical Length (Side)</span>
+                      <span className="dim-name">Chaise / Vertical Length</span>
                       <span className="dim-badge">{sofaL2.toFixed(2)} m</span>
                     </div>
                     <input
@@ -526,10 +551,25 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                       onChange={(e) => setSofaL2(Number(e.target.value))}
                       className="dimension-range-slider"
                     />
+                    <div className="dim-slider-ticks">
+                      <span>{(product.config as SofaConfig).minLength2.toFixed(2)} m</span>
+                      <span>{(product.config as SofaConfig).maxLength2.toFixed(2)} m</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 3: Configuration */}
+                <div className="config-step">
+                  <div className="config-step-header">
+                    <div>
+                      <span className="config-step-number">03</span>
+                      <h3 className="config-step-title">Configuration</h3>
+                      <p className="config-step-desc">Choose chaise orientation and headrest count.</p>
+                    </div>
                   </div>
 
                   <div className="orientation-selector-row">
-                    <span className="sub-label">Chaise Position:</span>
+                    <span className="sub-label">Chaise Position</span>
                     <div className="orientation-buttons">
                       <button
                         type="button"
@@ -547,45 +587,41 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                       </button>
                     </div>
                   </div>
-                </div>
 
-                {/* Headrests */}
-                <div className="custom-section">
-                  <div className="modal-label">
-                    3. Headrests (Appuis-tête) — <span className="highlight-gold">{headrests} Included</span>
-                  </div>
-                  <div className="headrest-btn-group">
-                    {[0, 1, 2, 3, 4].map((count) => (
-                      <button
-                        key={count}
-                        type="button"
-                        className={`headrest-pill ${headrests === count ? "active" : ""}`}
-                        onClick={() => setHeadrests(count)}
-                      >
-                        {count === 0 ? "None (0)" : `${count} Headrests`}
-                      </button>
-                    ))}
+                  <div style={{ marginTop: 16 }}>
+                    <span className="sub-label" style={{ display: 'block', marginBottom: 8 }}>Headrests</span>
+                    <div className="headrest-btn-group">
+                      {[0, 1, 2, 3, 4].map((count) => (
+                        <button
+                          key={count}
+                          type="button"
+                          className={`headrest-pill ${headrests === count ? "active" : ""}`}
+                          onClick={() => setHeadrests(count)}
+                        >
+                          {count === 0 ? "None" : count}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </>
             )}
 
-            {/* ───────────────── 2. MATTRESS CONFIGURATION CONTROLS ───────────────── */}
+            {/* ───────────────── MATTRESS CONFIGURATION ───────────────── */}
             {configType === "mattress" && mattressPricing && (
               <>
-                {/* Standard Sizes vs Custom */}
-                <div className="custom-section">
-                  <div className="custom-section-header">
-                    <div className="modal-label">
-                      1. Mattress Dimensions —{" "}
-                      <span className="highlight-gold">{mattressPricing.sizeLabel}</span>
+                <div className="config-step">
+                  <div className="config-step-header">
+                    <div>
+                      <span className="config-step-number">01</span>
+                      <h3 className="config-step-title">Dimensions</h3>
                     </div>
                     <button
                       type="button"
                       className="reset-dim-btn"
                       onClick={() => setIsCustomMattressSize(!isCustomMattressSize)}
                     >
-                      {isCustomMattressSize ? "Standard Sizes" : "⚙ Custom Dimensions"}
+                      {isCustomMattressSize ? "Standard" : "Custom"}
                     </button>
                   </div>
 
@@ -608,9 +644,9 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                               <span className="seat-size-number" style={{ fontSize: "0.85rem" }}>
                                 {s.label}
                               </span>
-                              {isSelected && <span className="seat-check">✓</span>}
+                              <span className="seat-check">✓</span>
                             </div>
-                            <div className="seat-card-base">Base: {s.basePrice.toLocaleString()} DH</div>
+                            <div className="seat-card-base">{s.basePrice.toLocaleString()} DH</div>
                           </button>
                         )
                       })}
@@ -619,7 +655,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                     <div className="custom-dim-panel">
                       <div className="dimension-control-row">
                         <div className="dim-header">
-                          <span className="dim-name">Width (Largeur)</span>
+                          <span className="dim-name">Width</span>
                           <span className="dim-badge">{Math.round(mattressWidth * 100)} cm</span>
                         </div>
                         <input
@@ -634,7 +670,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                       </div>
                       <div className="dimension-control-row">
                         <div className="dim-header">
-                          <span className="dim-name">Length (Longueur)</span>
+                          <span className="dim-name">Length</span>
                           <span className="dim-badge">{Math.round(mattressLength * 100)} cm</span>
                         </div>
                         <input
@@ -651,9 +687,13 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                   )}
                 </div>
 
-                {/* Thickness Profile */}
-                <div className="custom-section">
-                  <div className="modal-label">2. Height Profile & Depth</div>
+                <div className="config-step">
+                  <div className="config-step-header">
+                    <div>
+                      <span className="config-step-number">02</span>
+                      <h3 className="config-step-title">Height Profile</h3>
+                    </div>
+                  </div>
                   <div className="seat-size-grid">
                     {(product.config as MattressConfig).thicknessOptions.map((t) => {
                       const isSelected = mattressThicknessId === t.id
@@ -666,7 +706,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                         >
                           <div className="seat-card-top">
                             <span className="seat-size-number">{t.thicknessCm} cm</span>
-                            {isSelected && <span className="seat-check">✓</span>}
+                            <span className="seat-check">✓</span>
                           </div>
                           <div className="seat-card-rate">{t.label.split("—")[1] || "Standard"}</div>
                         </button>
@@ -675,9 +715,13 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                   </div>
                 </div>
 
-                {/* Core Support Technology */}
-                <div className="custom-section">
-                  <div className="modal-label">3. Core Support Layer</div>
+                <div className="config-step">
+                  <div className="config-step-header">
+                    <div>
+                      <span className="config-step-number">03</span>
+                      <h3 className="config-step-title">Core Support</h3>
+                    </div>
+                  </div>
                   <select
                     className="modal-select"
                     value={mattressCoreId}
@@ -691,9 +735,13 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                   </select>
                 </div>
 
-                {/* Firmness */}
-                <div className="custom-section">
-                  <div className="modal-label">4. Ergonomic Firmness Level</div>
+                <div className="config-step">
+                  <div className="config-step-header">
+                    <div>
+                      <span className="config-step-number">04</span>
+                      <h3 className="config-step-title">Firmness</h3>
+                    </div>
+                  </div>
                   <div className="headrest-btn-group">
                     {(product.config as MattressConfig).firmnessLevels.map((f) => (
                       <button
@@ -710,14 +758,19 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
               </>
             )}
 
-            {/* ───────────────── 3. ARMCHAIR CONFIGURATION CONTROLS ───────────────── */}
+            {/* ───────────────── CHAIR CONFIGURATION ───────────────── */}
             {configType === "chair" && (
               <>
-                <div className="custom-section">
-                  <div className="custom-section-header">
-                    <div className="modal-label">
-                      1. Custom Armchair Width —{" "}
-                      <span className="highlight-gold">{Math.round(chairWidth * 100)} cm</span>
+                <div className="config-step">
+                  <div className="config-step-header">
+                    <div>
+                      <span className="config-step-number">01</span>
+                      <h3 className="config-step-title">
+                        Width
+                        <span style={{ color: 'var(--gold)', fontWeight: 600, marginLeft: 8, fontSize: '.95rem' }}>
+                          {Math.round(chairWidth * 100)} cm
+                        </span>
+                      </h3>
                     </div>
                     {chairWidth !== (product.config as ChairConfig).baseWidth && (
                       <button
@@ -725,7 +778,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                         className="reset-dim-btn"
                         onClick={() => setChairWidth((product.config as ChairConfig).baseWidth)}
                       >
-                        ↺ Reset (85 cm)
+                        Reset
                       </button>
                     )}
                   </div>
@@ -740,18 +793,19 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                       className="dimension-range-slider"
                     />
                     <div className="dim-slider-ticks">
-                      <span>70 cm (Compact)</span>
-                      <span className="tick-base">85 cm (Standard)</span>
-                      <span>125 cm (Loveseat)</span>
+                      <span>70 cm</span>
+                      <span className="tick-base">85 cm</span>
+                      <span>125 cm</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Leg Finishes */}
-                <div className="custom-section">
-                  <div className="modal-label">
-                    2. Leg Material & Finish —{" "}
-                    <span className="highlight-gold">{chairPricing ? chairPricing.legLabel : ""}</span>
+                <div className="config-step">
+                  <div className="config-step-header">
+                    <div>
+                      <span className="config-step-number">02</span>
+                      <h3 className="config-step-title">Leg Finish</h3>
+                    </div>
                   </div>
                   <div className="seat-size-grid">
                     {(product.config as ChairConfig).legFinishes.map((leg) => {
@@ -774,7 +828,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                                 border: "1px solid rgba(255,255,255,0.3)",
                               }}
                             />
-                            {isSelected && <span className="seat-check">✓</span>}
+                            <span className="seat-check">✓</span>
                           </div>
                           <div className="seat-card-base">{leg.label}</div>
                           <div className="seat-card-rate">
@@ -786,9 +840,13 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                   </div>
                 </div>
 
-                {/* Tufting Style */}
-                <div className="custom-section">
-                  <div className="modal-label">3. Backrest Tufting Craftsmanship</div>
+                <div className="config-step">
+                  <div className="config-step-header">
+                    <div>
+                      <span className="config-step-number">03</span>
+                      <h3 className="config-step-title">Tufting</h3>
+                    </div>
+                  </div>
                   <div className="headrest-btn-group">
                     {(product.config as ChairConfig).tuftingStyles.map((t) => (
                       <button
@@ -805,12 +863,16 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
               </>
             )}
 
-            {/* ───────────────── 4. ACCESSORIES CONFIGURATION CONTROLS ───────────────── */}
+            {/* ───────────────── ACCESSORIES CONFIGURATION ───────────────── */}
             {configType === "accessory" && (
               <>
-                {/* Pack Options */}
-                <div className="custom-section">
-                  <div className="modal-label">1. Pack Quantity</div>
+                <div className="config-step">
+                  <div className="config-step-header">
+                    <div>
+                      <span className="config-step-number">01</span>
+                      <h3 className="config-step-title">Pack Quantity</h3>
+                    </div>
+                  </div>
                   <div className="seat-size-grid">
                     {(product.config as AccessoryConfig).packOptions.map((pack) => {
                       const isSelected = accessoryPackId === pack.id
@@ -823,7 +885,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                         >
                           <div className="seat-card-top">
                             <span className="seat-size-number">{pack.count} pcs</span>
-                            {isSelected && <span className="seat-check">✓</span>}
+                            <span className="seat-check">✓</span>
                           </div>
                           <div className="seat-card-base">{pack.label}</div>
                         </button>
@@ -832,9 +894,13 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                   </div>
                 </div>
 
-                {/* Size Options */}
-                <div className="custom-section">
-                  <div className="modal-label">2. Cushion Dimensions</div>
+                <div className="config-step">
+                  <div className="config-step-header">
+                    <div>
+                      <span className="config-step-number">02</span>
+                      <h3 className="config-step-title">Cushion Size</h3>
+                    </div>
+                  </div>
                   <div className="headrest-btn-group">
                     {(product.config as AccessoryConfig).sizeOptions.map((s) => (
                       <button
@@ -849,9 +915,13 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                   </div>
                 </div>
 
-                {/* Filling Options */}
-                <div className="custom-section">
-                  <div className="modal-label">3. Inner Core Filling</div>
+                <div className="config-step">
+                  <div className="config-step-header">
+                    <div>
+                      <span className="config-step-number">03</span>
+                      <h3 className="config-step-title">Filling</h3>
+                    </div>
+                  </div>
                   <select
                     className="modal-select"
                     value={accessoryFillId}
@@ -867,13 +937,22 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
               </>
             )}
 
-            {/* ───────────────── COMMON: COLOR SELECTION ───────────────── */}
-            <div className="custom-section">
-              <div className="modal-label">
-                Color & Finish —{" "}
-                <span className="modal-color-name">{product.colorNames[selectedColorIdx]}</span>
+            {/* ───────────────── COMMON: COLOR & MATERIAL ───────────────── */}
+            <div className="config-step">
+              <div className="config-step-header">
+                <div>
+                  <span className="config-step-number">
+                    {configType === "sofa" ? "04" : configType === "mattress" ? "05" : configType === "chair" ? "04" : "04"}
+                  </span>
+                  <h3 className="config-step-title">
+                    Color & Finish
+                    <span className="modal-color-name" style={{ marginLeft: 8 }}>
+                      {product.colorNames[selectedColorIdx]}
+                    </span>
+                  </h3>
+                </div>
               </div>
-              <div className="modal-colors" id="modalColors">
+              <div className="modal-colors">
                 {product.colors.map((hex, i) => (
                   <button
                     key={i}
@@ -888,239 +967,79 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
               </div>
             </div>
 
-            {/* Upholstery Grade (for Sofas, Chairs, Accessories) */}
+            {/* Upholstery Grade */}
             {configType !== "mattress" && (
-              <div className="custom-section">
-                <div className="modal-label">Upholstery Grade</div>
-                <select
-                  className="modal-select"
-                  value={selectedStyleId}
-                  onChange={(e) => setSelectedStyleId(e.target.value)}
-                >
-                  {upholsteryStyles.map((style) => (
-                    <option key={style.id} value={style.id}>
-                      {style.label}{" "}
-                      {style.multiplier > 1
-                        ? `(+${Math.round((style.multiplier - 1) * 100)}%)`
-                        : "(Standard Included)"}
-                    </option>
-                  ))}
-                </select>
+              <div className="config-step" style={{ borderBottom: 'none', marginBottom: 0, paddingBottom: 0 }}>
+                <div className="config-step-header">
+                  <div>
+                    <span className="config-step-number">
+                      {configType === "sofa" ? "05" : configType === "chair" ? "05" : "05"}
+                    </span>
+                    <h3 className="config-step-title">Upholstery Grade</h3>
+                  </div>
+                </div>
+                <div className="upholstery-grid">
+                  {upholsteryStyles.map((style) => {
+                    const isSelected = selectedStyleId === style.id
+                    return (
+                      <button
+                        key={style.id}
+                        type="button"
+                        className={`upholstery-card ${isSelected ? "selected" : ""}`}
+                        onClick={() => setSelectedStyleId(style.id)}
+                      >
+                        <span className="upholstery-label">{style.label}</span>
+                        <span className="upholstery-price">
+                          {style.multiplier > 1
+                            ? `+${Math.round((style.multiplier - 1) * 100)}%`
+                            : "Standard"}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
             )}
 
-            {/* ───────────────── SOFA: REFERENCE BASE MODEL ───────────────── */}
+            {/* ── Reference Base Info ── */}
             {configType === "sofa" && (
               <div className="sofa-base-info-banner">
                 <div className="base-info-header">
                   <span className="base-icon">📐</span>
-                  <span className="base-title">Reference Base Model</span>
+                  <span className="base-title">Reference Base</span>
                 </div>
                 <div className="base-info-grid">
                   <div className="base-info-item">
-                    <span className="base-lbl">Standard Dimensions:</span>
+                    <span className="base-lbl">Standard</span>
                     <span className="base-val">
                       {(product.config as SofaConfig).baseLength1.toFixed(2)} m ×{" "}
                       {(product.config as SofaConfig).baseLength2.toFixed(2)} m
                     </span>
                   </div>
                   <div className="base-info-item">
-                    <span className="base-lbl">Base Seat Module:</span>
-                    <span className="base-val">{(product.config as SofaConfig).defaultSeatSize} cm</span>
-                  </div>
-                  <div className="base-info-item">
-                    <span className="base-lbl">Starting Price:</span>
-                    <span className="base-val gold">3,000 DH</span>
-                  </div>
-                  <div className="base-info-item">
-                    <span className="base-lbl">Current Rate / Meter:</span>
+                    <span className="base-lbl">Starting from</span>
                     <span className="base-val gold">
-                      {(product.config as SofaConfig).seatPricing[seatSize].pricePerMeter.toLocaleString()} DH / m
+                      {formatPriceDH((product.config as SofaConfig).seatPricing[seatSize].basePrice)}
                     </span>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* ───────────────── LIVE PRICE BREAKDOWN SUMMARY CARD ───────────────── */}
-            <div className="price-summary-card">
-              <div className="price-summary-title">YOUR CONFIGURATION SUMMARY</div>
-              <div className="summary-details-list">
-                <div className="summary-row">
-                  <span className="sum-label">Product Model</span>
-                  <span className="sum-val">{product.name}</span>
-                </div>
-
-                {configType === "sofa" && sofaPricing && (
-                  <>
-                    <div className="summary-row">
-                      <span className="sum-label">Dimensions</span>
-                      <span className="sum-val">
-                        {sofaL1.toFixed(2)} m × {sofaL2.toFixed(2)} m
-                        {sofaPricing.extraMeters > 0 && (
-                          <span className="sum-extra-tag">
-                            {" "}
-                            (+{sofaPricing.extraMeters.toFixed(2)} m extra)
-                          </span>
-                        )}
-                      </span>
-                    </div>
-                    <div className="summary-row">
-                      <span className="sum-label">Seat Module</span>
-                      <span className="sum-val">{seatSize} cm</span>
-                    </div>
-                    <div className="summary-row">
-                      <span className="sum-label">Chaise Position</span>
-                      <span className="sum-val">
-                        {chaiseOrientation === "left" ? "Left Chaise" : "Right Chaise"}
-                      </span>
-                    </div>
-                    <div className="summary-row">
-                      <span className="sum-label">Headrests</span>
-                      <span className="sum-val">{headrests}</span>
-                    </div>
-                    <div className="summary-divider" />
-                    <div className="summary-row">
-                      <span className="sum-label">Base Price ({seatSize} cm)</span>
-                      <span className="sum-val">{formatPriceDH(sofaPricing.basePrice)}</span>
-                    </div>
-                    <div className="summary-row">
-                      <span className="sum-label">
-                        Dimension Extra ({sofaPricing.ratePerMeter} DH/m)
-                      </span>
-                      <span className="sum-val">
-                        {sofaPricing.dimensionSupplement > 0
-                          ? `+${formatPriceDH(sofaPricing.dimensionSupplement)}`
-                          : "0 DH (Included in base)"}
-                      </span>
-                    </div>
-                  </>
-                )}
-
-                {configType === "mattress" && mattressPricing && (
-                  <>
-                    <div className="summary-row">
-                      <span className="sum-label">Dimensions</span>
-                      <span className="sum-val">{mattressPricing.sizeLabel}</span>
-                    </div>
-                    <div className="summary-row">
-                      <span className="sum-label">Thickness</span>
-                      <span className="sum-val">{mattressPricing.thicknessLabel}</span>
-                    </div>
-                    <div className="summary-row">
-                      <span className="sum-label">Core Support</span>
-                      <span className="sum-val">{mattressPricing.coreLabel}</span>
-                    </div>
-                    <div className="summary-divider" />
-                    <div className="summary-row">
-                      <span className="sum-label">Base Size Price</span>
-                      <span className="sum-val">{formatPriceDH(mattressPricing.baseSizePrice)}</span>
-                    </div>
-                    {mattressPricing.thicknessSupplement > 0 && (
-                      <div className="summary-row">
-                        <span className="sum-label">Thickness Upgrade</span>
-                        <span className="sum-val">
-                          +{formatPriceDH(mattressPricing.thicknessSupplement)}
-                        </span>
-                      </div>
-                    )}
-                    {mattressPricing.coreSupplement > 0 && (
-                      <div className="summary-row">
-                        <span className="sum-label">Core Tech Upgrade</span>
-                        <span className="sum-val">+{formatPriceDH(mattressPricing.coreSupplement)}</span>
-                      </div>
-                    )}
-                  </>
-                )}
-
-                {configType === "chair" && chairPricing && (
-                  <>
-                    <div className="summary-row">
-                      <span className="sum-label">Width</span>
-                      <span className="sum-val">{Math.round(chairWidth * 100)} cm</span>
-                    </div>
-                    <div className="summary-row">
-                      <span className="sum-label">Leg Finish</span>
-                      <span className="sum-val">{chairPricing.legLabel}</span>
-                    </div>
-                    <div className="summary-row">
-                      <span className="sum-label">Tufting Craft</span>
-                      <span className="sum-val">{chairPricing.tuftingLabel}</span>
-                    </div>
-                    <div className="summary-divider" />
-                    <div className="summary-row">
-                      <span className="sum-label">Base Price (85 cm)</span>
-                      <span className="sum-val">{formatPriceDH(chairPricing.basePrice)}</span>
-                    </div>
-                    {chairPricing.widthSupplement > 0 && (
-                      <div className="summary-row">
-                        <span className="sum-label">Extra Width ({chairPricing.extraWidthCm} cm)</span>
-                        <span className="sum-val">+{formatPriceDH(chairPricing.widthSupplement)}</span>
-                      </div>
-                    )}
-                    {chairPricing.legSupplement > 0 && (
-                      <div className="summary-row">
-                        <span className="sum-label">Leg Finish Supplement</span>
-                        <span className="sum-val">+{formatPriceDH(chairPricing.legSupplement)}</span>
-                      </div>
-                    )}
-                    {chairPricing.tuftingSupplement > 0 && (
-                      <div className="summary-row">
-                        <span className="sum-label">Tufting Craft Supplement</span>
-                        <span className="sum-val">
-                          +{formatPriceDH(chairPricing.tuftingSupplement)}
-                        </span>
-                      </div>
-                    )}
-                  </>
-                )}
-
-                {configType === "accessory" && accessoryPricing && (
-                  <>
-                    <div className="summary-row">
-                      <span className="sum-label">Pack</span>
-                      <span className="sum-val">{accessoryPricing.packLabel}</span>
-                    </div>
-                    <div className="summary-row">
-                      <span className="sum-label">Size</span>
-                      <span className="sum-val">{accessoryPricing.sizeLabel}</span>
-                    </div>
-                    <div className="summary-row">
-                      <span className="sum-label">Filling</span>
-                      <span className="sum-val">{accessoryPricing.fillLabel}</span>
-                    </div>
-                    <div className="summary-divider" />
-                    <div className="summary-row">
-                      <span className="sum-label">Pack Base Price</span>
-                      <span className="sum-val">{formatPriceDH(accessoryPricing.packBasePrice)}</span>
-                    </div>
-                    {accessoryPricing.sizeSupplement > 0 && (
-                      <div className="summary-row">
-                        <span className="sum-label">Size Upgrade</span>
-                        <span className="sum-val">+{formatPriceDH(accessoryPricing.sizeSupplement)}</span>
-                      </div>
-                    )}
-                    {accessoryPricing.fillSupplement > 0 && (
-                      <div className="summary-row">
-                        <span className="sum-label">Fill Upgrade</span>
-                        <span className="sum-val">+{formatPriceDH(accessoryPricing.fillSupplement)}</span>
-                      </div>
-                    )}
-                  </>
-                )}
-
-                <div className="summary-divider" />
-
-                <div className="summary-row total-row">
-                  <span className="total-label">TOTAL CONFIGURATION</span>
-                  <span className="total-val">{formatPriceDH(currentUnitPrice)}</span>
-                </div>
+            {/* ── Sticky Summary Bar ── */}
+            <div className="sticky-summary-bar">
+              <div className="summary-bar-config">
+                <div className="summary-bar-title">Your Configuration</div>
+                <div className="summary-bar-details">{summaryText}</div>
+              </div>
+              <div className="summary-bar-actions">
+                <div className="summary-bar-price">{formatPriceDH(currentUnitPrice)}</div>
               </div>
             </div>
 
             {/* Quantity */}
             <div className="modal-qty-section">
-              <div className="modal-label">Quantity</div>
+              <div className="modal-label" style={{ marginBottom: 0 }}>Quantity</div>
               <div className="modal-qty">
                 <button
                   className="modal-qty-btn"
@@ -1146,7 +1065,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
             </button>
 
             <p className="modal-note">
-              Free delivery in Tanger on orders over 800 DH · Handcrafted to custom specifications
+              Free delivery on orders over 800 DH · Handcrafted to custom specifications
             </p>
           </div>
         </div>
