@@ -1021,47 +1021,42 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
               </div>
             )}
 
-            {/* Quantity */}
-            <div className="modal-qty-section">
-              <div className="modal-label" style={{ marginBottom: 0 }}>Quantity</div>
-              <div className="modal-qty">
-                <button
-                  className="modal-qty-btn"
-                  onClick={() => setQty(Math.max(1, qty - 1))}
-                  aria-label="Decrease quantity"
-                >
-                  −
-                </button>
-                <span className="modal-qty-val">{qty}</span>
-                <button
-                  className="modal-qty-btn"
-                  onClick={() => setQty(qty + 1)}
-                  aria-label="Increase quantity"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-
-            {/* Add to Cart */}
-            <button className="modal-add-btn" onClick={handleAddToCart}>
-              Add to Cart — {formatPriceDH(currentTotalPrice)}
-            </button>
-
             <p className="modal-note">
               Free delivery on orders over 800 DH · Handcrafted to custom specifications
             </p>
           </div>
         </div>
 
-        {/* Sticky Summary Bar — fixed at bottom of modal, outside scroll area */}
+        {/* Sticky Bottom Bar — config summary + quantity + CTA */}
         <div className="sticky-summary-bar">
-          <div className="summary-bar-config">
-            <div className="summary-bar-title">Your Configuration</div>
-            <div className="summary-bar-details">{summaryText}</div>
-          </div>
-          <div className="summary-bar-actions">
+          <div className="summary-bar-left">
+            <div className="summary-bar-config">
+              <div className="summary-bar-title">Your Configuration</div>
+              <div className="summary-bar-details">{summaryText}</div>
+            </div>
             <div className="summary-bar-price">{formatPriceDH(currentUnitPrice)}</div>
+          </div>
+          <div className="summary-bar-right">
+            <div className="summary-bar-qty">
+              <button
+                className="modal-qty-btn"
+                onClick={() => setQty(Math.max(1, qty - 1))}
+                aria-label="Decrease quantity"
+              >
+                −
+              </button>
+              <span className="modal-qty-val">{qty}</span>
+              <button
+                className="modal-qty-btn"
+                onClick={() => setQty(qty + 1)}
+                aria-label="Increase quantity"
+              >
+                +
+              </button>
+            </div>
+            <button className="modal-add-btn" onClick={handleAddToCart}>
+              Add to Cart — {formatPriceDH(currentTotalPrice)}
+            </button>
           </div>
         </div>
       </div>

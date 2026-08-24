@@ -1331,28 +1331,34 @@ footer {
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(255,255,255,.95);
+  background: rgba(255,255,255,.97);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-top: 1px solid var(--border-soft);
   border-radius: 0 0 24px 24px;
-  padding: 16px 32px;
+  padding: 14px 28px;
   z-index: 5;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
-.summary-bar-config {
+.summary-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
   flex: 1;
   min-width: 0;
 }
+.summary-bar-config {
+  min-width: 0;
+}
 .summary-bar-title {
-  font-size: .68rem; font-weight: 600; letter-spacing: 1.5px;
-  text-transform: uppercase; color: var(--fg-dim); margin-bottom: 4px;
+  font-size: .62rem; font-weight: 600; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--fg-dim); margin-bottom: 2px;
 }
 .summary-bar-details {
-  font-size: .82rem; color: var(--fg); font-weight: 500;
+  font-size: .78rem; color: var(--fg); font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1362,12 +1368,34 @@ footer {
 }
 .summary-bar-price {
   font-family: var(--font-display);
-  font-size: 1.5rem; font-weight: 700; color: var(--fg);
+  font-size: 1.35rem; font-weight: 700; color: var(--fg);
   white-space: nowrap;
-}
-.summary-bar-actions {
-  display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
   flex-shrink: 0;
+}
+.summary-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.summary-bar-qty {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.summary-bar-qty .modal-qty-btn {
+  width: 30px;
+  height: 30px;
+  font-size: .9rem;
+}
+.summary-bar-qty .modal-qty-val {
+  font-size: .9rem;
+  min-width: 22px;
+}
+.summary-bar-right .modal-add-btn {
+  padding: 12px 24px;
+  font-size: .8rem;
+  white-space: nowrap;
 }
 
 /* ── Price Summary Card (Refined) ── */
@@ -2261,10 +2289,27 @@ footer {
 
   /* Sticky summary bar */
   .sticky-summary-bar {
-    padding: 14px 16px;
+    padding: 12px 14px;
     flex-wrap: wrap;
     gap: 10px;
     border-radius: 0 0 20px 20px;
+  }
+  .summary-bar-left {
+    flex: 1 1 100%;
+    gap: 12px;
+  }
+  .summary-bar-config { flex: 1; min-width: 0; }
+  .summary-bar-details { font-size: .7rem; }
+  .summary-bar-price { font-size: 1.1rem; }
+  .summary-bar-right {
+    flex: 1 1 100%;
+    gap: 8px;
+  }
+  .summary-bar-qty { flex-shrink: 0; }
+  .summary-bar-right .modal-add-btn {
+    flex: 1;
+    padding: 12px 14px;
+    font-size: .78rem;
   }
   .summary-bar-details {
     font-size: .75rem;
