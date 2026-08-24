@@ -1021,17 +1021,6 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
               </div>
             )}
 
-            {/* ── Sticky Summary Bar ── */}
-            <div className="sticky-summary-bar">
-              <div className="summary-bar-config">
-                <div className="summary-bar-title">Your Configuration</div>
-                <div className="summary-bar-details">{summaryText}</div>
-              </div>
-              <div className="summary-bar-actions">
-                <div className="summary-bar-price">{formatPriceDH(currentUnitPrice)}</div>
-              </div>
-            </div>
-
             {/* Quantity */}
             <div className="modal-qty-section">
               <div className="modal-label" style={{ marginBottom: 0 }}>Quantity</div>
@@ -1062,6 +1051,17 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
             <p className="modal-note">
               Free delivery on orders over 800 DH · Handcrafted to custom specifications
             </p>
+          </div>
+        </div>
+
+        {/* Sticky Summary Bar — fixed at bottom of modal, outside scroll area */}
+        <div className="sticky-summary-bar">
+          <div className="summary-bar-config">
+            <div className="summary-bar-title">Your Configuration</div>
+            <div className="summary-bar-details">{summaryText}</div>
+          </div>
+          <div className="summary-bar-actions">
+            <div className="summary-bar-price">{formatPriceDH(currentUnitPrice)}</div>
           </div>
         </div>
       </div>
