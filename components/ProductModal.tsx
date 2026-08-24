@@ -48,6 +48,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
   const [sofaL2, setSofaL2] = useState(2.0)
   const [headrests, setHeadrests] = useState(2)
   const [chaiseOrientation, setChaiseOrientation] = useState<"left" | "right">("left")
+  const [armrests, setArmrests] = useState<"both" | "outer" | "none">("both")
 
   // Mattress State
   const [mattressSizeId, setMattressSizeId] = useState("queen_160_200")
@@ -85,6 +86,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
         setSofaL2(config.baseLength2 || 2.0)
         setHeadrests(config.defaultHeadrests ?? 2)
         setChaiseOrientation("left")
+        setArmrests("both")
       } else if (config.type === "mattress") {
         setMattressSizeId(config.defaultSizeId || config.sizes[0]?.id || "queen_160_200")
         setIsCustomMattressSize(false)
@@ -248,13 +250,13 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
   const summaryText = useMemo(() => {
     if (!configType) return ""
     if (configType === "sofa") {
-      return `${seatSize} cm · ${sofaL1.toFixed(2)} m × ${sofaL2.toFixed(2)} m · ${chaiseOrientation === "left" ? "Left" : "Right"} Chaise · ${headrests} Headrest${headrests !== 1 ? "s" : ""}`
+      return `${seatSize} cm · ${sofaL1.toFixed(2)} m × ${sofaL2.toFixed(2)} m · ${chaiseOrientation === "left" ? "Left" : "Right"} Chaise · ${headrests} Headrest${headrests !== 1 ? "s" : ""} · ${armrests === "both" ? "2 Armrests" : armrests === "outer" ? "Outer Armrest" : "No Armrests"}`
     }
     if (configType === "chair") {
       return `${Math.round(chairWidth * 100)} cm wide`
     }
     return ""
-  }, [configType, seatSize, sofaL1, sofaL2, chaiseOrientation, headrests, chairWidth])
+  }, [configType, seatSize, sofaL1, sofaL2, chaiseOrientation, headrests, armrests, chairWidth])
 
   if (!product || !pricingData) return null
 
@@ -341,6 +343,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                 colorName={product.colorNames[selectedColorIdx]}
                 headrests={headrests}
                 chaiseOrientation={chaiseOrientation}
+                armrests={armrests}
                 photoUrl={product.img}
                 photoAlt={product.imgAlt}
                 modelName={product.name}
@@ -596,6 +599,33 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                           {count === 0 ? "None" : count}
                         </button>
                       ))}
+                    </div>
+                  </div>
+
+                  <div style={{ marginTop: 16 }}>
+                    <span className="sub-label" style={{ display: 'block', marginBottom: 8 }}>Armrests</span>
+                    <div className="orientation-buttons">
+                      <button
+                        type="button"
+                        className={`orient-btn ${armrests === "both" ? "active" : ""}`}
+                        onClick={() => setArmrests("both")}
+                      >
+                        Both
+                      </button>
+                      <button
+                        type="button"
+                        className={`orient-btn ${armrests === "outer" ? "active" : ""}`}
+                        onClick={() => setArmrests("outer")}
+                      >
+                        Outer Only
+                      </button>
+                      <button
+                        type="button"
+                        className={`orient-btn ${armrests === "none" ? "active" : ""}`}
+                        onClick={() => setArmrests("none")}
+                      >
+                        None
+                      </button>
                     </div>
                   </div>
                 </div>
