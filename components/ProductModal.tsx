@@ -242,6 +242,20 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
     accessoryFillId,
   ])
 
+  const configType = product?.config?.type
+
+  // Build summary text for sticky bar (must be before any early return)
+  const summaryText = useMemo(() => {
+    if (!configType) return ""
+    if (configType === "sofa") {
+      return `${seatSize} cm · ${sofaL1.toFixed(2)} m × ${sofaL2.toFixed(2)} m · ${chaiseOrientation === "left" ? "Left" : "Right"} Chaise · ${headrests} Headrest${headrests !== 1 ? "s" : ""}`
+    }
+    if (configType === "chair") {
+      return `${Math.round(chairWidth * 100)} cm wide`
+    }
+    return ""
+  }, [configType, seatSize, sofaL1, sofaL2, chaiseOrientation, headrests, chairWidth])
+
   if (!product || !pricingData) return null
 
   const currentUnitPrice = pricingData.unitPrice
@@ -305,25 +319,6 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
   const handleBgClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) onClose()
   }
-
-  const configType = product.config.type
-
-  // Build summary text for sticky bar
-  const summaryText = useMemo(() => {
-    if (configType === "sofa") {
-      return `${seatSize} cm · ${sofaL1.toFixed(2)} m × ${sofaL2.toFixed(2)} m · ${chaiseOrientation === "left" ? "Left" : "Right"} Chaise · ${headrests} Headrest${headrests !== 1 ? "s" : ""}`
-    }
-    if (configType === "mattress" && mattressPricing) {
-      return `${mattressPricing.sizeLabel} · ${mattressPricing.thicknessLabel}`
-    }
-    if (configType === "chair") {
-      return `${Math.round(chairWidth * 100)} cm · ${chairPricing?.legLabel || ""} · ${chairPricing?.tuftingLabel || ""}`
-    }
-    if (configType === "accessory" && accessoryPricing) {
-      return `${accessoryPricing.packLabel} · ${accessoryPricing.sizeLabel} · ${accessoryPricing.fillLabel}`
-    }
-    return ""
-  }, [configType, seatSize, sofaL1, sofaL2, chaiseOrientation, headrests, mattressPricing, chairWidth, chairPricing, accessoryPricing])
 
   return (
     <div
