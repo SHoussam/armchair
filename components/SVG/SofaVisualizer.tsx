@@ -468,7 +468,7 @@ export default function SofaVisualizer({
                 {/* 7. Armrests */}
                 {armrests !== "none" && chaiseOrientation === "left" && (
                   <>
-                    {/* Right armrest (outer end) */}
+                    {/* Outer end of horizontal section (right side) */}
                     <rect
                       x={sofaH - armrestWidth} y={backrestThickness}
                       width={armrestWidth}
@@ -478,12 +478,13 @@ export default function SofaVisualizer({
                       stroke="rgba(201,168,76,0.2)"
                       strokeWidth="0.8"
                     />
-                    {/* Left armrest (chaise corner side) */}
+                    {/* Outer end of vertical chaise section (bottom) */}
                     {armrests === "both" && (
                       <rect
-                        x="0" y={backrestThickness}
-                        width={armrestWidth}
-                        height={seatDepthPx - backrestThickness + 3}
+                        x={backrestThickness}
+                        y={sofaV - armrestWidth}
+                        width={seatDepthPx - backrestThickness + 3}
+                        height={armrestWidth}
                         rx="4"
                         fill="rgba(0,0,0,0.3)"
                         stroke="rgba(201,168,76,0.2)"
@@ -494,7 +495,7 @@ export default function SofaVisualizer({
                 )}
                 {armrests !== "none" && chaiseOrientation === "right" && (
                   <>
-                    {/* Left armrest (outer end) */}
+                    {/* Outer end of horizontal section (left side) */}
                     <rect
                       x="0" y={backrestThickness}
                       width={armrestWidth}
@@ -504,12 +505,13 @@ export default function SofaVisualizer({
                       stroke="rgba(201,168,76,0.2)"
                       strokeWidth="0.8"
                     />
-                    {/* Right armrest (chaise corner side) */}
+                    {/* Outer end of vertical chaise section (bottom) */}
                     {armrests === "both" && (
                       <rect
-                        x={sofaH - armrestWidth} y={backrestThickness}
-                        width={armrestWidth}
-                        height={seatDepthPx - backrestThickness + 3}
+                        x={sofaH - seatDepthPx - 3}
+                        y={sofaV - armrestWidth}
+                        width={seatDepthPx - backrestThickness + 3}
+                        height={armrestWidth}
                         rx="4"
                         fill="rgba(0,0,0,0.3)"
                         stroke="rgba(201,168,76,0.2)"
