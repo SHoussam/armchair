@@ -370,12 +370,17 @@ export default function SofaVisualizer({
                   />
                 )}
 
-                {/* 4. Horizontal Seat Cushion — one rectangle */}
+                {/* 4. Horizontal Seat Cushion — ends before chaise */}
                 {(() => {
                   const rightArmrest = chaiseOrientation === "left" && armrestHorizontal
                   const leftArmrest = chaiseOrientation === "right" && armrestHorizontal
-                  const hStart = backrestThickness + 3 + (leftArmrest ? armrestWidth : 0)
-                  const hEnd = sofaH - 3 - (rightArmrest ? armrestWidth : 0)
+                  const hStart = chaiseOrientation === "left"
+                    ? seatDepthPx + 3
+                    : (leftArmrest ? armrestWidth + 3 : backrestThickness + 3)
+                  const hEnd = chaiseOrientation === "left"
+                    ? sofaH - 3 - (rightArmrest ? armrestWidth : 0)
+                    : sofaH - seatDepthPx - 3
+
                   return (
                     <rect
                       x={hStart}
@@ -400,7 +405,7 @@ export default function SofaVisualizer({
                       x={
                         chaiseOrientation === "left"
                           ? backrestThickness + 3
-                          : sofaH - seatDepthPx + 3
+                          : sofaH - seatDepthPx
                       }
                       y={vStartY}
                       width={seatDepthPx - backrestThickness - 3}

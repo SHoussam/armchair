@@ -1031,7 +1031,6 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
             {configType === "sofa" && (
               <div className="sofa-base-info-banner">
                 <div className="base-info-header">
-                  <span className="base-icon">📐</span>
                   <span className="base-title">Reference Base</span>
                 </div>
                 <div className="base-info-grid">

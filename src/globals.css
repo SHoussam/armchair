@@ -27,7 +27,7 @@
 
   /* Typography */
   --font-body:   'Inter', sans-serif;
-  --font-display: 'Playfair Display', Georgia, serif;
+  --font-display: 'Inter', sans-serif;
 
   /* Shadows */
   --shadow-sm:   0 2px 12px rgba(34,29,22,.06);
