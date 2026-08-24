@@ -61,16 +61,9 @@ export default function SofaVisualizer({
   // Dimensions in SVG pixels
   const sofaH = length1 * scale // Horizontal span
   const sofaV = length2 * scale // Vertical span
-  const seatDepthPx = (seatSize / 100) * scale * 1.05 // Visual seat cushion depth
+  const seatDepthPx = (seatSize / 100) * scale * 1.05 // Visual seat cushion depth (backrest to front)
   const backrestThickness = 24
   const armrestWidth = 20
-
-  // Calculate cushion segments
-  const horizontalSeatSpan = sofaH - (chaiseOrientation === "left" ? seatDepthPx : armrestWidth) - armrestWidth
-  const numHorizontalCushions = Math.max(2, Math.round(horizontalSeatSpan / ((seatSize / 100) * scale)))
-
-  const verticalChaiseSpan = sofaV - seatDepthPx
-  const numVerticalCushions = Math.max(1, Math.round(verticalChaiseSpan / ((seatSize / 100) * scale)))
 
   // SVG positioning offsets to center the sofa
   const offsetX = (svgWidth - sofaH) / 2 + 10
@@ -375,95 +368,37 @@ export default function SofaVisualizer({
                   />
                 )}
 
-                {/* 4. Horizontal Seat Cushions */}
-                {Array.from({ length: numHorizontalCushions }).map((_, idx) => {
-                  const cushionW = horizontalSeatSpan / numHorizontalCushions
-                  const cushionX =
+                {/* 4. Horizontal Seat Cushion — one rectangle */}
+                <rect
+                  x={chaiseOrientation === "left" ? seatDepthPx + 3 : armrestWidth + 3}
+                  y={backrestThickness + 3}
+                  width={
                     chaiseOrientation === "left"
-                      ? seatDepthPx + idx * cushionW
-                      : idx * cushionW
-                  const cushionY = backrestThickness + 3
-                  const cushionH = seatDepthPx - backrestThickness
+                      ? sofaH - seatDepthPx - armrestWidth - 3
+                      : sofaH - seatDepthPx - armrestWidth - 3
+                  }
+                  height={seatDepthPx - backrestThickness - 3}
+                  rx="5"
+                  fill="url(#cushionGrad)"
+                  stroke="rgba(255,255,255,0.12)"
+                  strokeWidth="0.8"
+                />
 
-                  return (
-                    <g key={`h-cushion-${idx}`}>
-                      <rect
-                        x={cushionX + 2} y={cushionY}
-                        width={cushionW - 4} height={cushionH}
-                        rx="5"
-                        fill="url(#cushionGrad)"
-                        stroke="rgba(255,255,255,0.12)"
-                        strokeWidth="0.8"
-                      />
-                      {/* Seam line */}
-                      <line
-                        x1={cushionX + (cushionW - 4) * 0.3}
-                        y1={cushionY + cushionH / 2}
-                        x2={cushionX + (cushionW - 4) * 0.7}
-                        y2={cushionY + cushionH / 2}
-                        stroke="rgba(0,0,0,0.2)"
-                        strokeWidth="0.8"
-                        strokeDasharray="2 2"
-                      />
-                    </g>
-                  )
-                })}
-
-                {/* 5. Chaise Vertical Seat Cushions */}
-                {Array.from({ length: numVerticalCushions }).map((_, idx) => {
-                  const cushionH = verticalChaiseSpan / numVerticalCushions
-                  const cushionY = seatDepthPx + idx * cushionH
-                  const cushionX =
+                {/* 5. Chaise Vertical Seat Cushion — one rectangle */}
+                <rect
+                  x={
                     chaiseOrientation === "left"
                       ? backrestThickness + 3
                       : sofaH - seatDepthPx + 3
-                  const cushionW = seatDepthPx - backrestThickness
-
-                  return (
-                    <g key={`v-cushion-${idx}`}>
-                      <rect
-                        x={cushionX} y={cushionY + 2}
-                        width={cushionW} height={cushionH - 4}
-                        rx="5"
-                        fill="url(#cushionGrad)"
-                        stroke="rgba(255,255,255,0.12)"
-                        strokeWidth="0.8"
-                      />
-                      <line
-                        x1={cushionX + cushionW / 2}
-                        y1={cushionY + (cushionH - 4) * 0.3}
-                        x2={cushionX + cushionW / 2}
-                        y2={cushionY + (cushionH - 4) * 0.7}
-                        stroke="rgba(0,0,0,0.2)"
-                        strokeWidth="0.8"
-                        strokeDasharray="2 2"
-                      />
-                    </g>
-                  )
-                })}
-
-                {/* 6. Corner Junction Cushion */}
-                {chaiseOrientation === "left" ? (
-                  <rect
-                    x={backrestThickness + 3} y={backrestThickness + 3}
-                    width={seatDepthPx - backrestThickness - 2}
-                    height={seatDepthPx - backrestThickness - 2}
-                    rx="5"
-                    fill="url(#cushionGrad)"
-                    stroke="rgba(255,255,255,0.12)"
-                    strokeWidth="0.8"
-                  />
-                ) : (
-                  <rect
-                    x={sofaH - seatDepthPx + 3} y={backrestThickness + 3}
-                    width={seatDepthPx - backrestThickness - 2}
-                    height={seatDepthPx - backrestThickness - 2}
-                    rx="5"
-                    fill="url(#cushionGrad)"
-                    stroke="rgba(255,255,255,0.12)"
-                    strokeWidth="0.8"
-                  />
-                )}
+                  }
+                  y={seatDepthPx + 3}
+                  width={seatDepthPx - backrestThickness - 3}
+                  height={sofaV - seatDepthPx - armrestWidth - 3}
+                  rx="5"
+                  fill="url(#cushionGrad)"
+                  stroke="rgba(255,255,255,0.12)"
+                  strokeWidth="0.8"
+                />
 
                 {/* 7. Armrests */}
                 {armrests !== "none" && chaiseOrientation === "left" && (
@@ -553,7 +488,7 @@ export default function SofaVisualizer({
                   </g>
                 )}
 
-                {/* 9. Seat Depth Badge Callout */}
+                {/* 6. Seat Depth Badge Callout */}
                 <g transform={`translate(${sofaH / 2}, ${seatDepthPx + 18})`}>
                   <rect
                     x="-30" y="-9"
@@ -570,7 +505,7 @@ export default function SofaVisualizer({
                     fontWeight="600"
                     fontFamily="'Inter', sans-serif"
                   >
-                    {seatSize} cm seat
+                    {seatSize} cm depth
                   </text>
                 </g>
               </g>
