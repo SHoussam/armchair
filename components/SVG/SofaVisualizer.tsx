@@ -378,8 +378,8 @@ export default function SofaVisualizer({
                     ? seatDepthPx + 3
                     : (leftArmrest ? armrestWidth + 3 : backrestThickness + 3)
                   const hEnd = chaiseOrientation === "left"
-                    ? sofaH - 3 - (rightArmrest ? armrestWidth : 0)
-                    : sofaH - seatDepthPx - 3
+                    ? sofaH - (rightArmrest ? armrestWidth + 3 : 3)
+                    : sofaH - seatDepthPx - (leftArmrest ? 3 : 0)
 
                   return (
                     <rect
