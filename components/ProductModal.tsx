@@ -48,7 +48,8 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
   const [sofaL2, setSofaL2] = useState(2.0)
   const [headrests, setHeadrests] = useState(2)
   const [chaiseOrientation, setChaiseOrientation] = useState<"left" | "right">("left")
-  const [armrests, setArmrests] = useState<"both" | "outer" | "none">("both")
+  const [armrestHorizontal, setArmrestHorizontal] = useState(true)
+  const [armrestChaise, setArmrestChaise] = useState(true)
 
   // Mattress State
   const [mattressSizeId, setMattressSizeId] = useState("queen_160_200")
@@ -86,7 +87,8 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
         setSofaL2(config.baseLength2 || 2.0)
         setHeadrests(config.defaultHeadrests ?? 2)
         setChaiseOrientation("left")
-        setArmrests("both")
+        setArmrestHorizontal(true)
+        setArmrestChaise(true)
       } else if (config.type === "mattress") {
         setMattressSizeId(config.defaultSizeId || config.sizes[0]?.id || "queen_160_200")
         setIsCustomMattressSize(false)
@@ -250,13 +252,16 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
   const summaryText = useMemo(() => {
     if (!configType) return ""
     if (configType === "sofa") {
-      return `${seatSize} cm · ${sofaL1.toFixed(2)} m × ${sofaL2.toFixed(2)} m · ${chaiseOrientation === "left" ? "Left" : "Right"} Chaise · ${headrests} Headrest${headrests !== 1 ? "s" : ""} · ${armrests === "both" ? "2 Armrests" : armrests === "outer" ? "Outer Armrest" : "No Armrests"}`
+      const ar = []
+      if (armrestHorizontal) ar.push("Horizontal End")
+      if (armrestChaise) ar.push("Chaise End")
+      return `${seatSize} cm · ${sofaL1.toFixed(2)} m × ${sofaL2.toFixed(2)} m · ${chaiseOrientation === "left" ? "Left" : "Right"} Chaise · ${headrests} Headrest${headrests !== 1 ? "s" : ""} · ${ar.length ? ar.join(" + ") : "No Armrests"}`
     }
     if (configType === "chair") {
       return `${Math.round(chairWidth * 100)} cm wide`
     }
     return ""
-  }, [configType, seatSize, sofaL1, sofaL2, chaiseOrientation, headrests, armrests, chairWidth])
+  }, [configType, seatSize, sofaL1, sofaL2, chaiseOrientation, headrests, armrestHorizontal, armrestChaise, chairWidth])
 
   if (!product || !pricingData) return null
 
@@ -343,7 +348,8 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                 colorName={product.colorNames[selectedColorIdx]}
                 headrests={headrests}
                 chaiseOrientation={chaiseOrientation}
-                armrests={armrests}
+                armrestHorizontal={armrestHorizontal}
+                armrestChaise={armrestChaise}
                 photoUrl={product.img}
                 photoAlt={product.imgAlt}
                 modelName={product.name}
@@ -604,27 +610,22 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
 
                   <div style={{ marginTop: 16 }}>
                     <span className="sub-label" style={{ display: 'block', marginBottom: 8 }}>Armrests</span>
-                    <div className="orientation-buttons">
+                    <div style={{ display: 'flex', gap: 10 }}>
                       <button
                         type="button"
-                        className={`orient-btn ${armrests === "both" ? "active" : ""}`}
-                        onClick={() => setArmrests("both")}
+                        className={`headrest-pill ${armrestHorizontal ? "active" : ""}`}
+                        onClick={() => setArmrestHorizontal(!armrestHorizontal)}
+                        style={{ flex: 1 }}
                       >
-                        Both
+                        {armrestHorizontal ? "✓ " : ""}Horizontal End
                       </button>
                       <button
                         type="button"
-                        className={`orient-btn ${armrests === "outer" ? "active" : ""}`}
-                        onClick={() => setArmrests("outer")}
+                        className={`headrest-pill ${armrestChaise ? "active" : ""}`}
+                        onClick={() => setArmrestChaise(!armrestChaise)}
+                        style={{ flex: 1 }}
                       >
-                        Outer Only
-                      </button>
-                      <button
-                        type="button"
-                        className={`orient-btn ${armrests === "none" ? "active" : ""}`}
-                        onClick={() => setArmrests("none")}
-                      >
-                        None
+                        {armrestChaise ? "✓ " : ""}Chaise End
                       </button>
                     </div>
                   </div>

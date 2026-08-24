@@ -11,7 +11,8 @@ interface SofaVisualizerProps {
   colorName: string
   headrests: number
   chaiseOrientation: "left" | "right"
-  armrests: "both" | "outer" | "none"
+  armrestHorizontal: boolean
+  armrestChaise: boolean
   photoUrl: string
   photoAlt: string
   modelName: string
@@ -33,7 +34,8 @@ export default function SofaVisualizer({
   colorName,
   headrests,
   chaiseOrientation,
-  armrests,
+  armrestHorizontal,
+  armrestChaise,
   photoUrl,
   photoAlt,
   modelName,
@@ -369,30 +371,28 @@ export default function SofaVisualizer({
                 )}
 
                 {/* 4. Horizontal Seat Cushion — one rectangle */}
-                <rect
-                  x={
-                    chaiseOrientation === "left"
-                      ? backrestThickness + 3
-                      : (armrests !== "none" ? armrestWidth + 3 : backrestThickness + 3)
-                  }
-                  y={backrestThickness + 3}
-                  width={
-                    chaiseOrientation === "left"
-                      ? sofaH - backrestThickness - 3 - (armrests !== "none" ? armrestWidth : 0)
-                      : sofaH - backrestThickness - 3 - (armrests !== "none" ? armrestWidth : 0)
-                  }
-                  height={seatDepthPx - backrestThickness - 3}
-                  rx="5"
-                  fill="url(#cushionGrad)"
-                  stroke="rgba(255,255,255,0.12)"
-                  strokeWidth="0.8"
-                />
+                {(() => {
+                  const rightArmrest = chaiseOrientation === "left" && armrestHorizontal
+                  const leftArmrest = chaiseOrientation === "right" && armrestHorizontal
+                  const hStart = backrestThickness + 3 + (leftArmrest ? armrestWidth : 0)
+                  const hEnd = sofaH - 3 - (rightArmrest ? armrestWidth : 0)
+                  return (
+                    <rect
+                      x={hStart}
+                      y={backrestThickness + 3}
+                      width={hEnd - hStart}
+                      height={seatDepthPx - backrestThickness - 3}
+                      rx="5"
+                      fill="url(#cushionGrad)"
+                      stroke="rgba(255,255,255,0.12)"
+                      strokeWidth="0.8"
+                    />
+                  )
+                })()}
 
                 {/* 5. Chaise Vertical Seat Cushion — one rectangle */}
                 {(() => {
-                  const hasBottomArmrest =
-                    armrests === "both" ||
-                    (armrests === "outer" && chaiseOrientation === "left")
+                  const hasBottomArmrest = armrestChaise
                   const vCushionH = sofaV - seatDepthPx - 3 - (hasBottomArmrest ? armrestWidth : 0)
                   return (
                     <rect
@@ -412,60 +412,44 @@ export default function SofaVisualizer({
                   )
                 })()}
 
-                {/* 7. Armrests */}
-                {armrests !== "none" && chaiseOrientation === "left" && (
-                  <>
-                    {/* Outer end of horizontal section (right side) */}
-                    <rect
-                      x={sofaH - armrestWidth} y={backrestThickness}
-                      width={armrestWidth}
-                      height={seatDepthPx - backrestThickness + 3}
-                      rx="4"
-                      fill="rgba(0,0,0,0.3)"
-                      stroke="rgba(201,168,76,0.2)"
-                      strokeWidth="0.8"
-                    />
-                    {/* Outer end of vertical chaise section (bottom) */}
-                    {armrests === "both" && (
-                      <rect
-                        x={backrestThickness}
-                        y={sofaV - armrestWidth}
-                        width={seatDepthPx - backrestThickness + 3}
-                        height={armrestWidth}
-                        rx="4"
-                        fill="rgba(0,0,0,0.3)"
-                        stroke="rgba(201,168,76,0.2)"
-                        strokeWidth="0.8"
-                      />
-                    )}
-                  </>
+                {/* 6. Armrests */}
+                {chaiseOrientation === "left" && armrestHorizontal && (
+                  <rect
+                    x={sofaH - armrestWidth} y={backrestThickness}
+                    width={armrestWidth}
+                    height={seatDepthPx - backrestThickness + 3}
+                    rx="4"
+                    fill="rgba(0,0,0,0.3)"
+                    stroke="rgba(201,168,76,0.2)"
+                    strokeWidth="0.8"
+                  />
                 )}
-                {armrests !== "none" && chaiseOrientation === "right" && (
-                  <>
-                    {/* Outer end of horizontal section (left side) */}
-                    <rect
-                      x="0" y={backrestThickness}
-                      width={armrestWidth}
-                      height={seatDepthPx - backrestThickness + 3}
-                      rx="4"
-                      fill="rgba(0,0,0,0.3)"
-                      stroke="rgba(201,168,76,0.2)"
-                      strokeWidth="0.8"
-                    />
-                    {/* Outer end of vertical chaise section (bottom) */}
-                    {armrests === "both" && (
-                      <rect
-                        x={sofaH - seatDepthPx - 3}
-                        y={sofaV - armrestWidth}
-                        width={seatDepthPx - backrestThickness + 3}
-                        height={armrestWidth}
-                        rx="4"
-                        fill="rgba(0,0,0,0.3)"
-                        stroke="rgba(201,168,76,0.2)"
-                        strokeWidth="0.8"
-                      />
-                    )}
-                  </>
+                {chaiseOrientation === "right" && armrestHorizontal && (
+                  <rect
+                    x="0" y={backrestThickness}
+                    width={armrestWidth}
+                    height={seatDepthPx - backrestThickness + 3}
+                    rx="4"
+                    fill="rgba(0,0,0,0.3)"
+                    stroke="rgba(201,168,76,0.2)"
+                    strokeWidth="0.8"
+                  />
+                )}
+                {armrestChaise && (
+                  <rect
+                    x={
+                      chaiseOrientation === "left"
+                        ? backrestThickness
+                        : sofaH - seatDepthPx
+                    }
+                    y={sofaV - armrestWidth}
+                    width={seatDepthPx - backrestThickness + 3}
+                    height={armrestWidth}
+                    rx="4"
+                    fill="rgba(0,0,0,0.3)"
+                    stroke="rgba(201,168,76,0.2)"
+                    strokeWidth="0.8"
+                  />
                 )}
 
                 {/* 8. Headrests Rendering */}
