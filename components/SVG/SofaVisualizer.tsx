@@ -393,7 +393,8 @@ export default function SofaVisualizer({
                 {/* 5. Chaise Vertical Seat Cushion — one rectangle */}
                 {(() => {
                   const hasBottomArmrest = armrestChaise
-                  const vCushionH = sofaV - seatDepthPx - 3 - (hasBottomArmrest ? armrestWidth : 0)
+                  const vStartY = backrestThickness + 3
+                  const vCushionH = sofaV - vStartY - (hasBottomArmrest ? armrestWidth : 0)
                   return (
                     <rect
                       x={
@@ -401,7 +402,7 @@ export default function SofaVisualizer({
                           ? backrestThickness + 3
                           : sofaH - seatDepthPx + 3
                       }
-                      y={seatDepthPx + 3}
+                      y={vStartY}
                       width={seatDepthPx - backrestThickness - 3}
                       height={vCushionH}
                       rx="5"
