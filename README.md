@@ -68,7 +68,7 @@ Per-product-type configuration with **live price recalculation** powered by the 
 |---|---|
 | Framework | React 19 + TypeScript |
 | Build tool | Vite 7 |
-| Styling | Hand-written CSS (`src/globals.css`) — dark/gold design system with CSS variables; Tailwind v4 available via PostCSS |
+| Styling | Hand-written CSS (`src/globals.css`) — dark/gold design system with CSS variables; Tailwind v4 via PostCSS |
 | Icons | Lucide React + inline SVG |
 | UI primitives | Radix UI Slot, class-variance-authority, clsx, tailwind-merge |
 | State | React Context API + `useReducer` |
@@ -105,8 +105,14 @@ npm run lint
 
 ### Pricing engine tests
 
+The pricing test file is a self-contained TypeScript script. Run it with:
+
 ```bash
+# Option 1: Using tsx (if installed)
 npx tsx src/utils/pricing.test.ts
+
+# Option 2: Compile and run with Node
+npx tsc src/utils/pricing.test.ts --esModuleInterop --module commonjs --target ES2020 --outDir /tmp && node /tmp/pricing.test.js
 ```
 
 Runs the self-contained assertion suite covering the confirmed sofa/chair pricing cases (base prices, per-meter/per-cm supplements, fabric multipliers, base-price enforcement).
@@ -135,6 +141,9 @@ armchair-shop-website/
 ├── package.json                # Scripts & dependencies
 ├── .github/workflows/deploy.yml # GitHub Pages deploy workflow (push to main)
 ├── Specifications_Mobilier_Synthese.docx   # Functional specification (FR)
+├── way/                        # Additional spec documents (AR/FR)
+│   ├── Specifications_Mobilier_Consolide v2.docx
+│   └── Mowasafat_Mobilier_Version2_AR.docx
 ├── data/
 │   ├── data.ts                 # Source of truth: types, catalog, categories,
 │   │                           # upholstery multipliers, sofa/chair configs
@@ -150,14 +159,15 @@ armchair-shop-website/
 │   ├── ProductGrid.tsx         # Filters (tabs/searchable dropdown), sorting
 │   ├── ProductCard.tsx         # Card with colors, rating, wishlist, quick add
 │   ├── ProductModal.tsx        # Full configurator per product type
-│   ├── SofaVisualizer.tsx      # Live SVG preview (L-shape, seats, headrests…)
-│   ├── ChairVisualizer.tsx     # Live SVG preview (width, legs, tufting…)
-│   ├── MattressVisualizer.tsx  # Live SVG preview (ready for mattress SKUs)
-│   ├── AccessoryVisualizer.tsx # Live SVG preview (ready for accessory SKUs)
 │   ├── CartDrawer.tsx          # Slide-out cart with free-shipping progress
 │   ├── SearchBar.tsx           # Full-screen search overlay w/ live results
 │   ├── Footer.tsx              # Contact info, links, newsletter form
-│   └── Toast.tsx               # Notification system
+│   ├── Toast.tsx               # Notification system
+│   └── SVG/                    # Live SVG visualizers
+│       ├── SofaVisualizer.tsx      # L-shape proportions, seats, headrests, chaise
+│       ├── ChairVisualizer.tsx     # Width, leg finishes, tufting styles
+│       ├── MattressVisualizer.tsx  # Ready for mattress SKUs
+│       └── AccessoryVisualizer.tsx # Ready for accessory SKUs
 └── src/
     ├── main.tsx                # React entry point
     ├── App.tsx                 # Page composition + search/modal orchestration
