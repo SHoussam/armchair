@@ -4,7 +4,15 @@
     <link rel="icon" type="image/png" sizes="32x32" href="data\542094736_18306674428223104_4549775929201968607_n.jpg" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5" />
-    <meta name="theme-color" content="#FAF8F5" />
+    <meta name="theme-color" content="#FAF8F5" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)" />
+    <script>
+      (function() {
+        var stored = localStorage.getItem('theme');
+        var dark = stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (dark) document.documentElement.classList.add('dark');
+      })();
+    </script>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="format-detection" content="telephone=no" />
@@ -19,8 +27,8 @@
     <meta property="og:title" content="مفروشات عبداللطيف — Premium Moroccan Salons & Mattresses" />
     <meta property="og:description" content="Premium Moroccan salons, custom mattresses and furnishings. Based in Sidi Deris, Tanger. ☎ 0666 896 776" />
     <meta property="og:type" content="website" />
-    <script type="module" crossorigin src="/armchair/assets/index-QKfZ_A61.js"></script>
-    <link rel="stylesheet" crossorigin href="/armchair/assets/index-Sk20z6GJ.css">
+    <script type="module" crossorigin src="/armchair/assets/index-7iYdc9Om.js"></script>
+    <link rel="stylesheet" crossorigin href="/armchair/assets/index-DgwClqr-.css">
   </head>
   <body>
     <div id="root"></div>
