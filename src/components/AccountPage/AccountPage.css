@@ -1,0 +1,308 @@
+/* ── ACCOUNT PAGE & MODAL OVERLAY ── */
+.account-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(18, 14, 10, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 350;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5vh 2.5vw;
+  animation: fadeIn 0.25s var(--ease) both;
+}
+
+.account-modal {
+  background: var(--surface);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  max-height: 90dvh;
+  overflow-y: auto;
+  position: relative;
+  border: 1px solid rgba(176, 141, 62, 0.25);
+  box-shadow: 0 32px 80px rgba(22, 18, 12, 0.35);
+  animation: scaleIn 0.3s var(--ease) both;
+  display: flex;
+  flex-direction: column;
+}
+
+.account-modal::-webkit-scrollbar {
+  width: 5px;
+}
+.account-modal::-webkit-scrollbar-track {
+  background: transparent;
+}
+.account-modal::-webkit-scrollbar-thumb {
+  background: rgba(176, 141, 62, 0.25);
+  border-radius: 4px;
+}
+
+.account-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-soft);
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 2;
+}
+
+.account-title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--fg);
+  margin: 0;
+}
+
+.account-close {
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--fg-dim);
+  transition: all var(--duration-normal) var(--ease-premium);
+}
+
+.account-close:hover {
+  color: var(--gold);
+  border-color: var(--border);
+  background: var(--surface-3);
+  transform: rotate(90deg) scale(1.05);
+}
+
+.account-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  flex: 1;
+}
+
+/* Profile Card */
+.account-profile-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+}
+
+.account-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(176, 141, 62, 0.3);
+}
+
+.account-profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.account-profile-name {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--fg);
+  margin: 0;
+}
+
+.account-profile-detail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--fg-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Orders Section */
+.account-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.account-section-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--fg);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.account-orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.account-order-card {
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.account-order-card:hover {
+  border-color: rgba(176, 141, 62, 0.35);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.account-order-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.account-order-id {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--fg);
+  margin-right: 8px;
+}
+
+.account-order-date {
+  font-size: 0.8rem;
+  color: var(--fg-muted);
+}
+
+.account-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.account-order-items {
+  padding: 8px 0;
+  border-top: 1px dashed var(--border-soft);
+  border-bottom: 1px dashed var(--border-soft);
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.account-order-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--fg-dim);
+}
+
+.account-order-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.account-order-total {
+  font-size: 0.9rem;
+  color: var(--fg);
+}
+
+.account-order-total strong {
+  color: var(--gold);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.account-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid rgba(176, 141, 62, 0.35);
+  color: var(--gold);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.account-view-btn:hover {
+  background: rgba(176, 141, 62, 0.1);
+  border-color: var(--gold);
+}
+
+.account-empty {
+  text-align: center;
+  padding: 36px 20px;
+  color: var(--fg-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.account-empty p {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--fg);
+  margin: 4px 0 0;
+}
+
+.account-empty span {
+  font-size: 0.85rem;
+}
+
+.account-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-soft);
+  display: flex;
+  justify-content: flex-end;
+  background: var(--surface);
+  border-radius: 0 0 20px 20px;
+}
+
+.account-signout-btn {
+  background: transparent;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  color: #dc2626;
+  padding: 8px 18px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.account-signout-btn:hover {
+  background: rgba(220, 38, 38, 0.08);
+  border-color: #dc2626;
+}

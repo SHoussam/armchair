@@ -2,7 +2,26 @@ import {
   calculateSofaPrice,
   calculateChairPrice,
 } from "./pricing"
-import { products } from "../../data/data"
+
+const chairConfig = {
+  type: "chair" as const,
+  basePrice: 1800,
+  baseWidth: 0.85,
+  minWidth: 0.70,
+  maxWidth: 1.25,
+  ratePerCmExtra: 15,
+  legFinishes: [
+    { id: "natural_oak", label: "Solid Natural Oak", colorHex: "#b89060", supplement: 0 },
+    { id: "dark_walnut", label: "Carved Dark Walnut", colorHex: "#4a3020", supplement: 150 },
+    { id: "brass_gold", label: "Brushed Brass / Gold", colorHex: "#c9a84c", supplement: 250 },
+    { id: "matte_black", label: "Matte Black Steel", colorHex: "#1a1a1a", supplement: 100 },
+  ],
+  tuftingStyles: [
+    { id: "smooth", label: "Modern Smooth Surface", supplement: 0 },
+    { id: "channel", label: "Vertical Channel Stitching", supplement: 120 },
+    { id: "diamond", label: "Royal Diamond Button Tufting", supplement: 220 },
+  ],
+}
 
 function runTests() {
   console.log("==================================================")
@@ -90,14 +109,14 @@ function runTests() {
   // ─────────────────────────────────────────────
   console.log("\n--- 2. Armchair Pricing Tests ---")
 
-  const chair = products.find((p) => p.id === 2)!
-  if (chair.config.type === "chair") {
+  const chair = chairConfig
+  if (chair.type === "chair") {
     // Base armchair (85cm, Natural Oak, Smooth)
     const c1 = calculateChairPrice({
       width: 0.85,
       legFinishId: "natural_oak",
       tuftingStyleId: "smooth",
-      chairConfig: chair.config,
+      chairConfig: chair,
     })
     assert(
       c1.finalPrice === 1800 && c1.extraWidthCm === 0,
@@ -109,7 +128,7 @@ function runTests() {
       width: 1.05,
       legFinishId: "brass_gold",
       tuftingStyleId: "diamond",
-      chairConfig: chair.config,
+      chairConfig: chair,
     })
     // 1800 + 300 + 250 + 220 = 2570 DH
     assert(

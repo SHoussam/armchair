@@ -1,0 +1,19 @@
+/* ── SECTION HEADER ── */
+.section-header { text-align: center; margin-bottom: 56px; }
+.section-eyebrow {
+  font-size: .72rem; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--gold); font-weight: 600; margin-bottom: 14px;
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+}
+.section-eyebrow::before, .section-eyebrow::after {
+  content: ''; display: block; width: 40px; height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold));
+}
+.section-eyebrow::after {
+  background: linear-gradient(to left, transparent, var(--gold));
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 500; color: var(--fg);
+}
+.section-sub { color: var(--fg-muted); margin-top: 12px; font-size: .93rem; }

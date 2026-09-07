@@ -15,7 +15,7 @@ import {
   ChairConfig,
   AccessoryConfig,
   upholsteryStyles,
-} from "@/data/data"
+} from "@/data/types"
 
 export { type SeatSize }
 
@@ -242,6 +242,7 @@ export interface ChairPricingParams {
   legFinishId: string
   tuftingStyleId: string
   styleId?: string
+  fabricMultiplier?: number
   chairConfig: ChairConfig
 }
 
@@ -278,7 +279,7 @@ export function calculateChairPrice(params: ChairPricingParams): ChairPriceBreak
   const tuftingSupplement = tufting ? tufting.supplement : 0
 
   const fabricStyle = upholsteryStyles.find((s) => s.id === params.styleId) ?? upholsteryStyles[0]
-  const fabricMultiplier = fabricStyle ? fabricStyle.multiplier : 1.0
+  const fabricMultiplier = params.fabricMultiplier !== undefined ? params.fabricMultiplier : (fabricStyle ? fabricStyle.multiplier : 1.0)
 
   const preFabricTotal = basePrice + widthSupplement + legSupplement + tuftingSupplement
   const fabricSupplement = Number(
@@ -314,6 +315,7 @@ export interface AccessoryPricingParams {
   sizeId: string
   fillId: string
   styleId?: string
+  fabricMultiplier?: number
   accessoryConfig: AccessoryConfig
 }
 
@@ -348,7 +350,7 @@ export function calculateAccessoryPrice(params: AccessoryPricingParams): Accesso
   const fillSupplement = fill ? fill.supplement : 0
 
   const fabricStyle = upholsteryStyles.find((s) => s.id === params.styleId) ?? upholsteryStyles[0]
-  const fabricMultiplier = fabricStyle ? fabricStyle.multiplier : 1.0
+  const fabricMultiplier = params.fabricMultiplier !== undefined ? params.fabricMultiplier : (fabricStyle ? fabricStyle.multiplier : 1.0)
 
   const preFabricTotal = packBasePrice + sizeSupplement + fillSupplement
   const fabricSupplement = Number(

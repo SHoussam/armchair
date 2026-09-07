@@ -1,235 +1,184 @@
-# مفروشات عبداللطيف — Abdelatif Furnishings
+# Frontend — Abdelatif Furnishings Storefront
 
-A premium e-commerce storefront for a Moroccan furniture business based in **Sidi Deris, Tanger**, specializing in handcrafted salons, custom mattresses, and fine upholstery.
-
-> ☎ +212 666 896 776 · 💬 [WhatsApp](https://wa.me/212666896776) · 📍 Sidi Deris, Tanger 90000, Morocco
+React 19 + TypeScript + Vite 7 + Tailwind CSS v4 storefront for Abdelatif Furnishings (مفروشات عبداللطيف), featuring dynamic REST API integration, bespoke 2D vector configurators, live pricing calculations, Sanctum authentication, and order tracking.
 
 ---
 
-## 📋 About
-
-This project implements the customer-facing storefront described in `Specifications_Mobilier_Synthese.docx` — the functional specification for a made-to-measure furniture shop. Customers browse the collection, personalize products (dimensions, colors, upholstery style, options) with automatic price calculation, preview their configuration live, and place orders via WhatsApp / bank transfer (RIB provided by the business, confirmed manually by the administrator).
-
-**Current version:** storefront only (catalog, cart, real-time product configurator with live visualizers, search).
-**Roadmap (per spec):** customer accounts with order tracking, admin dashboard, production/delivery status pipeline, deposit-based payment flow.
-
----
-
-## ✨ Features
-
-### Catalog & Discovery
-- **Product grid** with responsive layout (1 column mobile → auto-fill desktop)
-- **Category filters** — All, Salon, Chair
-  - Desktop: pill-style tab buttons
-  - Mobile: searchable dropdown list (type-to-filter categories)
-- **Sorting** — Featured, Price low→high, Price high→low, Top rated
-- **Live search overlay** (`SearchBar`) matching name, category, and description with inline image results
-- Bilingual product data — English names + Arabic names (`nameAr`)
-- Ratings, review counts, sale/best-seller badges, old prices
-- **Focused catalog** — currently 2 flagship products (L-shaped salon + accent armchair), driven by a centralized, backend-ready config (`data/data.ts`, designed to be swapped for a single API call)
-
-### Product Configurator (`ProductModal`)
-Per-product-type configuration with **live price recalculation** powered by the pricing engine:
-
-- **L-Shaped Salon (sofa)**
-  - Seat depth tiers — 70 cm (3,000 DH base · 900 DH/m), 80 cm (3,500 DH · 1,000 DH/m), 90 cm (4,000 DH · 1,100 DH/m)
-  - Custom dimensions L1 × L2 (1.80–5.00 m × 1.20–4.00 m, 10 cm steps) → per-meter supplement beyond base 2.70 × 2.00 m
-  - Headrest count, chaise left/right orientation
-  - Base-price enforcement (configuration below reference never drops below tier base price)
-- **Armchair (chair)**
-  - Custom width 0.70–1.25 m (+15 DH per extra cm above the 0.85 m base)
-  - Leg finishes (natural oak, carved walnut, brushed brass, matte black steel) with supplements
-  - Backrest tufting styles (smooth, channel stitching, diamond button tufting) with supplements
-- **Shared options** — color swatches with named colors, upholstery grades (Standard Fabric ×1.00, Premium Velvet ×1.22, Signature Leather ×1.45), quantity stepper
-- **Live SVG visualizers** — `SofaVisualizer` / `ChairVisualizer` render the configured product in real time (proportions, seat depth, headrests, chaise orientation, fabric color); photo ↔ configurator toggle
-- Mattress & accessory configurators/pricing are already implemented in the engine, ready for catalog expansion
-
-### Cart & Ordering
-- Slide-out cart drawer with quantity controls and item removal
-- Cart items store the **full configuration + detailed price breakdown** (seat size, dimensions, options, line-by-line supplements)
-- **Free shipping over MAD 800** (otherwise MAD 150 flat), with progress bar toward the threshold
-- Wishlist (heart toggle) with toast feedback
-- Global state via React Context + `useReducer` (cart, wishlist, toasts)
-- Swipe-down-to-close modal/drawer behavior on mobile
-- **WhatsApp checkout integration** — floating button, hero CTA, cart/contact links to `wa.me/212666896776`
-
-### Design & UX
-- Luxury dark theme ("midnight" + gold palette), Cormorant Garamond / DM Sans typography
-- Scroll-triggered entrance animations, sticky blurred navbar, mobile hamburger menu
-- Fully responsive: dedicated layouts for mobile (<768px), tablet, laptop, and desktop breakpoints
-- Touch-optimized controls (44px touch targets, tap-highlight handling, momentum scrolling)
-- Google Maps embed for the showroom, testimonials section, contact + CTA sections
-
----
-
-## 🛠 Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
 | Framework | React 19 + TypeScript |
-| Build tool | Vite 7 |
-| Styling | Hand-written CSS (`src/globals.css`) — dark/gold design system with CSS variables; Tailwind v4 via PostCSS |
-| Icons | Lucide React + inline SVG |
-| UI primitives | Radix UI Slot, class-variance-authority, clsx, tailwind-merge |
-| State | React Context API + `useReducer` |
-| Pricing | Dedicated engine (`src/utils/pricing.ts`) with typed breakdowns per product type |
-| Testing | Self-contained assertion suite for the pricing engine (`src/utils/pricing.test.ts`) |
-| Deployment | GitHub Pages via GitHub Actions workflow |
+| Build Tool | Vite 7 |
+| Styling | Tailwind CSS v4 + custom design tokens (`globals.css`) |
+| Icons | Lucide React + custom inline SVGs |
+| State Management | React Context + `useReducer` |
+| Authentication | Laravel Sanctum token-based auth (`AuthContext.tsx`) |
+| API Communication | Native `fetch` with typed backend adapters (`data/data.ts`) |
+| Pricing Engine | Universal calculation engine (`utils/pricing.ts`) with typed breakdowns |
 
 ---
 
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js ≥ 18 (CI uses Node 20)
-- npm ≥ 9
-
-### Install & run
+## Getting Started
 
 ```bash
-# install dependencies
+# Install dependencies
 npm install
 
-# start dev server (http://localhost:5173/armchair/)
+# Start local dev server (default: http://localhost:5173/armchair/)
 npm run dev
 
-# typecheck + production build
+# Run TypeScript compiler check
+npx tsc --noEmit
+
+# Run ESLint check
+npm run lint
+
+# Build production bundle
 npm run build
 
-# preview the production build locally
+# Preview production build locally
 npm run preview
-
-# lint
-npm run lint
 ```
 
-### Pricing engine tests
-
-The pricing test file is a self-contained TypeScript script. Run it with:
+### Pricing Engine Test Suite
 
 ```bash
-# Option 1: Using tsx (if installed)
 npx tsx src/utils/pricing.test.ts
-
-# Option 2: Compile and run with Node
-npx tsc src/utils/pricing.test.ts --esModuleInterop --module commonjs --target ES2020 --outDir /tmp && node /tmp/pricing.test.js
 ```
-
-Runs the self-contained assertion suite covering the confirmed sofa/chair pricing cases (base prices, per-meter/per-cm supplements, fabric multipliers, base-price enforcement).
-
-### Deploy to GitHub Pages
-
-Two options:
-
-- **Automatic** — pushing to `main` triggers the GitHub Actions workflow (`.github/workflows/deploy.yml`): install → build → publish `dist/`.
-- **Manual** —
-
-```bash
-npm run deploy   # runs predeploy (build) then publishes dist/
-```
-
-The Vite config sets `base: "/armchair/"`, so the site is served from the `/armchair/` path of the GitHub Pages domain.
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
-armchair-shop-website/
-├── index.html                  # Entry HTML (SEO meta, Open Graph)
-├── vite.config.ts              # Vite config (@ alias, /armchair/ base)
-├── package.json                # Scripts & dependencies
-├── .github/workflows/deploy.yml # GitHub Pages deploy workflow (push to main)
-├── Specifications_Mobilier_Synthese.docx   # Functional specification (FR)
-├── way/                        # Additional spec documents (AR/FR)
-│   ├── Specifications_Mobilier_Consolide v2.docx
-│   └── Mowasafat_Mobilier_Version2_AR.docx
-├── data/
-│   ├── data.ts                 # Source of truth: types, catalog, categories,
-│   │                           # upholstery multipliers, sofa/chair configs
-│   ├── products.ts             # Re-export of data.ts (backward compatibility)
-│   └── *.jpg                   # Product photos
-├── context/
-│   └── CartContext.tsx         # Cart + wishlist + toast state (useReducer);
-│                               # cart items carry full config + price breakdown
-├── components/
-│   ├── Navbar.tsx              # Sticky nav, search/cart buttons, mobile menu
-│   ├── Hero.tsx                # Hero split-layout with brand block & stats
-│   ├── FeaturesBanner.tsx      # Trust strip (delivery, warranty, etc.)
-│   ├── ProductGrid.tsx         # Filters (tabs/searchable dropdown), sorting
-│   ├── ProductCard.tsx         # Card with colors, rating, wishlist, quick add
-│   ├── ProductModal.tsx        # Full configurator per product type
-│   ├── CartDrawer.tsx          # Slide-out cart with free-shipping progress
-│   ├── SearchBar.tsx           # Full-screen search overlay w/ live results
-│   ├── Footer.tsx              # Contact info, links, newsletter form
-│   ├── Toast.tsx               # Notification system
-│   └── SVG/                    # Live SVG visualizers
-│       ├── SofaVisualizer.tsx      # L-shape proportions, seats, headrests, chaise
-│       ├── ChairVisualizer.tsx     # Width, leg finishes, tufting styles
-│       ├── MattressVisualizer.tsx  # Ready for mattress SKUs
-│       └── AccessoryVisualizer.tsx # Ready for accessory SKUs
+frontend/
+├── index.html                      # Entry HTML (SEO, viewport-fit=cover meta)
+├── vite.config.ts                  # Vite config + @ alias → src/, /armchair/ base
+├── tailwind.config.js              # Tailwind CSS configuration
+├── postcss.config.js               # PostCSS with @tailwindcss/postcss
+├── tsconfig.json                   # TypeScript configuration
+├── package.json
+│
 └── src/
-    ├── main.tsx                # React entry point
-    ├── App.tsx                 # Page composition + search/modal orchestration
-    ├── globals.css             # Entire design system + responsive breakpoints
+    ├── main.tsx                    # React application entry point
+    ├── App.tsx                     # Page routing & overlay orchestration
+    ├── globals.css                 # Comprehensive dark/gold design system
+    │
+    ├── components/                 # UI components
+    │   ├── Navbar/                 # Sticky header with search, auth, cart triggers
+    │   ├── MobileBottomNav/        # Mobile bottom tab bar (auto-hiding on scroll)
+    │   ├── Hero/                   # Hero section with brand story & CTA
+    │   ├── FeaturesStrip/          # Workshop craftsmanship & delivery highlights
+    │   ├── Shop/                   # Category filtering, live search & product listing
+    │   ├── ProductModal/           # Dynamic configurator with SVG vector blueprints
+    │   ├── CartDrawer/             # Slide-out cart with free-shipping progress tracker
+    │   ├── CheckoutModal.tsx       # 4-step checkout & payment receipt upload wizard
+    │   ├── Search/                 # Full-screen search overlay with instant results
+    │   ├── AuthModal/              # Tabbed customer login and registration modal
+    │   ├── AccountPage/            # Customer profile and order history dashboard
+    │   ├── Tracking/               # Live 5-stage order status timeline
+    │   ├── Footer/                 # Contact details, showroom map & links
+    │   ├── Toast/                  # Swipe-to-dismiss toast notifications
+    │   └── SVG/                    # Vector visualizer blueprints
+    │       ├── SofaVisualizer.tsx       # L-shaped salon modular blueprint
+    │       ├── ChairVisualizer.tsx      # Armchair custom width & tufting blueprint
+    │       ├── MattressVisualizer.tsx   # 2.5D isometric mattress blueprint
+    │       └── AccessoryVisualizer.tsx  # Cushion set & pack blueprint
+    │
+    ├── context/
+    │   ├── CartContext.tsx          # Cart items, wishlist, toast state management
+    │   └── AuthContext.tsx          # Laravel Sanctum customer auth & token persistence
+    │
+    ├── hooks/
+    │   └── useCopyToClipboard.ts    # Copy-to-clipboard hook (for RIB numbers)
+    │
+    ├── data/
+    │   ├── data.ts                 # Backend API fetchers, type adapters & static fallbacks
+    │   ├── L.jpg                   # L-shaped sofa product reference image
+    │   ├── chare.jpg               # Velvet armchair product reference image
+    │   └── 542094736_*.jpg          # Additional showcase photography
+    │
     └── utils/
-        ├── pricing.ts          # Universal pricing engine (sofa/mattress/
-        │                       # chair/accessory) with price breakdowns
-        └── pricing.test.ts     # Assertion suite for the pricing engine
+        ├── pricing.ts              # Universal furniture pricing calculation engine
+        └── pricing.test.ts         # Automated pricing test suite
 ```
 
 ---
 
-## 🧭 Business Rules (from the Specification)
+## REST API Integration (`src/data/data.ts`)
 
-The `.docx` specification defines the target system this storefront belongs to:
+The storefront fetches dynamic data from the Laravel backend while maintaining resilient offline fallbacks:
 
-### Pricing model
-```
-Final price = Base price + Dimension supplements + Option supplements
-```
-- Each product has a base price tied to reference dimensions.
-- Configurations ≤ the reference keep the base price; larger sizes trigger fixed-tier or per-meter supplements defined per product.
-- Example: a corner sofa at MAD 3,000 (70 cm module) can rise to MAD 3,500 (80 cm) or MAD 4,000 (90 cm).
-
-*Currently implemented:* the full pricing engine — seat-size tiers with per-meter length supplements (sofa), per-cm width supplements plus option supplements (chair), thickness/core multipliers (mattress), pack/size/fill supplements (accessory), and fabric-grade multipliers applied across types. Dimension-based pricing is live in the configurator with an itemized breakdown shown at checkout time in the cart.
-
-### Payment flow
-- No online payment in this phase — orders are confirmed via **bank transfer (RIB)** verified manually by the administrator.
-- A **deposit (%)** is required before fabrication; the balance is due before shipping.
-
-### Order lifecycle
-| Status | Meaning |
-|---|---|
-| `PENDING` | Order created, deposit not yet validated |
-| `WORKING` | Deposit confirmed, fabrication in progress |
-| `WAITING_FOR_FINAL_PAYMENT` | Item finished, balance due |
-| `SHIPPING` | Fully paid, order in transit |
-| `DELIVERED` | Order delivered |
-
-### Delivery tariffs (planned)
-| Zone | Rate |
-|---|---|
-| Tanger | From MAD 100, adjusted by furniture size |
-| Rest of Morocco | MAD 200 + distance × coefficient (up to ~MAD 800) |
-| International | Via external carrier, rates TBD |
-| Customer pickup | Free |
-
-*Currently implemented:* simplified storefront rule — free shipping in Tanger over MAD 800, otherwise MAD 150 flat.
+| Function | API Endpoint | Description |
+|---|---|---|
+| `fetchProducts()` | `GET /api/products` | Loads active products with dimensions, configurations, and images. Maps to `Product` interface via `mapBackendProductToFrontend()`. |
+| `fetchCategories()` | `GET /api/categories` | Loads dynamic categories from the database for the category filter tabs. |
+| `fetchCities()` | `GET /api/cities` | Loads Moroccan delivery cities with dynamically calculated shipping fees based on zone rules. |
+| `fetchUpholsteryStyles()` | `GET /api/upholstery-styles` | Loads fabrics (Standard, Premium Velvet, Signature Leather) and pricing multipliers. |
 
 ---
 
-## 🗺 Roadmap
+## 2D SVG Configurator System
 
-- [ ] Client accounts — order tracking, personalization history, deposit/balance view
-- [ ] Admin dashboard — products, categories, pricing rules, orders, payment confirmation
-- [ ] Order status pipeline wired to the statuses above
-- [ ] Delivery fee engine (city rules, distance coefficients, international quotes)
-- [ ] Swap static catalog config (`data/data.ts`) for a backend API (interface already shaped for it)
-- [ ] Expand catalog using the ready-made mattress & accessory configurators
+The storefront includes four interactive SVG visualizers that render product blueprints in real time based on user adjustments.
+
+### Architecture
+
+```
+ProductModal (state owner)
+  ├── SofaVisualizer        ← receives dimensions, seat size, headrests, chaise
+  ├── ChairVisualizer       ← receives width, leg finishes, tufting patterns
+  ├── MattressVisualizer    ← receives dimensions, thickness, core materials
+  └── AccessoryVisualizer   ← receives pack quantities, sizes, fill types
+```
+
+### Supported Customizations
+- **L-Shaped Salon (`SofaVisualizer`)**: Modular seat sizes (70cm, 80cm, 90cm), independent horizontal and vertical length sliders (e.g. 2.70m × 2.00m), chaise orientation (left/right), headrests count (0-4), armrest configurations.
+- **Armchair (`ChairVisualizer`)**: Custom width slider (70cm - 125cm), 4 leg finishes (Natural Oak, Dark Walnut, Brushed Brass, Matte Black), 3 tufting styles (Smooth, Channel, Diamond).
+- **Mattress (`MattressVisualizer`)**: Standard sizes or custom dimensions, thickness tiers (20cm - 35cm), core types (Pocket springs, High-density HR foam, Latex, Orthopedic).
 
 ---
 
-## 📄 License
+## Pricing Engine (`src/utils/pricing.ts`)
+
+The pricing engine implements the workshop's pricing rules with typed itemized breakdowns:
+
+```
+Final Price = Base Price + Dimension Supplements + Option Supplements
+```
+
+- **Sofa Formula**: Base tier price + extra meters beyond standard dimension × per-meter rate + headrest costs. Configured with fabric multiplier.
+- **Chair Formula**: Base price + extra width beyond 85cm × per-cm rate + leg finish supplement + tufting supplement. Multiplied by fabric grade.
+- **Enforcement**: Calculations strictly enforce that prices never fall below the product's base tier price.
+
+---
+
+## State Management
+
+### 1. `CartContext` (`src/context/CartContext.tsx`)
+- Manages items in the shopping cart using `useReducer`.
+- Stores full item customizations and price breakdowns.
+- Tracks wishlist product IDs and active toast notifications.
+- Computes cart subtotal, item counts, and free shipping progress (800 DH threshold).
+
+### 2. `AuthContext` (`src/context/AuthContext.tsx`)
+- Connected to Laravel Sanctum API endpoints (`/api/login`, `/api/register`, `/api/me`, `/api/logout`).
+- Stores the Bearer token in `localStorage` (`sanctum_token`).
+- Validates the token on mount via `GET /api/me`.
+- Synchronizes authentication state across the navbar, mobile navigation, and checkout modal.
+
+---
+
+## Mobile-First UI Patterns
+
+- **Safe Areas**: Uses `viewport-fit=cover` and CSS `env(safe-area-inset-bottom)` for notch-safe rendering on mobile devices.
+- **Auto-Hiding Bottom Nav (`MobileNav`)**: Fixed 5-tab mobile navigation bar that hides on scroll down and reappears on scroll up.
+- **Swipeable Toasts (`Toast.tsx`)**: Touch gesture support allowing users to swipe away toast notifications horizontally.
+- **Touch Targets**: Minimum 48px touch targets on buttons, swatches, and inputs.
+
+---
+
+## License
 
 Private project — © Abdelatif Furnishings (مفروشات عبداللطيف), Tanger, Morocco.
