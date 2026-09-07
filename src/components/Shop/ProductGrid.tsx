@@ -51,10 +51,11 @@ export default function ProductGrid({ searchQuery, onViewDetail }: ProductGridPr
       const matchesCategory =
         activeCategory === "All" ||
         prodCat === activeCat ||
-        (activeCat === "salon" && (prodCat.includes("sofa") || prodCat.includes("salon"))) ||
-        (activeCat === "sofas" && (prodCat.includes("sofa") || prodCat.includes("salon"))) ||
-        (activeCat === "chair" && prodCat.includes("chair")) ||
-        (activeCat === "chairs" && prodCat.includes("chair"))
+        (activeCat === "salons" && (prodCat.includes("sofa") || prodCat.includes("salon"))) ||
+        (activeCat === "chairs" && (prodCat.includes("chair") || prodCat.includes("couch"))) ||
+        (activeCat === "beds" && (prodCat.includes("bed") || prodCat.includes("mattress"))) ||
+        (activeCat === "mattresses" && (prodCat.includes("mattress") || prodCat.includes("bed"))) ||
+        (activeCat === "accessories" && (prodCat.includes("accessor") || prodCat.includes("cushion") || prodCat.includes("pouf") || prodCat.includes("headrest")))
       const query = searchQuery.toLowerCase()
       const matchesSearch =
         !query ||

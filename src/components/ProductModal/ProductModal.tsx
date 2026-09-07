@@ -8,6 +8,7 @@ import {
   fetchUpholsteryStyles,
   SofaConfig,
   MattressConfig,
+  BedConfig,
   ChairConfig,
   AccessoryConfig,
   SeatSize,
@@ -16,12 +17,15 @@ import { useCart } from "@/context/CartContext"
 import {
   calculateSofaPrice,
   calculateMattressPrice,
+  calculateBedPrice,
   calculateChairPrice,
   calculateAccessoryPrice,
   formatPriceDH,
 } from "@/utils/pricing"
 import SofaVisualizer from "../SVG/SofaVisualizer"
 import MattressVisualizer from "../SVG/MattressVisualizer"
+import BedVisualizer from "../SVG/BedVisualizer"
+import HeadrestVisualizer from "../SVG/HeadrestVisualizer"
 import ChairVisualizer from "../SVG/ChairVisualizer"
 import AccessoryVisualizer from "../SVG/AccessoryVisualizer"
 
@@ -75,15 +79,23 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
   const [mattressCoreId, setMattressCoreId] = useState("pocket_springs")
   const [mattressFirmnessId, setMattressFirmnessId] = useState("ortho_firm")
 
+  // Bed State
+  const [bedSizeId, setBedSizeId] = useState("queen_160_200")
+  const [isCustomBedSize, setIsCustomBedSize] = useState(false)
+  const [bedWidth, setBedWidth] = useState(1.60)
+  const [bedLength, setBedLength] = useState(2.00)
+  const [bedHeadboardStyleId, setBedHeadboardStyleId] = useState("tufted")
+
   // Chair State
   const [chairWidth, setChairWidth] = useState(0.85)
   const [chairLegId, setChairLegId] = useState("natural_oak")
   const [chairTuftingId, setChairTuftingId] = useState("smooth")
 
-  // Accessory State
+  // Accessory / Headrest State
   const [accessoryPackId, setAccessoryPackId] = useState("pack_4")
-  const [accessorySizeId, setAccessorySizeId] = useState("s45")
-  const [accessoryFillId, setAccessoryFillId] = useState("microfiber")
+  const [accessorySizeId, setAccessorySizeId] = useState("s65")
+  const [accessoryFillId, setAccessoryFillId] = useState("high_density_foam")
+  const [headrestTilt, setHeadrestTilt] = useState(30)
 
   // Reset state when product changes
   useEffect(() => {
@@ -115,14 +127,25 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
         setMattressThicknessId(config.thicknessOptions[0]?.id || "t20")
         setMattressCoreId(config.coreOptions[0]?.id || "pocket_springs")
         setMattressFirmnessId(config.firmnessLevels[0]?.id || "medium")
+      } else if (config.type === "bed") {
+        const bc = config as BedConfig
+        setBedSizeId(bc.defaultSizeId || bc.sizes[0]?.id || "queen_160_200")
+        setIsCustomBedSize(false)
+        const defSize = bc.sizes.find((s) => s.id === bc.defaultSizeId) || bc.sizes[0]
+        if (defSize) {
+          setBedWidth(defSize.width)
+          setBedLength(defSize.length)
+        }
+        setBedHeadboardStyleId(bc.headboardStyles[0]?.id || "tufted")
       } else if (config.type === "chair") {
         setChairWidth(config.baseWidth || 0.85)
         setChairLegId(config.legFinishes[0]?.id || "natural_oak")
         setChairTuftingId(config.tuftingStyles[0]?.id || "smooth")
       } else if (config.type === "accessory") {
         setAccessoryPackId(config.packOptions[1]?.id || config.packOptions[0]?.id || "pack_4")
-        setAccessorySizeId(config.sizeOptions[0]?.id || "s45")
-        setAccessoryFillId(config.fillOptions[0]?.id || "microfiber")
+        setAccessorySizeId(config.sizeOptions[0]?.id || "s65")
+        setAccessoryFillId(config.fillOptions[0]?.id || "high_density_foam")
+        setHeadrestTilt(30)
       }
     }
 
@@ -161,6 +184,12 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
       const defSize = config.sizes.find((s) => s.id === config.defaultSizeId) || config.sizes[0]
       changed = mattressSizeId !== (config.defaultSizeId || config.sizes[0]?.id) ||
         (defSize !== undefined && (mattressWidth !== defSize.width || mattressLength !== defSize.length))
+    } else if (config.type === "bed") {
+      const bc = config as BedConfig
+      const defSize = bc.sizes.find((s) => s.id === bc.defaultSizeId) || bc.sizes[0]
+      changed = bedSizeId !== (bc.defaultSizeId || bc.sizes[0]?.id) ||
+        (defSize !== undefined && (bedWidth !== defSize.width || bedLength !== defSize.length)) ||
+        bedHeadboardStyleId !== (bc.headboardStyles[0]?.id || "tufted")
     } else if (config.type === "chair") {
       changed = chairWidth !== (config as ChairConfig).baseWidth
     } else if (config.type === "accessory") {
@@ -170,7 +199,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
       hasCustomized.current = true
       setActiveVisView("configurator")
     }
-  }, [product, seatSize, sofaL1, sofaL2, headrests, mattressSizeId, mattressWidth, mattressLength, chairWidth, accessoryPackId])
+  }, [product, seatSize, sofaL1, sofaL2, headrests, mattressSizeId, mattressWidth, mattressLength, bedSizeId, bedWidth, bedLength, bedHeadboardStyleId, chairWidth, accessoryPackId, headrestTilt])
 
   const selectedStyle = useMemo(
     () => stylesList.find((style) => style.id === selectedStyleId) ?? stylesList[0] ?? upholsteryStyles[0],
@@ -211,6 +240,21 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
         mattressConfig: matConf,
       })
       return { type: "mattress" as const, data: calc, unitPrice: calc.finalPrice }
+    }
+
+    if (config.type === "bed") {
+      const bedConf = config as BedConfig
+      const calc = calculateBedPrice({
+        sizeId: bedSizeId,
+        isCustomSize: isCustomBedSize,
+        customWidth: bedWidth,
+        customLength: bedLength,
+        headboardStyleId: bedHeadboardStyleId,
+        styleId: selectedStyle.id,
+        fabricMultiplier: selectedStyle.multiplier,
+        bedConfig: bedConf,
+      })
+      return { type: "bed" as const, data: calc, unitPrice: calc.finalPrice }
     }
 
     if (config.type === "chair") {
@@ -255,6 +299,11 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
     mattressThicknessId,
     mattressCoreId,
     mattressFirmnessId,
+    bedSizeId,
+    isCustomBedSize,
+    bedWidth,
+    bedLength,
+    bedHeadboardStyleId,
     chairWidth,
     chairLegId,
     chairTuftingId,
@@ -274,11 +323,14 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
       if (armrestChaise) ar.push("Chaise End")
       return `${seatSize} cm · ${sofaL1.toFixed(2)} m × ${sofaL2.toFixed(2)} m · ${chaiseOrientation === "left" ? "Left" : "Right"} Chaise · ${headrests} Headrest${headrests !== 1 ? "s" : ""} · ${ar.length ? ar.join(" + ") : "No Armrests"}`
     }
+    if (configType === "bed") {
+      return `${Math.round(bedWidth * 100)} × ${Math.round(bedLength * 100)} cm Bed`
+    }
     if (configType === "chair") {
       return `${Math.round(chairWidth * 100)} cm wide`
     }
     return ""
-  }, [configType, seatSize, sofaL1, sofaL2, chaiseOrientation, headrests, armrestHorizontal, armrestChaise, chairWidth])
+  }, [configType, seatSize, sofaL1, sofaL2, chaiseOrientation, headrests, armrestHorizontal, armrestChaise, bedWidth, bedLength, chairWidth])
 
   if (!product || !pricingData) return null
 
@@ -287,6 +339,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
 
   const sofaPricing = pricingData.type === "sofa" ? pricingData.data : null
   const mattressPricing = pricingData.type === "mattress" ? pricingData.data : null
+  const bedPricing = pricingData.type === "bed" ? pricingData.data : null
   const chairPricing = pricingData.type === "chair" ? pricingData.data : null
   const accessoryPricing = pricingData.type === "accessory" ? pricingData.data : null
 
@@ -316,6 +369,17 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
         priceBreakdown: mattressPricing,
       })
       showToast(`${product.name} (${mattressPricing.sizeLabel}) added to cart`)
+    } else if (config.type === "bed" && bedPricing) {
+      addItem(product, selectedColorIdx, {
+        qty,
+        styleId: selectedStyle.id,
+        styleLabel: selectedStyle.label,
+        length1: bedPricing.width,
+        length2: bedPricing.length,
+        unitPrice: bedPricing.finalPrice,
+        priceBreakdown: bedPricing,
+      })
+      showToast(`${product.name} (${bedPricing.sizeLabel}) added to cart`)
     } else if (config.type === "chair" && chairPricing) {
       addItem(product, selectedColorIdx, {
         qty,
@@ -404,6 +468,28 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
               />
             )}
 
+            {configType === "bed" && bedPricing && (
+              <BedVisualizer
+                width={bedPricing.width}
+                length={bedPricing.length}
+                headboardStyle={bedHeadboardStyleId}
+                headboardHeightCm={(product.config as BedConfig).headboardHeightCm || 120}
+                colorHex={product.colors[selectedColorIdx]}
+                colorName={product.colorNames[selectedColorIdx]}
+                photoUrl={product.img}
+                photoAlt={product.imgAlt}
+                modelName={product.name}
+                activeView={activeVisView}
+                onToggleView={setActiveVisView}
+                onWidthChange={setBedWidth}
+                onLengthChange={setBedLength}
+                minWidth={(product.config as BedConfig).customBounds.minWidth}
+                maxWidth={(product.config as BedConfig).customBounds.maxWidth}
+                minLength={(product.config as BedConfig).customBounds.minLength}
+                maxLength={(product.config as BedConfig).customBounds.maxLength}
+              />
+            )}
+
             {configType === "chair" && chairPricing && (
               <ChairVisualizer
                 width={chairWidth}
@@ -429,18 +515,33 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
             )}
 
             {configType === "accessory" && accessoryPricing && (
-              <AccessoryVisualizer
-                packCount={accessoryPricing.packCount}
-                sizeLabel={accessoryPricing.sizeLabel}
-                fillLabel={accessoryPricing.fillLabel}
-                colorHex={product.colors[selectedColorIdx]}
-                colorName={product.colorNames[selectedColorIdx]}
-                photoUrl={product.img}
-                photoAlt={product.imgAlt}
-                modelName={product.name}
-                activeView={activeVisView}
-                onToggleView={setActiveVisView}
-              />
+              (product.config as AccessoryConfig).accessorySubtype === "headrest" || product.name.toLowerCase().includes("headrest") ? (
+                <HeadrestVisualizer
+                  packCount={accessoryPricing.packCount}
+                  tiltDegrees={headrestTilt}
+                  colorHex={product.colors[selectedColorIdx]}
+                  colorName={product.colorNames[selectedColorIdx]}
+                  photoUrl={product.img}
+                  photoAlt={product.imgAlt}
+                  modelName={product.name}
+                  activeView={activeVisView}
+                  onToggleView={setActiveVisView}
+                  onTiltChange={setHeadrestTilt}
+                />
+              ) : (
+                <AccessoryVisualizer
+                  packCount={accessoryPricing.packCount}
+                  sizeLabel={accessoryPricing.sizeLabel}
+                  fillLabel={accessoryPricing.fillLabel}
+                  colorHex={product.colors[selectedColorIdx]}
+                  colorName={product.colorNames[selectedColorIdx]}
+                  photoUrl={product.img}
+                  photoAlt={product.imgAlt}
+                  modelName={product.name}
+                  activeView={activeVisView}
+                  onToggleView={setActiveVisView}
+                />
+              )
             )}
           </div>
 
@@ -473,6 +574,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                     ? `Base ${formatPriceDH(sofaPricing.basePrice)} + extras`
                     : `Starting price · ${seatSize} cm module`)}
                 {configType === "mattress" && mattressPricing && mattressPricing.sizeLabel}
+                {configType === "bed" && bedPricing && bedPricing.sizeLabel}
                 {configType === "chair" && `${Math.round(chairWidth * 100)} cm wide`}
                 {configType === "accessory" && accessoryPricing && accessoryPricing.packLabel}
               </span>
@@ -543,7 +645,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                   <div className="dimension-control-row">
                     <div className="dim-header">
                       <span className="dim-name">Horizontal Length</span>
-                      <span className="dim-badge">{sofaL1.toFixed(2)} m</span>
+                      <span className="dim-badge">{Math.round(sofaL1 * 100)} cm ({sofaL1.toFixed(2)} m)</span>
                     </div>
                     <input
                       type="range"
@@ -555,15 +657,15 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                       className="dimension-range-slider"
                     />
                     <div className="dim-slider-ticks">
-                      <span>{(product.config as SofaConfig).minLength1.toFixed(2)} m</span>
-                      <span>{(product.config as SofaConfig).maxLength1.toFixed(2)} m</span>
+                      <span>{Math.round((product.config as SofaConfig).minLength1 * 100)} cm ({(product.config as SofaConfig).minLength1.toFixed(2)} m)</span>
+                      <span>{Math.round((product.config as SofaConfig).maxLength1 * 100)} cm ({(product.config as SofaConfig).maxLength1.toFixed(2)} m)</span>
                     </div>
                   </div>
 
                   <div className="dimension-control-row">
                     <div className="dim-header">
                       <span className="dim-name">Chaise / Vertical Length</span>
-                      <span className="dim-badge">{sofaL2.toFixed(2)} m</span>
+                      <span className="dim-badge">{Math.round(sofaL2 * 100)} cm ({sofaL2.toFixed(2)} m)</span>
                     </div>
                     <input
                       type="range"
@@ -575,8 +677,8 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                       className="dimension-range-slider"
                     />
                     <div className="dim-slider-ticks">
-                      <span>{(product.config as SofaConfig).minLength2.toFixed(2)} m</span>
-                      <span>{(product.config as SofaConfig).maxLength2.toFixed(2)} m</span>
+                      <span>{Math.round((product.config as SofaConfig).minLength2 * 100)} cm ({(product.config as SofaConfig).minLength2.toFixed(2)} m)</span>
+                      <span>{Math.round((product.config as SofaConfig).maxLength2 * 100)} cm ({(product.config as SofaConfig).maxLength2.toFixed(2)} m)</span>
                     </div>
                   </div>
                 </div>
@@ -803,108 +905,230 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
               </>
             )}
 
-            {/* ───────────────── CHAIR CONFIGURATION ───────────────── */}
-            {configType === "chair" && (
+            {/* ───────────────── BED CONFIGURATION ───────────────── */}
+            {configType === "bed" && bedPricing && (
               <>
                 <div className="config-step">
                   <div className="config-step-header">
                     <div>
                       <span className="config-step-number">01</span>
-                      <h3 className="config-step-title">
-                        Width
-                        <span style={{ color: 'var(--gold)', fontWeight: 600, marginLeft: 8, fontSize: '.95rem' }}>
-                          {Math.round(chairWidth * 100)} cm
-                        </span>
-                      </h3>
+                      <h3 className="config-step-title">Bed Size & Dimensions</h3>
                     </div>
-                    {chairWidth !== (product.config as ChairConfig).baseWidth && (
+                    {(product.config as BedConfig).allowCustomDimensions && (
                       <button
                         type="button"
                         className="reset-dim-btn"
-                        onClick={() => setChairWidth((product.config as ChairConfig).baseWidth)}
+                        onClick={() => setIsCustomBedSize(!isCustomBedSize)}
                       >
-                        Reset
+                        {isCustomBedSize ? "Standard" : "Custom"}
                       </button>
                     )}
                   </div>
-                  <div className="dimension-control-row">
-                    <input
-                      type="range"
-                      min={(product.config as ChairConfig).minWidth}
-                      max={(product.config as ChairConfig).maxWidth}
-                      step={0.05}
-                      value={chairWidth}
-                      onChange={(e) => setChairWidth(Number(e.target.value))}
-                      className="dimension-range-slider"
-                    />
-                    <div className="dim-slider-ticks">
-                      <span>70 cm</span>
-                      <span className="tick-base">85 cm</span>
-                      <span>125 cm</span>
+
+                  {!isCustomBedSize ? (
+                    <div className="mattress-size-grid">
+                      {(product.config as BedConfig).sizes.map((s) => {
+                        const isSelected = bedSizeId === s.id
+                        return (
+                          <button
+                            key={s.id}
+                            type="button"
+                            className={`seat-size-card ${isSelected ? "selected" : ""}`}
+                            onClick={() => {
+                              setBedSizeId(s.id)
+                              setBedWidth(s.width)
+                              setBedLength(s.length)
+                            }}
+                          >
+                            <div className="seat-card-top">
+                              <span className="seat-size-number" style={{ fontSize: "0.85rem" }}>
+                                {s.label}
+                              </span>
+                              <span className="seat-check">✓</span>
+                            </div>
+                            <div className="seat-card-base">{s.basePrice.toLocaleString()} DH</div>
+                          </button>
+                        )
+                      })}
                     </div>
-                  </div>
+                  ) : (
+                    <div className="custom-dim-panel">
+                      <div className="dimension-control-row">
+                        <div className="dim-header">
+                          <span className="dim-name">Width</span>
+                          <span className="dim-badge">{Math.round(bedWidth * 100)} cm</span>
+                        </div>
+                        <input
+                          type="range"
+                          min={(product.config as BedConfig).customBounds.minWidth}
+                          max={(product.config as BedConfig).customBounds.maxWidth}
+                          step={0.05}
+                          value={bedWidth}
+                          onChange={(e) => setBedWidth(Number(e.target.value))}
+                          className="dimension-range-slider"
+                        />
+                      </div>
+                      <div className="dimension-control-row">
+                        <div className="dim-header">
+                          <span className="dim-name">Length</span>
+                          <span className="dim-badge">{Math.round(bedLength * 100)} cm</span>
+                        </div>
+                        <input
+                          type="range"
+                          min={(product.config as BedConfig).customBounds.minLength}
+                          max={(product.config as BedConfig).customBounds.maxLength}
+                          step={0.05}
+                          value={bedLength}
+                          onChange={(e) => setBedLength(Number(e.target.value))}
+                          className="dimension-range-slider"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="config-step">
                   <div className="config-step-header">
                     <div>
                       <span className="config-step-number">02</span>
-                      <h3 className="config-step-title">Leg Finish</h3>
+                      <h3 className="config-step-title">Headboard Style</h3>
                     </div>
                   </div>
                   <div className="seat-size-grid">
-                    {(product.config as ChairConfig).legFinishes.map((leg) => {
-                      const isSelected = chairLegId === leg.id
+                    {(product.config as BedConfig).headboardStyles.map((hb) => {
+                      const isSelected = bedHeadboardStyleId === hb.id
                       return (
                         <button
-                          key={leg.id}
+                          key={hb.id}
                           type="button"
                           className={`seat-size-card ${isSelected ? "selected" : ""}`}
-                          onClick={() => setChairLegId(leg.id)}
+                          onClick={() => setBedHeadboardStyleId(hb.id)}
                         >
                           <div className="seat-card-top">
-                            <span
-                              style={{
-                                display: "inline-block",
-                                width: 12,
-                                height: 12,
-                                borderRadius: "50%",
-                                backgroundColor: leg.colorHex,
-                                border: "1px solid rgba(255,255,255,0.3)",
-                              }}
-                            />
+                            <span className="seat-size-number" style={{ fontSize: "0.85rem" }}>
+                              {hb.label}
+                            </span>
                             <span className="seat-check">✓</span>
                           </div>
-                          <div className="seat-card-base">{leg.label}</div>
                           <div className="seat-card-rate">
-                            {leg.supplement > 0 ? `+${leg.supplement} DH` : "Included"}
+                            {hb.supplement > 0 ? `+${hb.supplement} DH` : "Included"}
                           </div>
                         </button>
                       )
                     })}
                   </div>
                 </div>
+              </>
+            )}
 
-                <div className="config-step">
-                  <div className="config-step-header">
-                    <div>
-                      <span className="config-step-number">03</span>
-                      <h3 className="config-step-title">Tufting</h3>
+            {/* ───────────────── CHAIR CONFIGURATION ───────────────── */}
+            {configType === "chair" && (
+              <>
+                {(product.config as ChairConfig).minWidth < (product.config as ChairConfig).maxWidth && (
+                  <div className="config-step">
+                    <div className="config-step-header">
+                      <div>
+                        <span className="config-step-number">01</span>
+                        <h3 className="config-step-title">
+                          Width
+                          <span style={{ color: 'var(--gold)', fontWeight: 600, marginLeft: 8, fontSize: '.95rem' }}>
+                            {Math.round(chairWidth * 100)} cm
+                          </span>
+                        </h3>
+                      </div>
+                      {chairWidth !== (product.config as ChairConfig).baseWidth && (
+                        <button
+                          type="button"
+                          className="reset-dim-btn"
+                          onClick={() => setChairWidth((product.config as ChairConfig).baseWidth)}
+                        >
+                          Reset
+                        </button>
+                      )}
+                    </div>
+                    <div className="dimension-control-row">
+                      <input
+                        type="range"
+                        min={(product.config as ChairConfig).minWidth}
+                        max={(product.config as ChairConfig).maxWidth}
+                        step={0.05}
+                        value={chairWidth}
+                        onChange={(e) => setChairWidth(Number(e.target.value))}
+                        className="dimension-range-slider"
+                      />
+                      <div className="dim-slider-ticks">
+                        <span>{Math.round((product.config as ChairConfig).minWidth * 100)} cm</span>
+                        <span className="tick-base">{Math.round((product.config as ChairConfig).baseWidth * 100)} cm</span>
+                        <span>{Math.round((product.config as ChairConfig).maxWidth * 100)} cm</span>
+                      </div>
                     </div>
                   </div>
-                  <div className="headrest-btn-group">
-                    {(product.config as ChairConfig).tuftingStyles.map((t) => (
-                      <button
-                        key={t.id}
-                        type="button"
-                        className={`headrest-pill ${chairTuftingId === t.id ? "active" : ""}`}
-                        onClick={() => setChairTuftingId(t.id)}
-                      >
-                        {t.label} {t.supplement > 0 ? `(+${t.supplement} DH)` : ""}
-                      </button>
-                    ))}
+                )}
+
+                {(product.config as ChairConfig).legFinishes.length > 0 && (
+                  <div className="config-step">
+                    <div className="config-step-header">
+                      <div>
+                        <span className="config-step-number">02</span>
+                        <h3 className="config-step-title">Leg Finish</h3>
+                      </div>
+                    </div>
+                    <div className="seat-size-grid">
+                      {(product.config as ChairConfig).legFinishes.map((leg) => {
+                        const isSelected = chairLegId === leg.id
+                        return (
+                          <button
+                            key={leg.id}
+                            type="button"
+                            className={`seat-size-card ${isSelected ? "selected" : ""}`}
+                            onClick={() => setChairLegId(leg.id)}
+                          >
+                            <div className="seat-card-top">
+                              <span
+                                style={{
+                                  display: "inline-block",
+                                  width: 12,
+                                  height: 12,
+                                  borderRadius: "50%",
+                                  backgroundColor: leg.colorHex,
+                                  border: "1px solid rgba(255,255,255,0.3)",
+                                }}
+                              />
+                              <span className="seat-check">✓</span>
+                            </div>
+                            <div className="seat-card-base">{leg.label}</div>
+                            <div className="seat-card-rate">
+                              {leg.supplement > 0 ? `+${leg.supplement} DH` : "Included"}
+                            </div>
+                          </button>
+                        )
+                      })}
+                    </div>
                   </div>
-                </div>
+                )}
+
+                {(product.config as ChairConfig).tuftingStyles.length > 0 && (
+                  <div className="config-step">
+                    <div className="config-step-header">
+                      <div>
+                        <span className="config-step-number">03</span>
+                        <h3 className="config-step-title">Tufting</h3>
+                      </div>
+                    </div>
+                    <div className="headrest-btn-group">
+                      {(product.config as ChairConfig).tuftingStyles.map((t) => (
+                        <button
+                          key={t.id}
+                          type="button"
+                          className={`headrest-pill ${chairTuftingId === t.id ? "active" : ""}`}
+                          onClick={() => setChairTuftingId(t.id)}
+                        >
+                          {t.label} {t.supplement > 0 ? `(+${t.supplement} DH)` : ""}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </>
             )}
 
@@ -943,7 +1167,11 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                   <div className="config-step-header">
                     <div>
                       <span className="config-step-number">02</span>
-                      <h3 className="config-step-title">Cushion Size</h3>
+                      <h3 className="config-step-title">
+                        {(product.config as AccessoryConfig).accessorySubtype === "headrest" || product.name.toLowerCase().includes("headrest")
+                          ? "Headrest Profile"
+                          : "Cushion Size"}
+                      </h3>
                     </div>
                   </div>
                   <div className="headrest-btn-group">
@@ -960,25 +1188,48 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                   </div>
                 </div>
 
-                <div className="config-step">
-                  <div className="config-step-header">
-                    <div>
-                      <span className="config-step-number">03</span>
-                      <h3 className="config-step-title">Filling</h3>
+                {(product.config as AccessoryConfig).tiltAngles ? (
+                  <div className="config-step">
+                    <div className="config-step-header">
+                      <div>
+                        <span className="config-step-number">03</span>
+                        <h3 className="config-step-title">Incline Adjustment Angle</h3>
+                      </div>
+                    </div>
+                    <div className="headrest-btn-group">
+                      {(product.config as AccessoryConfig).tiltAngles!.map((t) => (
+                        <button
+                          key={t.id}
+                          type="button"
+                          className={`headrest-pill ${headrestTilt === t.degrees ? "active" : ""}`}
+                          onClick={() => setHeadrestTilt(t.degrees)}
+                        >
+                          {t.label}
+                        </button>
+                      ))}
                     </div>
                   </div>
-                  <select
-                    className="modal-select"
-                    value={accessoryFillId}
-                    onChange={(e) => setAccessoryFillId(e.target.value)}
-                  >
-                    {(product.config as AccessoryConfig).fillOptions.map((fill) => (
-                      <option key={fill.id} value={fill.id}>
-                        {fill.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                ) : (
+                  <div className="config-step">
+                    <div className="config-step-header">
+                      <div>
+                        <span className="config-step-number">03</span>
+                        <h3 className="config-step-title">Filling</h3>
+                      </div>
+                    </div>
+                    <select
+                      className="modal-select"
+                      value={accessoryFillId}
+                      onChange={(e) => setAccessoryFillId(e.target.value)}
+                    >
+                      {(product.config as AccessoryConfig).fillOptions.map((fill) => (
+                        <option key={fill.id} value={fill.id}>
+                          {fill.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </>
             )}
 
@@ -987,7 +1238,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
               <div className="config-step-header">
                 <div>
                   <span className="config-step-number">
-                    {configType === "sofa" ? "04" : configType === "mattress" ? "05" : configType === "chair" ? "04" : "04"}
+                    {configType === "sofa" ? "04" : configType === "bed" ? "03" : configType === "mattress" ? "05" : configType === "chair" ? "04" : "04"}
                   </span>
                   <h3 className="config-step-title">
                     Color & Finish
@@ -1018,7 +1269,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                 <div className="config-step-header">
                   <div>
                     <span className="config-step-number">
-                      {configType === "sofa" ? "05" : configType === "chair" ? "05" : "05"}
+                      {configType === "sofa" ? "05" : configType === "bed" ? "04" : configType === "chair" ? "05" : "05"}
                     </span>
                     <h3 className="config-step-title">Upholstery Grade</h3>
                   </div>
@@ -1056,8 +1307,8 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                   <div className="base-info-item">
                     <span className="base-lbl">Standard</span>
                     <span className="base-val">
-                      {(product.config as SofaConfig).baseLength1.toFixed(2)} m ×{" "}
-                      {(product.config as SofaConfig).baseLength2.toFixed(2)} m
+                      {Math.round((product.config as SofaConfig).baseLength1 * 100)} ×{" "}
+                      {Math.round((product.config as SofaConfig).baseLength2 * 100)} cm ({(product.config as SofaConfig).baseLength1.toFixed(2)} m × {(product.config as SofaConfig).baseLength2.toFixed(2)} m)
                     </span>
                   </div>
                   <div className="base-info-item">

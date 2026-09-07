@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useCart } from "@/context/CartContext"
 import { useAuth } from "@/context/AuthContext"
+import "./CheckoutModal.css"
 import { formatPriceDH } from "@/utils/pricing"
 import { CITIES, City, fetchCities } from "@/data/data"
 import {
@@ -197,6 +198,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
         const formData = new FormData()
         formData.append("customer_name", name)
         formData.append("customer_email", email)
+        formData.append("customer_phone", phone)
         const shippingAddress = deliveryMethod === "pickup" ? "Pickup at store" : `${address}, ${selectedCity.name}`
         formData.append("shipping_address", shippingAddress)
         formData.append("city_id", String(selectedCity.id))
@@ -232,6 +234,9 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
             styleId: item.styleId,
           }
           formData.append(`items[${index}][pricing_data]`, JSON.stringify(pricingData))
+          if (notes.trim()) {
+            formData.append(`items[${index}][special_request]`, notes.trim())
+          }
         })
 
         if (proofFile) {

@@ -383,11 +383,35 @@
     border-right: none;
     border-bottom: 1px solid var(--border-soft);
     flex: none;
+    max-height: 50vh;
   }
   .modal-img {
-    max-height: 160px;
-    min-height: 120px;
+    max-height: none;
+    min-height: 180px;
+    height: auto;
     border-radius: 0;
+  }
+
+  /* Photo view: scrollable within its container */
+  .modal-img-col .visualizer-photo-pane {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    min-height: 180px;
+    max-height: 50vh;
+  }
+  .modal-img-col .visualizer-photo-pane img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  /* Blueprint/SVG view: fixed, no scroll */
+  .modal-img-col .visualizer-svg-pane {
+    overflow: hidden;
+    max-height: 50vh;
+  }
+  .modal-img-col .sofa-blueprint-svg {
+    max-height: 45vh;
   }
 
   /* Visualizer in modal - compact mobile layout */
@@ -417,14 +441,14 @@
     border-top: 1px solid var(--border-soft);
   }
   .visualizer-canvas-wrapper {
-    min-height: 160px;
+    min-height: 180px;
     padding: 8px;
   }
   .sofa-blueprint-svg {
-    max-height: 160px;
+    max-height: 45vh;
   }
   .visualizer-photo-pane {
-    min-height: 160px;
+    min-height: 180px;
   }
   .visualizer-quick-adjust-bar {
     display: none;

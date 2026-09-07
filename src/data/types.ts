@@ -66,15 +66,49 @@ export interface MattressConfig {
   firmnessLevels: Array<{ id: string; label: string; desc: string }>
 }
 
+export interface BedSizeOption {
+  id: string
+  label: string
+  width: number
+  length: number
+  basePrice: number
+}
+
+export interface BedHeadboardStyle {
+  id: string
+  label: string
+  supplement: number
+}
+
+export interface BedConfig {
+  type: "bed"
+  defaultSizeId: string
+  sizes: BedSizeOption[]
+  allowCustomDimensions: boolean
+  customBounds: {
+    minWidth: number
+    maxWidth: number
+    minLength: number
+    maxLength: number
+    basePrice: number
+    pricePerM2: number
+  }
+  headboardStyles: BedHeadboardStyle[]
+  headboardHeightCm: number
+  hasStorageBox?: boolean
+}
+
 export interface AccessoryConfig {
   type: "accessory"
+  accessorySubtype?: "cushion" | "headrest" | "pouf"
   basePrice: number
   packOptions: Array<{ id: string; count: number; label: string; multiplier: number }>
   sizeOptions: Array<{ id: string; sizeLabel: string; supplement: number }>
   fillOptions: Array<{ id: string; label: string; supplement: number }>
+  tiltAngles?: Array<{ id: string; label: string; degrees: number }>
 }
 
-export type ProductCustomConfig = SofaConfig | ChairConfig | MattressConfig | AccessoryConfig
+export type ProductCustomConfig = SofaConfig | ChairConfig | MattressConfig | BedConfig | AccessoryConfig
 
 export interface UpholsteryStyle {
   id: string
@@ -86,4 +120,5 @@ export const upholsteryStyles: UpholsteryStyle[] = [
   { id: "standard", label: "Standard Fabric", multiplier: 1 },
   { id: "premium", label: "Premium Velvet", multiplier: 1.22 },
   { id: "signature", label: "Signature Leather", multiplier: 1.45 },
+  { id: "linen", label: "Belgian Linen", multiplier: 1.30 },
 ]

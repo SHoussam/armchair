@@ -1,6 +1,6 @@
 /* ── TOAST ── */
 .toast {
-  position: fixed; bottom: 28px; right: 28px; z-index: 500;
+  position: fixed; bottom: 28px; right: 28px; z-index: 1200;
   background: var(--surface-2);
   border: 1px solid var(--border-soft);
   border-left: 3px solid var(--gold);

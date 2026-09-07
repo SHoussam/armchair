@@ -107,6 +107,8 @@ export default function SofaVisualizer({
           <span>{colorName}</span>
           <span style={{ color: 'var(--fg-dim)' }}>·</span>
           <span>{seatSize} cm modules</span>
+          <span style={{ color: 'var(--fg-dim)' }}>·</span>
+          <span>{Math.round(length1 * 100)}×{Math.round(length2 * 100)} cm ({length1.toFixed(2)}×{length2.toFixed(2)} m)</span>
         </div>
       </div>
 
@@ -126,7 +128,7 @@ export default function SofaVisualizer({
             <svg
               viewBox={`0 0 ${svgWidth} ${svgHeight}`}
               className="sofa-blueprint-svg"
-              aria-label={`Interactive blueprint of ${modelName} at ${length1.toFixed(2)}m by ${length2.toFixed(2)}m`}
+              aria-label={`Interactive blueprint of ${modelName} at ${Math.round(length1 * 100)}cm by ${Math.round(length2 * 100)}cm`}
             >
               <defs>
                 {/* Refined blueprint grid */}
@@ -191,21 +193,21 @@ export default function SofaVisualizer({
                 {/* Dimension Badge - refined */}
                 <g transform={`translate(${offsetX + sofaH / 2}, ${offsetY - 28})`}>
                   <rect
-                    x="-38" y="-12"
-                    width="76" height="24" rx="12"
+                    x="-50" y="-12"
+                    width="100" height="24" rx="12"
                     fill="#1a1d2e"
-                    stroke="rgba(201,168,76,0.4)"
-                    strokeWidth="1"
+                    stroke="rgba(201,168,76,0.5)"
+                    strokeWidth="1.2"
                   />
                   <text
                     x="0" y="4"
                     textAnchor="middle"
                     fill="#d4b65c"
                     fontSize="11"
-                    fontWeight="600"
+                    fontWeight="700"
                     fontFamily="'Inter', sans-serif"
                   >
-                    {length1.toFixed(2)} m
+                    {Math.round(length1 * 100)} cm ({length1.toFixed(2)} m)
                   </text>
                 </g>
               </g>
@@ -231,21 +233,21 @@ export default function SofaVisualizer({
                     />
                     <g transform={`translate(${offsetX - 28}, ${offsetY + sofaV / 2})`}>
                       <rect
-                        x="-38" y="-12"
-                        width="76" height="24" rx="12"
+                        x="-50" y="-12"
+                        width="100" height="24" rx="12"
                         fill="#1a1d2e"
-                        stroke="rgba(201,168,76,0.4)"
-                        strokeWidth="1"
+                        stroke="rgba(201,168,76,0.5)"
+                        strokeWidth="1.2"
                       />
                       <text
                         x="0" y="4"
                         textAnchor="middle"
                         fill="#d4b65c"
                         fontSize="11"
-                        fontWeight="600"
+                        fontWeight="700"
                         fontFamily="'Inter', sans-serif"
                       >
-                        {length2.toFixed(2)} m
+                        {Math.round(length2 * 100)} cm ({length2.toFixed(2)} m)
                       </text>
                     </g>
                   </>
@@ -268,21 +270,21 @@ export default function SofaVisualizer({
                     />
                     <g transform={`translate(${offsetX + sofaH + 28}, ${offsetY + sofaV / 2})`}>
                       <rect
-                        x="-38" y="-12"
-                        width="76" height="24" rx="12"
+                        x="-50" y="-12"
+                        width="100" height="24" rx="12"
                         fill="#1a1d2e"
-                        stroke="rgba(201,168,76,0.4)"
-                        strokeWidth="1"
+                        stroke="rgba(201,168,76,0.5)"
+                        strokeWidth="1.2"
                       />
                       <text
                         x="0" y="4"
                         textAnchor="middle"
                         fill="#d4b65c"
                         fontSize="11"
-                        fontWeight="600"
+                        fontWeight="700"
                         fontFamily="'Inter', sans-serif"
                       >
-                        {length2.toFixed(2)} m
+                        {Math.round(length2 * 100)} cm ({length2.toFixed(2)} m)
                       </text>
                     </g>
                   </>

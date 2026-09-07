@@ -4,7 +4,7 @@
   background: rgba(18,14,10,.6);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  z-index: 350;
+  z-index: 1100;
   display: flex; align-items: center; justify-content: center;
   padding: 2.5vh 2.5vw;
   animation: fadeIn .25s var(--ease) both;

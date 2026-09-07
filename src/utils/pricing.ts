@@ -12,6 +12,7 @@ import {
   SeatSize,
   SofaConfig,
   MattressConfig,
+  BedConfig,
   ChairConfig,
   AccessoryConfig,
   upholsteryStyles,
@@ -369,6 +370,91 @@ export function calculateAccessoryPrice(params: AccessoryPricingParams): Accesso
     sizeSupplement,
     fillLabel: fill ? fill.label : "Microfiber",
     fillSupplement,
+    fabricStyleLabel: fabricStyle.label,
+    fabricMultiplier,
+    fabricSupplement,
+    finalPrice,
+  }
+}
+
+// ─────────────────────────────────────────────
+// 5. BED PRICING
+// ─────────────────────────────────────────────
+
+export interface BedPricingParams {
+  sizeId: string
+  isCustomSize?: boolean
+  customWidth?: number
+  customLength?: number
+  headboardStyleId?: string
+  styleId?: string
+  fabricMultiplier?: number
+  bedConfig: BedConfig
+}
+
+export interface BedPriceBreakdown {
+  type: "bed"
+  sizeLabel: string
+  width: number
+  length: number
+  isCustom: boolean
+  baseSizePrice: number
+  headboardLabel: string
+  headboardSupplement: number
+  fabricStyleLabel: string
+  fabricMultiplier: number
+  fabricSupplement: number
+  finalPrice: number
+}
+
+export function calculateBedPrice(params: BedPricingParams): BedPriceBreakdown {
+  const conf = params.bedConfig
+  let baseSizePrice = 4500
+  let width = 1.60
+  let length = 2.00
+  let sizeLabel = "Queen (160 × 200 cm)"
+  const isCustom = !!params.isCustomSize
+
+  if (isCustom && params.customWidth && params.customLength) {
+    width = Number(params.customWidth.toFixed(2))
+    length = Number(params.customLength.toFixed(2))
+    sizeLabel = `Custom (${Math.round(width * 100)} × ${Math.round(length * 100)} cm)`
+    const m2 = width * length
+    const baseM2 = 1.40 * 1.90
+    const extraM2 = Math.max(0, m2 - baseM2)
+    baseSizePrice = Number((conf.customBounds.basePrice + extraM2 * conf.customBounds.pricePerM2).toFixed(2))
+  } else {
+    const preset = conf.sizes.find((s) => s.id === params.sizeId) ?? conf.sizes[0]
+    if (preset) {
+      baseSizePrice = preset.basePrice
+      width = preset.width
+      length = preset.length
+      sizeLabel = preset.label
+    }
+  }
+
+  const hb = conf.headboardStyles.find((h) => h.id === params.headboardStyleId) ?? conf.headboardStyles[0]
+  const headboardSupplement = hb ? hb.supplement : 0
+
+  const fabricStyle = upholsteryStyles.find((s) => s.id === params.styleId) ?? upholsteryStyles[0]
+  const fabricMultiplier = params.fabricMultiplier !== undefined ? params.fabricMultiplier : (fabricStyle ? fabricStyle.multiplier : 1.0)
+
+  const preFabricTotal = baseSizePrice + headboardSupplement
+  const fabricSupplement = Number(
+    fabricMultiplier > 1 ? (preFabricTotal * (fabricMultiplier - 1)).toFixed(2) : 0
+  )
+
+  const finalPrice = Math.max(baseSizePrice, Number((preFabricTotal + fabricSupplement).toFixed(2)))
+
+  return {
+    type: "bed",
+    sizeLabel,
+    width,
+    length,
+    isCustom,
+    baseSizePrice,
+    headboardLabel: hb ? hb.label : "Royal Diamond Tufted",
+    headboardSupplement,
     fabricStyleLabel: fabricStyle.label,
     fabricMultiplier,
     fabricSupplement,

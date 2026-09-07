@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Search, Heart, Clock, User, LogIn, UserPlus, X } from "lucide-react"
+import { Search, Heart, Clock, User, LogIn, UserPlus, X, Menu, Home, LayoutGrid, ShoppingBag, LogOut } from "lucide-react"
 import { Product, products as defaultProducts, fetchProducts } from "@/data/data"
 
 interface NavbarProps {
@@ -30,6 +30,9 @@ export default function Navbar({
   const [productList, setProductList] = useState<Product[]>(defaultProducts)
   const [searchResults, setSearchResults] = useState<Product[]>([])
   const searchContainerRef = useRef<HTMLDivElement>(null)
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [mobileSearchVisible, setMobileSearchVisible] = useState(false)
+  const lastScrollY = useRef(0)
 
   // Sync external search query
   useEffect(() => {
@@ -74,6 +77,32 @@ export default function Navbar({
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
+  // Mobile: scroll-up to reveal search bar
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentY = window.scrollY
+      if (currentY < 80) {
+        setMobileSearchVisible(true)
+      } else if (currentY > lastScrollY.current + 10) {
+        setMobileSearchVisible(false)
+      }
+      lastScrollY.current = currentY
+    }
+    setMobileSearchVisible(window.scrollY < 80)
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  // Lock body scroll when drawer is open
+  useEffect(() => {
+    if (drawerOpen) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = ""
+    }
+    return () => { document.body.style.overflow = "" }
+  }, [drawerOpen])
+
   const handleInputChange = (val: string) => {
     setSearchTerm(val)
     onSearchChange?.(val)
@@ -93,8 +122,16 @@ export default function Navbar({
     <header className="top-navbar">
       <div className="top-navbar-container flex items-center justify-between">
         
-        {/* Left: Brand Logo and Name */}
+        {/* Left: Hamburger (mobile) + Brand */}
         <div className="navbar-left flex items-center">
+          <button
+            type="button"
+            className="navbar-hamburger"
+            onClick={() => setDrawerOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu size={22} />
+          </button>
           <a
             href={import.meta.env.BASE_URL || "/armchair/"}
             className="navbar-brand flex items-center"
@@ -110,7 +147,7 @@ export default function Navbar({
           </a>
         </div>
 
-        {/* Center: Real In-Bar Search (no popup!) */}
+        {/* Center: Real In-Bar Search (desktop only via CSS) */}
         <div className={`navbar-center flex items-center justify-center ${!isAuthenticated ? "expanded" : "compact"}`}>
           <div className="navbar-search-wrapper" ref={searchContainerRef}>
             <div className="navbar-search-bar">
@@ -227,6 +264,101 @@ export default function Navbar({
           )}
         </div>
 
+      </div>
+
+      {/* Mobile: Scroll-up Search Bar */}
+      <div className={`mobile-search-reveal ${mobileSearchVisible ? "visible" : ""}`}>
+        <div className="mobile-search-inner">
+          <Search className="search-icon" size={18} />
+          <input
+            type="text"
+            className="mobile-search-input"
+            placeholder="Search armchairs, salons, mattresses..."
+            value={searchTerm}
+            onChange={(e) => handleInputChange(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            aria-label="Search products"
+          />
+          {searchTerm && (
+            <button type="button" className="navbar-search-clear" onClick={handleClear} aria-label="Clear search">
+              <X size={15} />
+            </button>
+          )}
+        </div>
+        {isFocused && searchTerm.trim().length > 0 && (
+          <div className="mobile-search-dropdown">
+            {searchResults.length > 0 ? (
+              <div className="navbar-search-results">
+                {searchResults.slice(0, 5).map((product) => (
+                  <div
+                    key={product.id}
+                    className="navbar-search-item"
+                    onClick={() => handleProductClick(product)}
+                  >
+                    <img src={product.img} alt={product.imgAlt || product.name} className="navbar-search-thumb" />
+                    <div className="navbar-search-item-info">
+                      <div className="navbar-search-item-name">{product.name}</div>
+                      <div className="navbar-search-item-meta">
+                        <span className="navbar-search-item-cat">{product.category}</span>
+                        <span className="navbar-search-item-price">MAD {product.price?.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="navbar-search-empty">No furniture found for "{searchTerm}"</div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Mobile Drawer Overlay */}
+      {drawerOpen && <div className="mobile-drawer-overlay" onClick={() => setDrawerOpen(false)} />}
+
+      {/* Mobile Drawer */}
+      <div className={`mobile-drawer ${drawerOpen ? "open" : ""}`}>
+        <div className="mobile-drawer-header">
+          <span className="navbar-logo-badge">M</span>
+          <span className="mobile-drawer-brand">مفروشات <strong>عبد اللطيف</strong></span>
+          <button type="button" className="mobile-drawer-close" onClick={() => setDrawerOpen(false)} aria-label="Close menu">
+            <X size={22} />
+          </button>
+        </div>
+        <nav className="mobile-drawer-nav">
+          <button className="mobile-drawer-item" onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); setDrawerOpen(false) }}>
+            <Home size={20} /> <span>Home</span>
+          </button>
+          <button className="mobile-drawer-item" onClick={() => { onAuthClick?.("login"); setDrawerOpen(false) }}>
+            <LayoutGrid size={20} /> <span>Catalog</span>
+          </button>
+          <button className="mobile-drawer-item" onClick={() => { onWishlistClick?.(); setDrawerOpen(false) }}>
+            <Heart size={20} /> <span>Wishlist</span>
+          </button>
+          <button className="mobile-drawer-item" onClick={() => { onOrdersClick?.(); setDrawerOpen(false) }}>
+            <Clock size={20} /> <span>History</span>
+          </button>
+          <div className="mobile-drawer-divider" />
+          {isAuthenticated ? (
+            <>
+              <button className="mobile-drawer-item" onClick={() => { onAccountClick?.(); setDrawerOpen(false) }}>
+                <User size={20} /> <span>Account</span>
+              </button>
+              <button className="mobile-drawer-item" onClick={() => { setDrawerOpen(false) }}>
+                <LogOut size={20} /> <span>Log Out</span>
+              </button>
+            </>
+          ) : (
+            <>
+              <button className="mobile-drawer-item" onClick={() => { onAuthClick?.("login"); setDrawerOpen(false) }}>
+                <LogIn size={20} /> <span>Log In</span>
+              </button>
+              <button className="mobile-drawer-item primary" onClick={() => { onAuthClick?.("signup"); setDrawerOpen(false) }}>
+                <UserPlus size={20} /> <span>Sign Up</span>
+              </button>
+            </>
+          )}
+        </nav>
       </div>
     </header>
   );

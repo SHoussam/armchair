@@ -30,7 +30,7 @@ interface OrderHistory {
   date: string
   items: { name: string; qty: number; price: number }[]
   total: number
-  status: "pending" | "working" | "waiting_for_payment" | "shipping" | "delivered" | "cancelled"
+  status: "pending" | "working" | "waiting_for_final_payment" | "shipping" | "delivered" | "cancelled"
   city: string
 }
 
@@ -135,7 +135,7 @@ export default function AccountPage({ isOpen, onClose, onViewOrder }: AccountPag
                 }))
               : [],
             total: Number(ord.total || ord.total_amount || 0),
-            status: ord.status || "pending",
+            status: (ord.status || "pending").toLowerCase(),
             city: ord.city?.name || "Tanger",
           }))
           setOrders(mapped)

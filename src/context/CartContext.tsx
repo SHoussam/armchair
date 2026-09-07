@@ -5,6 +5,7 @@ import { Product } from "@/data/data"
 import {
   SofaPriceBreakdown,
   MattressPriceBreakdown,
+  BedPriceBreakdown,
   ChairPriceBreakdown,
   AccessoryPriceBreakdown,
   SeatSize,
@@ -13,6 +14,7 @@ import {
 export type AnyPriceBreakdown =
   | SofaPriceBreakdown
   | MattressPriceBreakdown
+  | BedPriceBreakdown
   | ChairPriceBreakdown
   | AccessoryPriceBreakdown
 
