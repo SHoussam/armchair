@@ -768,5 +768,70 @@
 
 /* ═══ DARK MODE ═══ */
 .dark .checkout-overlay {
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.dark .checkout-modal {
+  background: var(--surface);
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(201, 168, 76, 0.15);
+}
+
+.dark .checkout-header,
+.dark .checkout-steps,
+.dark .checkout-footer {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark .checkout-input-wrap input,
+.dark .checkout-input-wrap select,
+.dark .checkout-textarea {
+  background: var(--surface-2);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--fg);
+}
+
+.dark .checkout-input-wrap input:focus,
+.dark .checkout-input-wrap select:focus,
+.dark .checkout-textarea:focus {
+  border-color: var(--gold);
+  background: var(--surface-3);
+}
+
+.dark .checkout-item,
+.dark .deposit-box,
+.dark .rib-box,
+.dark .upload-dropzone {
+  background: var(--surface-2);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark .delivery-option {
+  background: var(--surface-2);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--fg);
+}
+
+.dark .delivery-option.selected {
+  background: rgba(201, 168, 76, 0.12);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.dark .rib-copy-btn {
+  background: var(--surface-3);
+  color: var(--fg);
+}
+
+.dark .rib-copy-btn:hover {
+  background: var(--gold);
+  color: #ffffff;
+}
+
+.dark .step-circle {
+  background: var(--surface-2);
+  color: var(--fg-dim);
+}
+
+.dark .step-connector {
+  background: rgba(255, 255, 255, 0.08);
 }

@@ -99,11 +99,11 @@
 }
 .badge-sale {
   background: linear-gradient(135deg, #e05252, #c03a3a);
-  color: var(--white);
+  color: #ffffff;
 }
 .badge-bestseller {
   background: linear-gradient(135deg, #7c56d4, #9b6eea);
-  color: var(--white);
+  color: #ffffff;
 }
 
 .wishlist-btn {

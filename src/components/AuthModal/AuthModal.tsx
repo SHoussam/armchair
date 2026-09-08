@@ -1,7 +1,6 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { useAuth } from "@/context/AuthContext"
+import { useCart } from "@/context/CartContext"
 import { LogIn, UserPlus, Mail, Lock, User, Phone, X, Eye, EyeOff } from "lucide-react"
 
 interface AuthModalProps {
@@ -12,6 +11,7 @@ interface AuthModalProps {
 
 export default function AuthModal({ isOpen, onClose, initialTab = "login" }: AuthModalProps) {
   const { login, signup, isLoading } = useAuth()
+  const { showToast } = useCart()
   const [tab, setTab] = useState<"login" | "signup">(initialTab)
   const [error, setError] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -66,6 +66,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = "login" }: Aut
 
     const result = await login(loginEmail.trim(), loginPassword)
     if (result.success) {
+      showToast("Welcome back! You are now logged in.")
       onClose()
     } else {
       setError(result.error || "Login failed.")
@@ -93,6 +94,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = "login" }: Aut
 
     const result = await signup(signupName.trim(), signupEmail.trim(), signupPassword, signupPhone.trim())
     if (result.success) {
+      showToast("Account created successfully! Welcome to مفروشات عبد اللطيف.")
       onClose()
     } else {
       setError(result.error || "Registration failed.")

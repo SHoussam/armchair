@@ -1,5 +1,3 @@
-"use client"
-
 import { useEffect, useState } from "react"
 import brandLogo from "@/data/542094736_18306674428223104_4549775929201968607_n.jpg"
 
@@ -24,18 +22,18 @@ export default function Hero({ onShopClick }: HeroProps) {
         </h1>
         <p className="hero-desc hero-mob-order-3">
           Premium Moroccan salons, custom mattresses, and fine upholstery — handcrafted in Tanger by
-          <strong style={{ color: "var(--gold)", fontWeight: 600 }}> عبداللطيف مفروشات</strong>.
+          <strong style={{ color: "var(--gold)", fontWeight: 600 }}> مفروشات عبد اللطيف</strong>.
           Quality you can feel, comfort that lasts a lifetime.
         </p>
 
         <div className="hero-brand hero-mob-order-4">
           <img
             src={brandLogo}
-            alt="شعار عبداللطيف مفروشات"
+            alt="شعار مفروشات عبد اللطيف"
             className="hero-brand-logo"
           />
           <div className="hero-brand-text">
-            عبداللطيف مفروشات
+            مفروشات عبد اللطيف
             <div className="hero-brand-sub">صناعة راقية، جودة مضمونة</div>
           </div>
         </div>

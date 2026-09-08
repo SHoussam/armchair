@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { useAuth } from "@/context/AuthContext"
 import {
@@ -182,10 +180,10 @@ export default function AccountPage({ isOpen, onClose, onViewOrder }: AccountPag
     <div className="account-overlay" onClick={handleBackdropClick} role="dialog" aria-modal="true" aria-label="My Account">
       <div className="account-modal">
         <div className="account-header">
+          <h2 className="account-title">My Account</h2>
           <button className="account-close" onClick={onClose} aria-label="Close account">
             <X size={18} />
           </button>
-          <h2 className="account-title">My Account</h2>
         </div>
 
         <div className="account-body">

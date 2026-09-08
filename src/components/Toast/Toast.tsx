@@ -88,9 +88,10 @@ export default function Toast() {
       const id = Date.now()
       setToasts((prev) => [...prev, { id, message: state.toast!, type: "success" }])
 
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         setToasts((prev) => prev.filter((t) => t.id !== id))
       }, 2800)
+      return () => clearTimeout(timeoutId)
     }
   }, [state.toast])
 

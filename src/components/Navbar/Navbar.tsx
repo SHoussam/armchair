@@ -1,8 +1,9 @@
-"use client"
-
 import { useState, useEffect, useRef } from "react"
-import { Search, Heart, Clock, User, LogIn, UserPlus, X, Menu, Home, LayoutGrid, ShoppingBag, LogOut } from "lucide-react"
+import { Search, Heart, Clock, User, LogIn, UserPlus, X, Menu, Home, LayoutGrid, ShoppingBag, LogOut, Sun, Moon } from "lucide-react"
 import { Product, products as defaultProducts, fetchProducts } from "@/data/data"
+import { useCart } from "@/context/CartContext"
+import { useTheme } from "@/context/ThemeContext"
+import { useAuth } from "@/context/AuthContext"
 
 interface NavbarProps {
   isAuthenticated: boolean
@@ -13,6 +14,8 @@ interface NavbarProps {
   onOrdersClick?: () => void
   onAccountClick?: () => void
   onWishlistClick?: () => void
+  onCartClick?: () => void
+  onCatalogClick?: () => void
 }
 
 export default function Navbar({
@@ -23,8 +26,13 @@ export default function Navbar({
   onAuthClick,
   onOrdersClick,
   onAccountClick,
-  onWishlistClick
+  onWishlistClick,
+  onCartClick,
+  onCatalogClick
 }: NavbarProps) {
+  const { totalItems, state: cartState } = useCart()
+  const { theme, toggleTheme } = useTheme()
+  const { logout } = useAuth()
   const [searchTerm, setSearchTerm] = useState(searchQuery)
   const [isFocused, setIsFocused] = useState(false)
   const [productList, setProductList] = useState<Product[]>(defaultProducts)
@@ -182,7 +190,16 @@ export default function Navbar({
                       <div
                         key={product.id}
                         className="navbar-search-item"
+                        role="button"
+                        tabIndex={0}
                         onClick={() => handleProductClick(product)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            handleProductClick(product);
+                          }
+                        }}
+                        aria-label={product.name}
                       >
                         <img src={product.img} alt={product.imgAlt || product.name} className="navbar-search-thumb" />
                         <div className="navbar-search-item-info">
@@ -207,6 +224,29 @@ export default function Navbar({
 
         {/* Right: Actions */}
         <div className="navbar-right flex items-center">
+          {/* Dark / Light Mode Switcher */}
+          <button
+            type="button"
+            className="nav-icon-btn theme-toggle-btn"
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+
+          {/* Desktop Cart Button */}
+          <button
+            type="button"
+            className="nav-cart-btn flex items-center"
+            onClick={onCartClick}
+            aria-label={`Shopping cart with ${totalItems} items`}
+          >
+            <ShoppingBag size={18} />
+            <span className="nav-cart-label">Cart</span>
+            {totalItems > 0 && <span className="nav-badge">{totalItems}</span>}
+          </button>
+
           {!isAuthenticated ? (
             /* Visitor State */
             <div className="visitor-actions flex items-center">
@@ -238,6 +278,9 @@ export default function Navbar({
               >
                 <Heart size={18} />
                 <span className="nav-item-label">Wishlist</span>
+                {cartState.wishlist.length > 0 && (
+                  <span className="nav-badge-pill">{cartState.wishlist.length}</span>
+                )}
               </button>
               <button 
                 type="button"
@@ -329,14 +372,30 @@ export default function Navbar({
           <button className="mobile-drawer-item" onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); setDrawerOpen(false) }}>
             <Home size={20} /> <span>Home</span>
           </button>
-          <button className="mobile-drawer-item" onClick={() => { onAuthClick?.("login"); setDrawerOpen(false) }}>
+          <button className="mobile-drawer-item" onClick={() => {
+            if (onCatalogClick) {
+              onCatalogClick();
+            } else {
+              document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" });
+            }
+            setDrawerOpen(false);
+          }}>
             <LayoutGrid size={20} /> <span>Catalog</span>
           </button>
           <button className="mobile-drawer-item" onClick={() => { onWishlistClick?.(); setDrawerOpen(false) }}>
             <Heart size={20} /> <span>Wishlist</span>
+            {cartState.wishlist.length > 0 && <span className="mobile-drawer-badge">{cartState.wishlist.length}</span>}
+          </button>
+          <button className="mobile-drawer-item" onClick={() => { onCartClick?.(); setDrawerOpen(false) }}>
+            <ShoppingBag size={20} /> <span>Cart</span>
+            {totalItems > 0 && <span className="mobile-drawer-badge">{totalItems}</span>}
           </button>
           <button className="mobile-drawer-item" onClick={() => { onOrdersClick?.(); setDrawerOpen(false) }}>
             <Clock size={20} /> <span>History</span>
+          </button>
+          <button className="mobile-drawer-item" onClick={toggleTheme}>
+            {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+            <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
           </button>
           <div className="mobile-drawer-divider" />
           {isAuthenticated ? (
@@ -344,7 +403,7 @@ export default function Navbar({
               <button className="mobile-drawer-item" onClick={() => { onAccountClick?.(); setDrawerOpen(false) }}>
                 <User size={20} /> <span>Account</span>
               </button>
-              <button className="mobile-drawer-item" onClick={() => { setDrawerOpen(false) }}>
+              <button className="mobile-drawer-item" onClick={() => { logout(); setDrawerOpen(false) }}>
                 <LogOut size={20} /> <span>Log Out</span>
               </button>
             </>

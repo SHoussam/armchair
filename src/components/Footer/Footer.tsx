@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import { Instagram, Facebook, Phone, MapPin, MessageCircle } from "lucide-react"
 
@@ -12,6 +10,11 @@ export default function Footer() {
     setSubmitted(true)
     setEmail("")
     setTimeout(() => setSubmitted(false), 3000)
+  }
+
+  const handleCategoryClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" })
   }
 
   return (
@@ -53,11 +56,11 @@ export default function Footer() {
         <div>
           <h3 className="footer-col-title">Shop</h3>
           <ul className="footer-links">
-            <li><a href="#">All Products</a></li>
-            <li><a href="#">Moroccan Salons</a></li>
-            <li><a href="#">Mattresses</a></li>
-            <li><a href="#">Chairs &amp; Sofas</a></li>
-            <li><a href="#">Accessories</a></li>
+            <li><a href="#shop" onClick={handleCategoryClick}>All Products</a></li>
+            <li><a href="#shop" onClick={handleCategoryClick}>Moroccan Salons</a></li>
+            <li><a href="#shop" onClick={handleCategoryClick}>Mattresses</a></li>
+            <li><a href="#shop" onClick={handleCategoryClick}>Chairs &amp; Sofas</a></li>
+            <li><a href="#shop" onClick={handleCategoryClick}>Accessories</a></li>
           </ul>
         </div>
 

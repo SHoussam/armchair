@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { Search, Package, Truck, CheckCircle, Clock, AlertCircle, X, ArrowLeft } from "lucide-react"
 
@@ -212,6 +210,17 @@ export default function OrderTrackingPage({ onClose, orderId }: OrderTrackingPag
       fetchOrderFromApi(orderId)
     }
   }, [orderId])
+
+  // Escape key listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && onClose) {
+        onClose()
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [onClose])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()

@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect, useMemo, useRef } from "react"
 import {
   Product,
@@ -14,6 +12,7 @@ import {
   SeatSize,
 } from "@/data/data"
 import { useCart } from "@/context/CartContext"
+import { renderStars } from "@/utils/helpers"
 import {
   calculateSofaPrice,
   calculateMattressPrice,
@@ -32,10 +31,6 @@ import AccessoryVisualizer from "../SVG/AccessoryVisualizer"
 interface ProductModalProps {
   product: Product | null
   onClose: () => void
-}
-
-function renderStars(rating: number): string {
-  return "★".repeat(Math.floor(rating)) + (rating % 1 >= 0.5 ? "½" : "")
 }
 
 export default function ProductModal({ product, onClose }: ProductModalProps) {
@@ -873,6 +868,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                     className="modal-select"
                     value={mattressCoreId}
                     onChange={(e) => setMattressCoreId(e.target.value)}
+                    aria-label="Mattress core support"
                   >
                     {(product.config as MattressConfig).coreOptions.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -1221,6 +1217,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                       className="modal-select"
                       value={accessoryFillId}
                       onChange={(e) => setAccessoryFillId(e.target.value)}
+                      aria-label="Cushion fill type"
                     >
                       {(product.config as AccessoryConfig).fillOptions.map((fill) => (
                         <option key={fill.id} value={fill.id}>

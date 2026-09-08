@@ -1,16 +1,11 @@
-"use client"
-
 import { useState } from "react"
 import { Product } from "@/data/data"
 import { useCart } from "@/context/CartContext"
+import { renderStars } from "@/utils/helpers"
 
 interface ProductCardProps {
   product: Product
   onViewDetail: (product: Product) => void
-}
-
-function renderStars(rating: number): string {
-  return "★".repeat(Math.floor(rating)) + (rating % 1 >= 0.5 ? "½" : "")
 }
 
 export default function ProductCard({ product, onViewDetail }: ProductCardProps) {
@@ -28,7 +23,7 @@ export default function ProductCard({ product, onViewDetail }: ProductCardProps)
   const handleWishlist = (e: React.MouseEvent) => {
     e.stopPropagation()
     toggleWishlist(product.id)
-    showToast(wished ? "Removed from wishlist" : "Added to wishlist ♥")
+    showToast(!wished ? "Removed from wishlist" : "Added to wishlist ♥")
   }
 
   const handleColorSelect = (e: React.MouseEvent, idx: number) => {

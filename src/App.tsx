@@ -5,13 +5,13 @@ import FeaturesBanner from "@/components/FeaturesStrip/FeaturesBanner"
 import ProductGrid from "@/components/Shop/ProductGrid"
 import CartDrawer from "@/components/CartDrawer/CartDrawer"
 import ProductModal from "@/components/ProductModal/ProductModal"
-import SearchBar from "@/components/Search/SearchBar"
 import Footer from "@/components/Footer/Footer"
 import Toast from "@/components/Toast/Toast"
 import AuthModal from "@/components/AuthModal/AuthModal"
 import OrderTrackingPage from "@/components/Tracking/OrderTrackingPage"
 import AccountPage from "@/components/AccountPage/AccountPage"
 import MobileNav from "@/components/MobileBottomNav/MobileNav"
+import WishlistDrawer from "@/components/WishlistDrawer/WishlistDrawer"
 import { CartProvider } from "@/context/CartContext"
 import { AuthProvider } from "@/context/AuthContext"
 import { ThemeProvider } from "@/context/ThemeContext"
@@ -21,10 +21,10 @@ import { Product } from "@/data/data"
 
 function ShopPage({ onOrdersClick, onAccountClick }: { onOrdersClick: () => void; onAccountClick: () => void }) {
   const [searchQuery, setSearchQuery] = useState("")
-  const [searchOpen, setSearchOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [authOpen, setAuthOpen] = useState(false)
   const [authTab, setAuthTab] = useState<"login" | "signup">("login")
+  const [wishlistOpen, setWishlistOpen] = useState(false)
   const shopRef = useRef<HTMLDivElement>(null)
   const { toggleCart } = useCart()
   const { isAuthenticated } = useAuth()
@@ -33,10 +33,6 @@ function ShopPage({ onOrdersClick, onAccountClick }: { onOrdersClick: () => void
     shopRef.current?.scrollIntoView({ behavior: "smooth" })
   }
 
-  const handleCloseSearch = () => {
-    setSearchOpen(false)
-    setSearchQuery("")
-  }
 
   return (
     <div>
@@ -48,7 +44,9 @@ function ShopPage({ onOrdersClick, onAccountClick }: { onOrdersClick: () => void
         onAuthClick={(tab) => { setAuthTab(tab); setAuthOpen(true) }}
         onOrdersClick={onOrdersClick}
         onAccountClick={onAccountClick}
-        onWishlistClick={toggleCart}
+        onWishlistClick={() => setWishlistOpen(true)}
+        onCartClick={toggleCart}
+        onCatalogClick={scrollToShop}
       />
 
       <main>
@@ -183,6 +181,12 @@ function ShopPage({ onOrdersClick, onAccountClick }: { onOrdersClick: () => void
       <Footer />
 
       <CartDrawer />
+      <WishlistDrawer
+        isOpen={wishlistOpen}
+        onClose={() => setWishlistOpen(false)}
+        onSelectProduct={(product) => setSelectedProduct(product)}
+        onBrowseClick={scrollToShop}
+      />
       <ProductModal product={selectedProduct} onClose={() => setSelectedProduct(null)} />
       <Toast />
       <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} initialTab={authTab} />
@@ -202,7 +206,7 @@ function ShopPage({ onOrdersClick, onAccountClick }: { onOrdersClick: () => void
 
       <MobileNav
         onCatalogClick={() => shopRef.current?.scrollIntoView({ behavior: "smooth" })}
-        onWishlistClick={toggleCart}
+        onWishlistClick={() => setWishlistOpen(true)}
         onCartClick={toggleCart}
         onProfileClick={() => { if (isAuthenticated) onAccountClick(); else { setAuthTab("login"); setAuthOpen(true); } }}
       />

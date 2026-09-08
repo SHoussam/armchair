@@ -1,17 +1,51 @@
-"use client"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useCart } from "@/context/CartContext"
+import { CITIES, City } from "@/data/data"
 import CheckoutModal from "../CheckoutModal"
 
 export default function CartDrawer() {
   const { state, removeItem, updateQty, closeCart, clearCart, totalPrice, totalItems, showToast } = useCart()
   const [checkoutOpen, setCheckoutOpen] = useState(false)
+  const [selectedCityId, setSelectedCityId] = useState<string | number | null>(null)
+
+  // Lock body scroll when cart drawer is open
+  useEffect(() => {
+    if (state.isOpen) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = ""
+    }
+    return () => {
+      document.body.style.overflow = ""
+    }
+  }, [state.isOpen])
+
+  // Escape key listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && state.isOpen) {
+        closeCart()
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [state.isOpen, closeCart])
 
   const FREE_SHIPPING_THRESHOLD = 800
-  const shipping = totalPrice >= FREE_SHIPPING_THRESHOLD ? 0 : 150
-  const grandTotal = totalPrice + shipping
-  const progressPct = Math.min(100, (totalPrice / FREE_SHIPPING_THRESHOLD) * 100)
+  const selectedCity = selectedCityId !== null
+    ? CITIES.find((c) => String(c.id) === String(selectedCityId))
+    : null
+  const shipping = selectedCity
+    ? selectedCity.zone === "tanger" && totalPrice >= FREE_SHIPPING_THRESHOLD
+      ? 0
+      : selectedCity.shipping
+    : null
+  const grandTotal = totalPrice + (shipping ?? 0)
+  const progressPct = selectedCity
+    ? selectedCity.zone === "tanger"
+      ? Math.min(100, (totalPrice / FREE_SHIPPING_THRESHOLD) * 100)
+      : 100
+    : 0
 
   const handleCheckout = () => {
     setCheckoutOpen(true)
@@ -132,6 +166,19 @@ export default function CartDrawer() {
                         </>
                       )}
 
+                      {breakdown?.type === "bed" && (
+                        <>
+                          <span>·</span>
+                          <span style={{ color: "var(--gold)" }}>{breakdown.sizeLabel}</span>
+                          {breakdown.headboardLabel && (
+                            <>
+                              <span>·</span>
+                              <span>{breakdown.headboardLabel}</span>
+                            </>
+                          )}
+                        </>
+                      )}
+
                       {!breakdown && (
                         <>
                           <span>·</span>
@@ -178,13 +225,37 @@ export default function CartDrawer() {
         {/* Footer */}
         {state.items.length > 0 && (
           <div className="cart-footer" id="cartFooter">
+            <div style={{ marginBottom: 12 }}>
+              <label htmlFor="cartCitySelect" style={{ display: "block", fontSize: "0.8rem", color: "var(--muted)", marginBottom: 4 }}>
+                Delivery City
+              </label>
+              <select
+                id="cartCitySelect"
+                className="modal-select"
+                value={selectedCityId ?? ""}
+                onChange={(e) => setSelectedCityId(e.target.value ? Number(e.target.value) : null)}
+                aria-label="Select delivery city"
+              >
+                <option value="">Select city...</option>
+                {CITIES.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}{c.zone === "tanger" ? " (Free over 800 MAD)" : ` — MAD ${c.shipping}`}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <div className="shipping-progress-track">
               <div className="shipping-progress-fill" style={{ width: `${progressPct}%` }} />
             </div>
             <div className="shipping-notice" id="shippingNotice">
-              {totalPrice < FREE_SHIPPING_THRESHOLD
-                ? `Add MAD ${(FREE_SHIPPING_THRESHOLD - totalPrice).toLocaleString()} more for free shipping!`
-                : "✓ You qualify for free shipping in Tanger!"}
+              {!selectedCity
+                ? "Select your city to see shipping cost"
+                : selectedCity.zone === "tanger" && totalPrice < FREE_SHIPPING_THRESHOLD
+                  ? `Add MAD ${(FREE_SHIPPING_THRESHOLD - totalPrice).toLocaleString()} more for free shipping!`
+                  : selectedCity.zone === "tanger"
+                    ? "✓ You qualify for free shipping in Tanger!"
+                    : `Shipping to ${selectedCity.name}: MAD ${selectedCity.shipping}`}
             </div>
 
             <div className="cart-subtotal">
@@ -193,7 +264,7 @@ export default function CartDrawer() {
             </div>
             <div className="cart-subtotal">
               <span>Shipping</span>
-              <span id="cartShipping">{shipping === 0 ? "Free" : `MAD ${shipping}`}</span>
+              <span id="cartShipping">{shipping === null ? "Calculated at checkout" : shipping === 0 ? "Free" : `MAD ${shipping}`}</span>
             </div>
             <div className="cart-total">
               <span>Total</span>

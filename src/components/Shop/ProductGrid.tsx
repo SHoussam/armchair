@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useRef, useEffect } from "react"
 import { products as defaultProducts, categories as defaultCategories, Product, fetchProducts, fetchCategories } from "@/data/data"
 import ProductCard from "./ProductCard"
@@ -53,8 +51,8 @@ export default function ProductGrid({ searchQuery, onViewDetail }: ProductGridPr
         prodCat === activeCat ||
         (activeCat === "salons" && (prodCat.includes("sofa") || prodCat.includes("salon"))) ||
         (activeCat === "chairs" && (prodCat.includes("chair") || prodCat.includes("couch"))) ||
-        (activeCat === "beds" && (prodCat.includes("bed") || prodCat.includes("mattress"))) ||
-        (activeCat === "mattresses" && (prodCat.includes("mattress") || prodCat.includes("bed"))) ||
+        (activeCat === "beds" && prodCat.includes("bed")) ||
+        (activeCat === "mattresses" && prodCat.includes("mattress")) ||
         (activeCat === "accessories" && (prodCat.includes("accessor") || prodCat.includes("cushion") || prodCat.includes("pouf") || prodCat.includes("headrest")))
       const query = searchQuery.toLowerCase()
       const matchesSearch =
@@ -103,7 +101,7 @@ export default function ProductGrid({ searchQuery, onViewDetail }: ProductGridPr
       <div className="section-header">
         <p className="section-eyebrow">Our Selection</p>
         <h2 className="section-title">The Collection</h2>
-        <p className="section-sub">Handcrafted armchairs — bespoke upholstery, made to order</p>
+        <p className="section-sub">Handcrafted Moroccan salons, luxury armchairs, mattresses & furnishings</p>
       </div>
 
       {/* Filter bar */}
@@ -193,8 +191,8 @@ export default function ProductGrid({ searchQuery, onViewDetail }: ProductGridPr
       {/* Grid */}
       {filtered.length === 0 ? (
         <div style={{ textAlign: "center", padding: "80px 0" }}>
-          <p className="section-title" style={{ fontSize: "1.4rem" }}>No chairs found.</p>
-          <p className="section-sub" style={{ marginTop: "12px" }}>Try a different category or search term.</p>
+          <p className="section-title" style={{ fontSize: "1.4rem" }}>No furniture found</p>
+          <p className="section-sub" style={{ marginTop: "12px" }}>Try selecting a different category or refining your search term.</p>
         </div>
       ) : (
         <div className="product-grid" id="productGrid">

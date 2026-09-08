@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect, useRef } from "react"
 import { Home, LayoutGrid, Heart, ShoppingBag, User } from "lucide-react"
 import { useCart } from "@/context/CartContext"

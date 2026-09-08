@@ -246,8 +246,93 @@
 
 /* ── RIGHT: Actions ── */
 .navbar-right {
-  gap: 12px;
+  gap: 10px;
   flex-shrink: 0;
+}
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-soft);
+  background: var(--surface-2);
+  color: var(--fg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-premium);
+}
+
+.theme-toggle-btn:hover {
+  background: var(--surface);
+  border-color: var(--gold);
+  color: var(--gold);
+  transform: rotate(15deg) scale(1.05);
+  box-shadow: 0 4px 14px rgba(176, 141, 62, 0.15);
+}
+
+/* Desktop Cart Button */
+.nav-cart-btn {
+  position: relative;
+  background: var(--surface-2);
+  color: var(--fg);
+  border: 1.5px solid var(--border-soft);
+  padding: 8px 18px;
+  border-radius: 100px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  gap: 7px;
+  transition: all var(--duration-normal) var(--ease-premium);
+  font-family: 'Inter', sans-serif;
+  white-space: nowrap;
+}
+
+.nav-cart-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(176, 141, 62, 0.08);
+  transform: translateY(-1px);
+}
+
+.nav-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  box-shadow: 0 2px 8px rgba(176, 141, 62, 0.35);
+}
+
+.nav-badge-pill {
+  background: rgba(176, 141, 62, 0.15);
+  color: var(--gold);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 10px;
+  margin-left: 2px;
+}
+
+.mobile-drawer-badge {
+  margin-left: auto;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
 }
 
 /* Visitor Buttons */
@@ -544,7 +629,7 @@
 /* ══════════════════════════════════════════════════
    MOBILE RESPONSIVE
    ══════════════════════════════════════════════════ */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .top-navbar-container {
     padding: 0 12px;
     height: 56px;
@@ -571,23 +656,9 @@
     justify-content: center;
   }
 
+  /* Hide all right-side buttons on mobile - navigation via hamburger drawer */
   .navbar-right {
-    gap: 4px;
-    margin-left: auto;
-  }
-
-  .nav-item-label {
     display: none;
-  }
-
-  .btn-signup span,
-  .btn-login span {
-    display: none;
-  }
-
-  .btn-signup,
-  .btn-login {
-    padding: 8px;
   }
 
   /* Mobile search reveal — fixed below header, slides in/out */
@@ -621,9 +692,9 @@
 }
 
 /* ══════════════════════════════════════════════════
-   TABLET (769–1024px)
+   TABLET (768–1024px)
    ══════════════════════════════════════════════════ */
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (min-width: 768px) and (max-width: 1024px) {
   .top-navbar-container {
     padding: 0 20px;
     height: 66px;

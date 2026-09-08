@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { useCart } from "@/context/CartContext"
 import { useAuth } from "@/context/AuthContext"
@@ -401,9 +399,9 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                       flex: 1,
                       padding: "12px",
                       borderRadius: "8px",
-                      border: `2px solid ${deliveryMethod === "delivery" ? "#d4a853" : "#333"}`,
+                      border: `2px solid ${deliveryMethod === "delivery" ? "var(--gold)" : "var(--border)"}`,
                       backgroundColor: deliveryMethod === "delivery" ? "rgba(212, 168, 83, 0.1)" : "transparent",
-                      color: deliveryMethod === "delivery" ? "#d4a853" : "#999",
+                      color: deliveryMethod === "delivery" ? "var(--gold)" : "var(--muted)",
                       cursor: "pointer",
                       fontSize: "14px",
                       fontWeight: 600,
@@ -419,9 +417,9 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                       flex: 1,
                       padding: "12px",
                       borderRadius: "8px",
-                      border: `2px solid ${deliveryMethod === "pickup" ? "#d4a853" : "#333"}`,
+                      border: `2px solid ${deliveryMethod === "pickup" ? "var(--gold)" : "var(--border)"}`,
                       backgroundColor: deliveryMethod === "pickup" ? "rgba(212, 168, 83, 0.1)" : "transparent",
-                      color: deliveryMethod === "pickup" ? "#d4a853" : "#999",
+                      color: deliveryMethod === "pickup" ? "var(--gold)" : "var(--muted)",
                       cursor: "pointer",
                       fontSize: "14px",
                       fontWeight: 600,
