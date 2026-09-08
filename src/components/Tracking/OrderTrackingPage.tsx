@@ -99,6 +99,7 @@ function StatusTimeline({ currentStatus }: TimelineProps) {
           <div
             key={status}
             className={`timeline-step ${isCompleted ? "completed" : ""} ${isCurrent ? "current" : ""} ${isPending ? "pending" : ""}`}
+            aria-current={isCurrent ? "step" : undefined}
           >
             <div className="timeline-connector-wrapper">
               {index > 0 && (

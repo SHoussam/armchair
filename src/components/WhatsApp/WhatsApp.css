@@ -26,7 +26,7 @@
   animation: shimmerPremium 1.5s ease infinite;
 }
 .btn-whatsapp:active {
-  transform: translateY(-1px) scale(.98);
+  transform: scale(0.975);
   transition-duration: .1s;
 }
 .btn-whatsapp-cta {
@@ -53,30 +53,28 @@
 }
 .btn-whatsapp-cta:hover::before { opacity: 1; }
 .btn-whatsapp-cta:active {
-  transform: translateY(-1px) scale(.98);
+  transform: scale(0.975);
   transition-duration: .1s;
 }
 
 /* ── FLOATING WHATSAPP ── */
 .whatsapp-float {
-  position: fixed; bottom: 84px; right: 28px; z-index: 490;
-  width: 56px; height: 56px; border-radius: 50%;
+  position: fixed; bottom: 28px; right: 28px; z-index: 490;
+  width: 48px; height: 48px; border-radius: 50%;
   background: var(--wa); color: #fff;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 6px 24px rgba(31,122,82,.4), 0 0 0 0 rgba(31,122,82,.2);
+  box-shadow: 0 4px 16px rgba(31,122,82,.32), 0 0 0 1px rgba(255,255,255,.2) inset;
   text-decoration: none;
-  transition: all var(--duration-normal) var(--ease-premium);
-  animation: pulse-badge 3s infinite;
+  transition: transform 0.2s var(--ease-apple), box-shadow 0.2s var(--ease-apple);
 }
 .whatsapp-float:hover {
-  transform: scale(1.12);
+  transform: scale(1.08);
   background: var(--wa-dark);
-  box-shadow: 0 10px 35px rgba(31,122,82,.55), 0 0 0 4px rgba(31,122,82,.15);
-  animation: none;
+  box-shadow: 0 6px 24px rgba(31,122,82,.45), 0 0 0 1px rgba(255,255,255,.25) inset;
 }
 .whatsapp-float:active {
-  transform: scale(1.05);
-  transition-duration: .1s;
+  transform: scale(0.92);
+  transition-duration: 0.1s;
 }
 
 /* Tracking WhatsApp */

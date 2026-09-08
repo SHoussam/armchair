@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react"
+import { X } from "lucide-react"
 import {
   Product,
   upholsteryStyles,
@@ -414,6 +415,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
       aria-label={`Product configurator for ${product.name}`}
     >
       <div className="modal modal-sofa-wide">
+        <div className="modal-sheet-grabber" aria-hidden="true" />
         <div className="modal-inner">
           {/* Left Column: Interactive Vector Visualizer - sticky on mobile */}
           <div className="modal-img-col">
@@ -543,7 +545,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
           {/* Right Column: Configuration Controls */}
           <div className="modal-body">
             <button className="modal-close" onClick={onClose} aria-label="Close configurator">
-              ✕
+              <X size={18} strokeWidth={2.5} />
             </button>
 
             {/* ── Header ── */}
@@ -922,27 +924,31 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                   </div>
 
                   {!isCustomBedSize ? (
-                    <div className="mattress-size-grid">
+                    <div className="bed-size-grid">
                       {(product.config as BedConfig).sizes.map((s) => {
                         const isSelected = bedSizeId === s.id
+                        const match = s.label.match(/^([A-Za-z\s]+?)\s+(\d+.*)$/)
+                        const sizeName = match ? match[1].trim() : s.label
+                        const sizeDims = match ? match[2].trim() : `${Math.round(s.width * 100)}×${Math.round(s.length * 100)} cm`
                         return (
                           <button
                             key={s.id}
                             type="button"
-                            className={`seat-size-card ${isSelected ? "selected" : ""}`}
+                            className={`bed-size-card ${isSelected ? "selected" : ""}`}
                             onClick={() => {
                               setBedSizeId(s.id)
                               setBedWidth(s.width)
                               setBedLength(s.length)
                             }}
                           >
-                            <div className="seat-card-top">
-                              <span className="seat-size-number" style={{ fontSize: "0.85rem" }}>
-                                {s.label}
-                              </span>
+                            <div className="bed-size-card-header">
+                              <div className="bed-size-title-wrap">
+                                <span className="bed-size-name">{sizeName}</span>
+                                <span className="bed-size-dim">{sizeDims}</span>
+                              </div>
                               <span className="seat-check">✓</span>
                             </div>
-                            <div className="seat-card-base">{s.basePrice.toLocaleString()} DH</div>
+                            <div className="bed-size-price">{s.basePrice.toLocaleString()} DH</div>
                           </button>
                         )
                       })}
@@ -990,24 +996,24 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                       <h3 className="config-step-title">Headboard Style</h3>
                     </div>
                   </div>
-                  <div className="seat-size-grid">
+                  <div className="headboard-style-grid">
                     {(product.config as BedConfig).headboardStyles.map((hb) => {
                       const isSelected = bedHeadboardStyleId === hb.id
                       return (
                         <button
                           key={hb.id}
                           type="button"
-                          className={`seat-size-card ${isSelected ? "selected" : ""}`}
+                          className={`headboard-style-card ${isSelected ? "selected" : ""}`}
                           onClick={() => setBedHeadboardStyleId(hb.id)}
                         >
-                          <div className="seat-card-top">
-                            <span className="seat-size-number" style={{ fontSize: "0.85rem" }}>
-                              {hb.label}
-                            </span>
+                          <div className="headboard-card-header">
+                            <span className="headboard-card-title">{hb.label}</span>
                             <span className="seat-check">✓</span>
                           </div>
-                          <div className="seat-card-rate">
-                            {hb.supplement > 0 ? `+${hb.supplement} DH` : "Included"}
+                          <div className="headboard-card-footer">
+                            <span className={`headboard-price-badge ${hb.supplement > 0 ? "supplement" : "included"}`}>
+                              {hb.supplement > 0 ? `+${hb.supplement} DH` : "Included"}
+                            </span>
                           </div>
                         </button>
                       )

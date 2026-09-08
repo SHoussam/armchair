@@ -5,7 +5,11 @@
   animation: gradientShift 8s ease infinite;
   border-top: 1px solid var(--border-soft);
   border-bottom: 1px solid var(--border-soft);
-  padding: 120px 5vw; text-align: center; position: relative; overflow: hidden;
+  padding: 100px clamp(24px, 3.5vw, 64px);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
 }
 .cta-banner::before {
   content: '';
@@ -27,7 +31,7 @@
   background: var(--fg); color: var(--white);
   padding: 14px 38px; border: none; border-radius: var(--radius-sm);
   font-size: .9rem; font-weight: 700; cursor: pointer;
-  letter-spacing: .8px; text-transform: uppercase;
+  letter-spacing: .5px;
   transition: all var(--duration-normal) var(--ease-premium);
   text-decoration: none; display: inline-block; position: relative;
   overflow: hidden;
@@ -50,6 +54,6 @@
   animation: shimmerPremium 1.5s ease infinite;
 }
 .btn-white:active {
-  transform: translateY(-1px) scale(.98);
+  transform: scale(0.975);
   transition-duration: .1s;
 }

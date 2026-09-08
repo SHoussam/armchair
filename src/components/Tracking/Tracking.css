@@ -131,7 +131,7 @@
 }
 
 .tracking-search-input::placeholder {
-  color: var(--fg-dim);
+  color: var(--fg-muted);
 }
 
 .tracking-search-btn {
@@ -261,7 +261,7 @@
 
 .tracking-product-name-ar {
   font-size: 1.05rem;
-  color: var(--fg-dim);
+  color: var(--fg-muted);
   margin-top: 4px;
 }
 
@@ -284,7 +284,7 @@
 
 .tracking-detail-label {
   font-size: 0.72rem;
-  color: var(--fg-dim);
+  color: var(--fg-muted);
   text-transform: uppercase;
   letter-spacing: 0.8px;
   font-weight: 600;
@@ -362,7 +362,7 @@
   justify-content: center;
   background: var(--surface-2);
   border: 2px solid var(--border-soft);
-  color: var(--fg-dim);
+  color: var(--fg-muted);
   transition: all 0.3s var(--ease-premium);
 }
 
@@ -392,7 +392,7 @@
 
 .timeline-label-ar {
   font-size: 0.85rem;
-  color: var(--fg-dim);
+  color: var(--fg-muted);
   margin-top: 2px;
 }
 

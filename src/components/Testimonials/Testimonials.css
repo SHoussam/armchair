@@ -1,9 +1,13 @@
 /* ── TESTIMONIALS ── */
-#testimonials { padding: 120px 5vw; }
+#testimonials {
+  padding: 100px clamp(24px, 3.5vw, 64px);
+  width: 100%;
+}
 .testimonials-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 24px;
+  width: 100%;
 }
 .testimonial-card {
   background: var(--surface-2); border-radius: var(--radius-md);

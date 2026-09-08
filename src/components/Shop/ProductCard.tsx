@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Heart } from "lucide-react"
 import { Product } from "@/data/data"
 import { useCart } from "@/context/CartContext"
 import { renderStars } from "@/utils/helpers"
@@ -61,7 +62,7 @@ export default function ProductCard({ product, onViewDetail }: ProductCardProps)
           onClick={handleWishlist}
           aria-label={wished ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
         >
-          {wished ? "♥" : "♡"}
+          <Heart size={19} fill={wished ? "currentColor" : "none"} strokeWidth={2} />
         </button>
 
         {/* Quick Personalize Button */}
@@ -73,7 +74,7 @@ export default function ProductCard({ product, onViewDetail }: ProductCardProps)
       <div className="product-card-body">
         <div className="product-category">
           {product.category}
-          <span style={{ marginLeft: "6px", color: "var(--gold)", fontSize: "0.68rem" }}>· Bespoke</span>
+          <span style={{ marginLeft: "6px", color: "var(--gold-text)", fontSize: "0.68rem" }}>· Bespoke</span>
         </div>
         <div className="product-name">{product.name}</div>
         <div className="product-stars">
@@ -81,10 +82,10 @@ export default function ProductCard({ product, onViewDetail }: ProductCardProps)
         </div>
         <div className="product-price-row">
           <span className="product-price">
-            From {product.price.toLocaleString()} DH
+            From {product.price.toLocaleString()} MAD
           </span>
           {product.oldPrice && (
-            <span className="product-price-old">{product.oldPrice.toLocaleString()} DH</span>
+            <span className="product-price-old">{product.oldPrice.toLocaleString()} MAD</span>
           )}
         </div>
         {/* Visual color swatches */}

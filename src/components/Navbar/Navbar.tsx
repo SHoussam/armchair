@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react"
-import { Search, Heart, Clock, User, LogIn, UserPlus, X, Menu, Home, LayoutGrid, ShoppingBag, LogOut, Sun, Moon } from "lucide-react"
+import { Search, Heart, Clock, User, LogIn, UserPlus, X, ShoppingBag, Sun, Moon } from "lucide-react"
 import { Product, products as defaultProducts, fetchProducts } from "@/data/data"
 import { useCart } from "@/context/CartContext"
 import { useTheme } from "@/context/ThemeContext"
@@ -38,7 +38,6 @@ export default function Navbar({
   const [productList, setProductList] = useState<Product[]>(defaultProducts)
   const [searchResults, setSearchResults] = useState<Product[]>([])
   const searchContainerRef = useRef<HTMLDivElement>(null)
-  const [drawerOpen, setDrawerOpen] = useState(false)
   const [mobileSearchVisible, setMobileSearchVisible] = useState(false)
   const lastScrollY = useRef(0)
 
@@ -101,16 +100,6 @@ export default function Navbar({
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // Lock body scroll when drawer is open
-  useEffect(() => {
-    if (drawerOpen) {
-      document.body.style.overflow = "hidden"
-    } else {
-      document.body.style.overflow = ""
-    }
-    return () => { document.body.style.overflow = "" }
-  }, [drawerOpen])
-
   const handleInputChange = (val: string) => {
     setSearchTerm(val)
     onSearchChange?.(val)
@@ -130,16 +119,8 @@ export default function Navbar({
     <header className="top-navbar">
       <div className="top-navbar-container flex items-center justify-between">
         
-        {/* Left: Hamburger (mobile) + Brand */}
+        {/* Left: Brand */}
         <div className="navbar-left flex items-center">
-          <button
-            type="button"
-            className="navbar-hamburger"
-            onClick={() => setDrawerOpen(true)}
-            aria-label="Open menu"
-          >
-            <Menu size={22} />
-          </button>
           <a
             href={import.meta.env.BASE_URL || "/armchair/"}
             className="navbar-brand flex items-center"
@@ -356,69 +337,7 @@ export default function Navbar({
         )}
       </div>
 
-      {/* Mobile Drawer Overlay */}
-      {drawerOpen && <div className="mobile-drawer-overlay" onClick={() => setDrawerOpen(false)} />}
-
-      {/* Mobile Drawer */}
-      <div className={`mobile-drawer ${drawerOpen ? "open" : ""}`}>
-        <div className="mobile-drawer-header">
-          <span className="navbar-logo-badge">M</span>
-          <span className="mobile-drawer-brand">مفروشات <strong>عبد اللطيف</strong></span>
-          <button type="button" className="mobile-drawer-close" onClick={() => setDrawerOpen(false)} aria-label="Close menu">
-            <X size={22} />
-          </button>
-        </div>
-        <nav className="mobile-drawer-nav">
-          <button className="mobile-drawer-item" onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); setDrawerOpen(false) }}>
-            <Home size={20} /> <span>Home</span>
-          </button>
-          <button className="mobile-drawer-item" onClick={() => {
-            if (onCatalogClick) {
-              onCatalogClick();
-            } else {
-              document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" });
-            }
-            setDrawerOpen(false);
-          }}>
-            <LayoutGrid size={20} /> <span>Catalog</span>
-          </button>
-          <button className="mobile-drawer-item" onClick={() => { onWishlistClick?.(); setDrawerOpen(false) }}>
-            <Heart size={20} /> <span>Wishlist</span>
-            {cartState.wishlist.length > 0 && <span className="mobile-drawer-badge">{cartState.wishlist.length}</span>}
-          </button>
-          <button className="mobile-drawer-item" onClick={() => { onCartClick?.(); setDrawerOpen(false) }}>
-            <ShoppingBag size={20} /> <span>Cart</span>
-            {totalItems > 0 && <span className="mobile-drawer-badge">{totalItems}</span>}
-          </button>
-          <button className="mobile-drawer-item" onClick={() => { onOrdersClick?.(); setDrawerOpen(false) }}>
-            <Clock size={20} /> <span>History</span>
-          </button>
-          <button className="mobile-drawer-item" onClick={toggleTheme}>
-            {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
-            <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
-          </button>
-          <div className="mobile-drawer-divider" />
-          {isAuthenticated ? (
-            <>
-              <button className="mobile-drawer-item" onClick={() => { onAccountClick?.(); setDrawerOpen(false) }}>
-                <User size={20} /> <span>Account</span>
-              </button>
-              <button className="mobile-drawer-item" onClick={() => { logout(); setDrawerOpen(false) }}>
-                <LogOut size={20} /> <span>Log Out</span>
-              </button>
-            </>
-          ) : (
-            <>
-              <button className="mobile-drawer-item" onClick={() => { onAuthClick?.("login"); setDrawerOpen(false) }}>
-                <LogIn size={20} /> <span>Log In</span>
-              </button>
-              <button className="mobile-drawer-item primary" onClick={() => { onAuthClick?.("signup"); setDrawerOpen(false) }}>
-                <UserPlus size={20} /> <span>Sign Up</span>
-              </button>
-            </>
-          )}
-        </nav>
-      </div>
     </header>
   );
 }
+

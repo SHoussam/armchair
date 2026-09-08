@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useAuth } from "@/context/AuthContext"
 import { useCart } from "@/context/CartContext"
 import { LogIn, UserPlus, Mail, Lock, User, Phone, X, Eye, EyeOff } from "lucide-react"
@@ -15,6 +15,8 @@ export default function AuthModal({ isOpen, onClose, initialTab = "login" }: Aut
   const [tab, setTab] = useState<"login" | "signup">(initialTab)
   const [error, setError] = useState("")
   const [showPassword, setShowPassword] = useState(false)
+  const previousFocusRef = useRef<HTMLElement | null>(null)
+  const modalRef = useRef<HTMLDivElement>(null)
 
   const [loginEmail, setLoginEmail] = useState("")
   const [loginPassword, setLoginPassword] = useState("")
@@ -27,6 +29,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = "login" }: Aut
 
   useEffect(() => {
     if (isOpen) {
+      previousFocusRef.current = document.activeElement as HTMLElement
       setError("")
       setShowPassword(false)
       setLoginEmail("")
@@ -37,8 +40,13 @@ export default function AuthModal({ isOpen, onClose, initialTab = "login" }: Aut
       setSignupPassword("")
       setSignupConfirm("")
       document.body.style.overflow = "hidden"
+      setTimeout(() => {
+        const firstInput = modalRef.current?.querySelector('input, button, [tabindex]:not([tabindex="-1"])') as HTMLElement | null
+        firstInput?.focus()
+      }, 50)
     } else {
       document.body.style.overflow = ""
+      if (previousFocusRef.current) previousFocusRef.current.focus()
     }
     return () => { document.body.style.overflow = "" }
   }, [isOpen])
@@ -50,6 +58,17 @@ export default function AuthModal({ isOpen, onClose, initialTab = "login" }: Aut
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) onClose()
+      if (e.key === "Tab" && isOpen && modalRef.current) {
+        const focusables = Array.from(modalRef.current.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')) as HTMLElement[]
+        if (focusables.length === 0) return
+        const first = focusables[0]
+        const last = focusables[focusables.length - 1]
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault(); last.focus()
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault(); first.focus()
+        }
+      }
     }
     window.addEventListener("keydown", handleKey)
     return () => window.removeEventListener("keydown", handleKey)
@@ -109,7 +128,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = "login" }: Aut
 
   return (
     <div className="auth-overlay" onClick={handleBackdropClick} role="dialog" aria-modal="true" aria-label="Authentication">
-      <div className="auth-modal">
+      <div className="auth-modal" ref={modalRef}>
         <button className="auth-close" onClick={onClose} aria-label="Close">
           <X size={18} />
         </button>
@@ -148,7 +167,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = "login" }: Aut
           </button>
         </div>
 
-        {error && <div className="auth-error">{error}</div>}
+        {error && <div id="auth-error" className="auth-error" role="alert" aria-live="polite">{error}</div>}
 
         {tab === "login" ? (
           <form onSubmit={handleLogin} className="auth-form">
@@ -164,6 +183,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = "login" }: Aut
                   onChange={(e) => setLoginEmail(e.target.value)}
                   autoComplete="email"
                   required
+                  aria-describedby={error ? "auth-error" : undefined}
                 />
               </div>
             </div>

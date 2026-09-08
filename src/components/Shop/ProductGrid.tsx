@@ -106,12 +106,12 @@ export default function ProductGrid({ searchQuery, onViewDetail }: ProductGridPr
 
       {/* Filter bar */}
       <div className="filter-bar">
-        {/* Desktop tabs */}
-        <div className="filter-tabs" id="filterTabs">
+        {/* Desktop segmented control */}
+        <div className="segmented-control-container" id="filterTabs">
           {categoriesList.map((cat) => (
             <button
               key={cat}
-              className={`filter-tab ${activeCategory === cat ? "active" : ""}`}
+              className={`segmented-tab ${activeCategory === cat ? "active" : ""}`}
               data-filter={cat.toLowerCase()}
               onClick={() => setActiveCategory(cat)}
             >

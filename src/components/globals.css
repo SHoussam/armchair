@@ -9,12 +9,13 @@
   --surface-2:   #f4f1eb;
   --surface-3:   #eae5dc;
   --gold:        #b08d3e;
+  --gold-text:   #8a661c;
   --gold-light:  #c9a84c;
   --gold-muted:  #8a7038;
   --rose:        #b96a4e;
   --fg:          #221d16;
   --fg-muted:    #6d6558;
-  --fg-dim:      #998f80;
+  --fg-dim:      #6e6659;
   --border:      rgba(176,141,62,.35);
   --border-soft: rgba(34,29,22,.09);
   --white:       #ffffff;
@@ -26,8 +27,17 @@
   --wa-soft:     rgba(31,122,82,.1);
 
   /* Typography */
-  --font-body:   'Inter', sans-serif;
-  --font-display: 'Inter', sans-serif;
+  --font-body:   -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", "Inter", system-ui, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "SF Pro", "Inter", system-ui, sans-serif;
+
+  /* Apple HIG Materials & Ease */
+  --ease-apple:  cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --material-blur: blur(24px) saturate(180%);
+  --material-thin: rgba(255, 255, 255, 0.78);
+  --material-border: 0.5px solid rgba(0, 0, 0, 0.08);
+  --material-highlight: 0 1px 0 0 rgba(255, 255, 255, 0.6) inset;
+  --touch-min:   44px;
 
   /* Shadows */
   --shadow-sm:   0 2px 12px rgba(34,29,22,.06);
@@ -55,23 +65,27 @@
   --shadow-btn-hover: 0 8px 25px rgba(34,29,22,.12), 0 4px 10px rgba(34,29,22,.08);
 }
 
-/* ── DARK MODE ── */
+/* ── DARK MODE (Apple 3-tier semantic surfaces) ── */
 .dark {
-  --midnight:    #121212;
-  --surface:     #1e1e1e;
-  --surface-2:   #2a2a2a;
-  --surface-3:   #333333;
+  --midnight:    #000000;          /* Apple System Background */
+  --surface:     #1c1c1e;          /* Apple Secondary Background (Cards) */
+  --surface-2:   #2c2c2e;          /* Apple Tertiary Background (Pills, inputs) */
+  --surface-3:   #3a3a3c;          /* Quaternary Background */
+  --fg:          #ffffff;          /* Primary Label (100% white) */
+  --fg-muted:    rgba(235, 235, 245, 0.60);  /* Secondary Label */
+  --fg-dim:      rgba(235, 235, 245, 0.38);  /* Tertiary Label */
+  --gold-text:   #dbb85e;          /* High-contrast gold label */
   --gold:        #c9a84c;
-  --gold-light:  #dbb85e;
+  --gold-light:  #e5c56c;
   --gold-muted:  #a08a42;
   --rose:        #d4805e;
-  --fg:          #e8e4de;
-  --fg-muted:    #a09890;
-  --fg-dim:      #706860;
   --border:      rgba(201,168,76,.28);
-  --border-soft: rgba(255,255,255,.08);
-  --white:       #1e1e1e;
-  --on-accent:   #121212;
+  --border-soft: rgba(255, 255, 255, 0.08);  /* Apple hairline separator */
+  --material-thin: rgba(28, 28, 30, 0.82);
+  --material-border: 0.5px solid rgba(255, 255, 255, 0.10);
+  --material-highlight: 0 1px 0 0 rgba(255, 255, 255, 0.06) inset;
+  --white:       #1c1c1e;
+  --on-accent:   #000000;
   --wa:          #25d366;
   --wa-dark:     #1ebe57;
   --wa-soft:     rgba(37,211,102,.1);
@@ -87,13 +101,19 @@
   --shadow-btn-hover: 0 8px 25px rgba(0,0,0,.3), 0 4px 10px rgba(0,0,0,.2);
 }
 
+/* Apple tactile press utility */
+.apple-press:active, button:active, .product-card:active {
+  transform: scale(0.975);
+  transition: transform 0.12s var(--ease-apple);
+}
+
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
   max-width: 100%;
 }
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   background: var(--midnight);
   color: var(--fg);
   line-height: 1.6;
@@ -195,3 +215,56 @@ body {
 .justify-end { justify-content: flex-end; }
 .flex-1 { flex: 1 1 0%; }
 .flex-shrink-0 { flex-shrink: 0; }
+
+/* ══════════════════════════════════════════════════════════════
+   TSK-F01 — Apple Design Accessibility Fixes
+   prefers-reduced-motion + focus-visible outline
+   ══════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .apple-press:active, button:active, .product-card:active {
+    transform: none !important;
+  }
+  /* Keyframes naturally stop when duration is near-zero; no invalid multi-keyframe block needed */
+}
+
+/* Focus-visible for keyboard navigation (Apple HIG accessibility) */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2.5px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* High-contrast focus ring for dark mode */
+.dark a:focus-visible,
+.dark button:focus-visible,
+.dark input:focus-visible,
+.dark textarea:focus-visible,
+.dark select:focus-visible,
+.dark [tabindex]:focus-visible {
+  outline: 2.5px solid var(--gold-light);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TSK-F06 — Apple Type Scale (rem-based)
+   ══════════════════════════════════════════════════════════════ */
+
+:root {
+  --text-xs: 0.6875rem;
+  --text-sm: 0.75rem;
+  --text-base: 0.875rem;
+  --text-lg: 1rem;
+  --text-xl: 1.125rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+}
