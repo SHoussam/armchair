@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useCart } from "@/context/CartContext"
-import CheckoutModal from "../CheckoutModal"
+import CheckoutModal from "@/components/CheckoutModal/CheckoutModal"
 
 export default function CartDrawer() {
   const { state, removeItem, updateQty, closeCart, clearCart, totalPrice, totalItems, showToast } = useCart()

@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext"
 import "./CheckoutModal.css"
 import { formatPriceDH } from "@/utils/pricing"
 import { CITIES, City, fetchCities } from "@/data/data"
-import LocationPicker from "./LocationPicker/LocationPicker"
+import LocationPicker from "../LocationPicker/LocationPicker"
 import {
   X,
   MapPin,
