@@ -483,61 +483,6 @@
 }
 
 /* ══════════════════════════════════════════════════
-   MOBILE SEARCH REVEAL (scroll-up)
-   ══════════════════════════════════════════════════ */
-.mobile-search-reveal {
-  display: none;
-}
-
-.mobile-search-inner {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 16px;
-  height: 42px;
-  background: var(--surface-2);
-  border: 1.5px solid var(--border-soft);
-  border-radius: 100px;
-  position: relative;
-}
-
-.mobile-search-inner:focus-within {
-  border-color: var(--gold);
-  background: var(--surface);
-  box-shadow: 0 0 0 3px rgba(176, 141, 62, 0.1);
-}
-
-.mobile-search-input {
-  flex: 1;
-  border: none;
-  background: transparent;
-  outline: none;
-  font-size: 0.88rem;
-  color: var(--fg);
-  font-family: 'Inter', sans-serif;
-  min-width: 0;
-  height: 100%;
-}
-
-.mobile-search-input::placeholder {
-  color: var(--fg-dim);
-}
-
-.mobile-search-dropdown {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: calc(100% + 6px);
-  background: var(--surface);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-  overflow: hidden;
-  z-index: 1050;
-  animation: fadeIn 0.2s ease;
-}
-
-/* ══════════════════════════════════════════════════
    MOBILE DRAWER (hamburger menu)
    ══════════════════════════════════════════════════ */
 .mobile-drawer-overlay {
@@ -704,28 +649,6 @@
     height: 36px;
   }
 
-  /* Mobile search reveal — fixed below header, slides in/out */
-  .mobile-search-reveal {
-    display: block;
-    position: fixed;
-    top: 56px;
-    left: 0;
-    right: 0;
-    z-index: 899;
-    background: var(--material-thin);
-    backdrop-filter: var(--material-blur);
-    -webkit-backdrop-filter: var(--material-blur);
-    padding: 8px 16px 10px;
-    transform: translateY(-110%);
-    transition: transform 0.3s var(--ease-apple);
-    border-bottom: var(--material-border);
-    box-shadow: var(--material-highlight);
-  }
-
-  .mobile-search-reveal.visible {
-    transform: translateY(0);
-  }
-
   .mobile-drawer-overlay,
   .mobile-drawer {
     display: none !important;
@@ -752,10 +675,6 @@
    ══════════════════════════════════════════════════ */
 .dark .top-navbar {
   background: rgba(0, 0, 0, 0.72);
-}
-
-.dark .mobile-search-reveal {
-  background: rgba(18, 18, 18, 0.97);
 }
 
 .dark .btn-profile {

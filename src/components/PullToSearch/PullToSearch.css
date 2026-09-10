@@ -1,0 +1,110 @@
+/* ══════════════════════════════════════════════════
+   PULL-TO-SEARCH (mobile only)
+   Hidden on desktop: the feature is fully wrapped in a
+   max-width media query so the PC layout stays untouched.
+   ══════════════════════════════════════════════════ */
+.pull-to-search {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .pull-to-search {
+    display: block;
+    position: relative;
+    z-index: 899;
+    padding: 8px 16px calc(8px + env(safe-area-inset-top, 0px));
+    background: var(--material-thin);
+    backdrop-filter: var(--material-blur);
+    -webkit-backdrop-filter: var(--material-blur);
+    border-bottom: var(--material-border);
+    box-shadow: var(--material-highlight);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .pull-to-search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 16px;
+    height: 44px;
+    background: var(--surface-2);
+    border: 1.5px solid var(--border-soft);
+    border-radius: 100px;
+    position: relative;
+    transition: border-color 0.25s var(--ease-apple), background 0.25s var(--ease-apple);
+  }
+
+  .pull-to-search-bar:focus-within {
+    border-color: var(--gold);
+    background: var(--surface);
+    box-shadow: 0 0 0 3px rgba(176, 141, 62, 0.1);
+  }
+
+  .pull-to-search-icon {
+    color: var(--fg-muted);
+    flex-shrink: 0;
+  }
+
+  .pull-to-search-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 16px; /* ≥16px prevents iOS Safari input zoom */
+    color: var(--fg);
+    font-family: 'Inter', sans-serif;
+    min-width: 0;
+    height: 100%;
+  }
+
+  .pull-to-search-input::placeholder {
+    color: var(--fg-dim);
+  }
+
+  .pull-to-search-clear {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--fg-dim);
+    padding: 4px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    min-width: 40px;
+    min-height: 40px;
+    transition: color 0.2s, background 0.2s;
+  }
+
+  .pull-to-search-clear:active {
+    color: var(--gold);
+    background: rgba(176, 141, 62, 0.08);
+  }
+
+  .pull-to-search-dropdown {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    top: calc(100% + 6px);
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    z-index: 1050;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .pull-to-search-empty {
+    padding: 18px;
+    text-align: center;
+    color: var(--fg-dim);
+    font-size: 0.88rem;
+  }
+}
+
+/* Dark mode matches the header material */
+.dark .pull-to-search {
+  background: rgba(18, 18, 18, 0.97);
+}

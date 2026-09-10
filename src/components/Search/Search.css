@@ -7,6 +7,7 @@
   display: flex; flex-direction: column; align-items: center; padding-top: 100px;
 }
 .search-overlay.open { opacity: 1; pointer-events: all; }
+.search-overlay.closing { opacity: 0; pointer-events: none; }
 .search-box {
   width: min(660px, 90vw);
   background: var(--surface-2);
@@ -14,7 +15,13 @@
   border-radius: var(--radius-md);
   display: flex; align-items: center; gap: 16px; padding: 0 20px;
   box-shadow: var(--shadow-lg);
-  animation: scaleIn .2s var(--ease) both;
+  transform: scale(1);
+  opacity: 1;
+  transition: transform .25s var(--ease), opacity .2s var(--ease);
+}
+.search-overlay.closing .search-box {
+  transform: scale(.95);
+  opacity: 0;
 }
 .search-box svg { color: var(--gold); flex-shrink: 0; }
 .search-input {

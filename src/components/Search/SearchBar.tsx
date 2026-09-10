@@ -28,9 +28,15 @@ export default function SearchBar({ isOpen, query, onChange, onClose, onSelectPr
     if (isOpen) setTimeout(() => inputRef.current?.focus(), 100)
   }, [isOpen])
 
+  const [closing, setClosing] = useState(false)
+  const handleClose = () => {
+    setClosing(true)
+    setTimeout(() => { setClosing(false); onClose() }, 250)
+  }
+
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose()
+      if (e.key === "Escape") handleClose()
     }
     window.addEventListener("keydown", handleKey)
     return () => window.removeEventListener("keydown", handleKey)
@@ -51,20 +57,20 @@ export default function SearchBar({ isOpen, query, onChange, onClose, onSelectPr
     setResults(matches)
   }, [query, productList])
 
-  if (!isOpen) return null
+  if (!isOpen && !closing) return null
 
   const handleSelectProduct = (product: Product) => {
-    onClose()
+    handleClose()
     onSelectProduct(product)
   }
 
   return (
     <div
-      className="search-overlay open"
+      className={`search-overlay ${closing ? "closing" : "open"}`}
       role="dialog"
       aria-label="Search products"
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose()
+        if (e.target === e.currentTarget) handleClose()
       }}
     >
       <div className="search-box">

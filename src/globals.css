@@ -18,5 +18,6 @@
 @import './components/MobileBottomNav/MobileBottomNav.css';
 @import './components/Tracking/Tracking.css';
 @import './components/Responsive/Responsive.css';
+@import './components/PullToSearch/PullToSearch.css';
 @import './components/PremiumEnhancements/PremiumEnhancements.css';
 @import './components/AccountPage/AccountPage.css';

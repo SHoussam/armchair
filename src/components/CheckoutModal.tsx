@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext"
 import "./CheckoutModal.css"
 import { formatPriceDH } from "@/utils/pricing"
 import { CITIES, City, fetchCities } from "@/data/data"
+import LocationPicker from "./LocationPicker/LocationPicker"
 import {
   X,
   MapPin,
@@ -17,7 +18,6 @@ import {
   Phone,
   User,
   Mail,
-  Building2,
   Home,
   MessageCircle,
 } from "lucide-react"
@@ -55,6 +55,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
   const [phone, setPhone] = useState("")
   const [address, setAddress] = useState("")
   const [cityId, setCityId] = useState<string | number>(CITIES[0]?.id || 1)
+  const [gpsCoords, setGpsCoords] = useState<{ lat: number; lng: number } | null>(null)
   const [notes, setNotes] = useState("")
 
   // Validation errors & loading
@@ -121,14 +122,14 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) onClose()
+      if (e.key === "Escape" && isOpen) handleClose()
     }
     window.addEventListener("keydown", handleKey)
     return () => window.removeEventListener("keydown", handleKey)
   }, [isOpen, onClose])
 
   const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) onClose()
+    if (e.target === e.currentTarget) handleClose()
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -278,7 +279,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
   const handleFinish = () => {
     clearCart()
     closeCart()
-    onClose()
+    handleClose()
   }
 
   const getWhatsAppLink = () => {
@@ -299,11 +300,17 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
     return `https://wa.me/212666896776?text=${msg}`
   }
 
-  if (!isOpen) return null
+  const [closing, setClosing] = useState(false)
+  const handleClose = () => {
+    setClosing(true)
+    setTimeout(() => { setClosing(false); onClose() }, 250)
+  }
+
+  if (!isOpen && !closing) return null
 
   return (
-    <div className="checkout-overlay" onClick={handleBackdropClick} role="dialog" aria-modal="true" aria-label="Checkout">
-      <div className="checkout-modal">
+    <div className={`checkout-overlay ${closing ? "closing" : ""}`} onClick={handleBackdropClick} role="dialog" aria-modal="true" aria-label="Checkout">
+      <div className={`checkout-modal ${closing ? "closing" : ""}`}>
         {/* Header */}
         <div className="checkout-header">
           <button className="checkout-close" onClick={onClose} aria-label="Close checkout">
@@ -376,14 +383,12 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
 
               <div className="checkout-field">
                 <label htmlFor="co-city">City *</label>
-                <div className="checkout-input-wrap has-select">
-                  <Building2 size={16} className="checkout-input-icon" />
-                  <select id="co-city" value={cityId} onChange={(e) => setCityId(e.target.value)}>
-                    {citiesList.map((c) => (
-                      <option key={c.id} value={c.id}>{c.name} {c.shipping > 0 ? `- ${formatPriceDH(c.shipping)}` : '(Free shipping)'}</option>
-                    ))}
-                  </select>
-                </div>
+                <LocationPicker
+                  cities={citiesList}
+                  selectedCityId={cityId}
+                  onSelect={(city) => setCityId(city.id)}
+                  onGpsLocate={(lat, lng) => setGpsCoords({ lat, lng })}
+                />
                 {selectedCity.zone === "tanger" && totalPrice >= FREE_SHIPPING_THRESHOLD && (
                   <span className="field-success">Free shipping available!</span>
                 )}
@@ -391,40 +396,18 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
 
               <div className="checkout-field">
                 <label>Delivery Method *</label>
-                <div className="delivery-method-options" style={{ display: "flex", gap: "12px", marginTop: "6px" }}>
+                <div className="delivery-method-options">
                   <button
                     type="button"
+                    className={`delivery-method-btn ${deliveryMethod === "delivery" ? "selected" : ""}`}
                     onClick={() => setDeliveryMethod("delivery")}
-                    style={{
-                      flex: 1,
-                      padding: "12px",
-                      borderRadius: "8px",
-                      border: `2px solid ${deliveryMethod === "delivery" ? "var(--gold)" : "var(--border)"}`,
-                      backgroundColor: deliveryMethod === "delivery" ? "rgba(212, 168, 83, 0.1)" : "transparent",
-                      color: deliveryMethod === "delivery" ? "var(--gold)" : "var(--muted)",
-                      cursor: "pointer",
-                      fontSize: "14px",
-                      fontWeight: 600,
-                      transition: "all 0.2s",
-                    }}
                   >
                     Delivery
                   </button>
                   <button
                     type="button"
+                    className={`delivery-method-btn ${deliveryMethod === "pickup" ? "selected" : ""}`}
                     onClick={() => setDeliveryMethod("pickup")}
-                    style={{
-                      flex: 1,
-                      padding: "12px",
-                      borderRadius: "8px",
-                      border: `2px solid ${deliveryMethod === "pickup" ? "var(--gold)" : "var(--border)"}`,
-                      backgroundColor: deliveryMethod === "pickup" ? "rgba(212, 168, 83, 0.1)" : "transparent",
-                      color: deliveryMethod === "pickup" ? "var(--gold)" : "var(--muted)",
-                      cursor: "pointer",
-                      fontSize: "14px",
-                      fontWeight: 600,
-                      transition: "all 0.2s",
-                    }}
                   >
                     Pickup (Free)
                   </button>
@@ -614,13 +597,13 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
         {/* Footer Buttons */}
         <div className="checkout-footer">
           {step > 1 && step < 4 && (
-            <button className="checkout-back-btn" onClick={handleBack} disabled={isSubmitting}>
+            <button className="btn-back" onClick={handleBack} disabled={isSubmitting}>
               <ChevronLeft size={16} /> Back
             </button>
           )}
           {step < 4 ? (
             <button
-              className="checkout-next-btn"
+              className="btn-next"
               onClick={handleNext}
               disabled={(step === 1 && !canProceedStep1) || (step === 3 && (!canProceedStep3 || isSubmitting))}
             >
@@ -628,7 +611,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
               {step < 3 && <ChevronRight size={16} />}
             </button>
           ) : (
-            <button className="checkout-next-btn" onClick={handleFinish}>
+            <button className="btn-next" onClick={handleFinish}>
               <CheckCircle2 size={16} /> Done
             </button>
           )}

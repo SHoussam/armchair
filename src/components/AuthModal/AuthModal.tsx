@@ -57,7 +57,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = "login" }: Aut
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) onClose()
+      if (e.key === "Escape" && isOpen) handleClose()
       if (e.key === "Tab" && isOpen && modalRef.current) {
         const focusables = Array.from(modalRef.current.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')) as HTMLElement[]
         if (focusables.length === 0) return
@@ -86,7 +86,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = "login" }: Aut
     const result = await login(loginEmail.trim(), loginPassword)
     if (result.success) {
       showToast("Welcome back! You are now logged in.")
-      onClose()
+      handleClose()
     } else {
       setError(result.error || "Login failed.")
     }
@@ -114,22 +114,29 @@ export default function AuthModal({ isOpen, onClose, initialTab = "login" }: Aut
     const result = await signup(signupName.trim(), signupEmail.trim(), signupPassword, signupPhone.trim())
     if (result.success) {
       showToast("Account created successfully! Welcome to مفروشات عبد اللطيف.")
-      onClose()
+      handleClose()
     } else {
       setError(result.error || "Registration failed.")
     }
   }
 
   const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) onClose()
+    if (e.target === e.currentTarget) handleClose()
   }
 
-  if (!isOpen) return null
+  const [closing, setClosing] = useState(false)
+
+  const handleClose = () => {
+    setClosing(true)
+    setTimeout(() => { setClosing(false); onClose() }, 250)
+  }
+
+  if (!isOpen && !closing) return null
 
   return (
-    <div className="auth-overlay" onClick={handleBackdropClick} role="dialog" aria-modal="true" aria-label="Authentication">
-      <div className="auth-modal" ref={modalRef}>
-        <button className="auth-close" onClick={onClose} aria-label="Close">
+    <div className={`auth-overlay ${closing ? "closing" : ""}`} onClick={handleBackdropClick} role="dialog" aria-modal="true" aria-label="Authentication">
+      <div className={`auth-modal ${closing ? "closing" : ""}`} ref={modalRef}>
+        <button className="auth-close" onClick={handleClose} aria-label="Close">
           <X size={18} />
         </button>
 

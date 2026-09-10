@@ -35,7 +35,7 @@ interface ProductModalProps {
 }
 
 export default function ProductModal({ product, onClose }: ProductModalProps) {
-  const { addItem, toggleCart, showToast } = useCart()
+  const { addItem, showToast } = useCart()
 
   // Dynamic Upholstery Styles from Backend
   const [stylesList, setStylesList] = useState<UpholsteryStyle[]>(upholsteryStyles)
@@ -399,7 +399,6 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
     }
 
     onClose()
-    toggleCart()
   }
 
   const handleBgClick = (e: React.MouseEvent) => {

@@ -7,8 +7,10 @@
   z-index: 1100;
   display: flex; align-items: center; justify-content: center;
   padding: 2.5vh 2.5vw;
-  animation: fadeIn .25s var(--ease) both;
+  opacity: 1;
+  transition: opacity .25s var(--ease);
 }
+.auth-overlay.closing { opacity: 0; }
 .auth-modal {
   background: var(--surface);
   border-radius: 20px;
@@ -19,7 +21,13 @@
   position: relative;
   border: 1px solid rgba(176,141,62,.2);
   box-shadow: 0 32px 80px rgba(22,18,12,.25);
-  animation: scaleIn .3s var(--ease) both;
+  transform: scale(1);
+  opacity: 1;
+  transition: transform .25s var(--ease), opacity .2s var(--ease);
+}
+.auth-modal.closing {
+  transform: scale(.95);
+  opacity: 0;
 }
 .auth-modal::-webkit-scrollbar { width: 4px; }
 .auth-modal::-webkit-scrollbar-track { background: transparent; }

@@ -1,4 +1,5 @@
 import { useRef, useState } from "react"
+import PullToSearch from "@/components/PullToSearch/PullToSearch"
 import Navbar from "@/components/Navbar/Navbar"
 import Hero from "@/components/Hero/Hero"
 import FeaturesBanner from "@/components/FeaturesStrip/FeaturesBanner"
@@ -36,6 +37,12 @@ function ShopPage({ onOrdersClick, onAccountClick }: { onOrdersClick: () => void
 
   return (
     <div>
+      {/* Mobile-only: hidden above the viewport, pull down from the top to reveal */}
+      <PullToSearch
+        query={searchQuery}
+        onChange={setSearchQuery}
+        onSelectProduct={(product) => setSelectedProduct(product)}
+      />
       <Navbar
         isAuthenticated={isAuthenticated}
         searchQuery={searchQuery}

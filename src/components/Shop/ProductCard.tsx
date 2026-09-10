@@ -56,15 +56,6 @@ export default function ProductCard({ product, onViewDetail }: ProductCardProps)
           <span className={badgeClass}>{product.badge}</span>
         )}
 
-        {/* Wishlist */}
-        <button
-          className={`wishlist-btn ${wished ? "active" : ""}`}
-          onClick={handleWishlist}
-          aria-label={wished ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
-        >
-          <Heart size={19} fill={wished ? "currentColor" : "none"} strokeWidth={2} />
-        </button>
-
         {/* Quick Personalize Button */}
         <button className="quick-add" onClick={handlePersonalize}>
           ⚙ Personalize & Price
@@ -103,6 +94,15 @@ export default function ProductCard({ product, onViewDetail }: ProductCardProps)
           ))}
         </div>
       </div>
+
+      {/* Wishlist — sibling of img/body for mobile flow */}
+      <button
+        className={`wishlist-btn ${wished ? "active" : ""}`}
+        onClick={handleWishlist}
+        aria-label={wished ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
+      >
+        <Heart size={19} fill={wished ? "currentColor" : "none"} strokeWidth={2} />
+      </button>
     </article>
   )
 }

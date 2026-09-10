@@ -98,3 +98,86 @@ footer {
   display: flex; align-items: center; justify-content: space-between;
   font-size: .78rem; opacity: .45; flex-wrap: wrap; gap: 10px;
 }
+
+/* ── Mobile ── */
+@media (max-width: 767px) {
+  footer {
+    padding: 48px 20px 28px;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    margin-bottom: 28px;
+  }
+
+  .footer-brand-name {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+
+  .footer-brand-desc {
+    font-size: 0.82rem;
+    line-height: 1.6;
+  }
+
+  .footer-social {
+    margin-top: 16px;
+  }
+
+  .social-link {
+    width: 40px;
+    height: 40px;
+  }
+
+  .footer-col-title {
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+  }
+
+  .footer-links {
+    gap: 10px;
+  }
+
+  .footer-links a,
+  .footer-links li span {
+    font-size: 0.84rem;
+    min-height: 36px;
+    align-items: center;
+  }
+
+  .footer-newsletter-form {
+    margin-top: 10px;
+  }
+
+  .footer-newsletter-input {
+    font-size: 16px;
+    padding: 12px 14px;
+  }
+
+  .footer-newsletter-btn {
+    padding: 12px 18px;
+    min-height: 44px;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding-top: 20px;
+    font-size: 0.75rem;
+  }
+}
+
+/* ── Dark Mode ── */
+.dark footer {
+  background: #1a1a1c;
+}
+.dark .footer-newsletter-input {
+  background: rgba(255,255,255,.06);
+  border-color: rgba(255,255,255,.1);
+  color: #f5f5f7;
+}
+.dark .footer-newsletter-input:focus {
+  background: rgba(255,255,255,.08);
+}

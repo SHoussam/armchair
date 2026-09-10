@@ -10,8 +10,10 @@
   align-items: center;
   justify-content: center;
   padding: 2.5vh 2.5vw;
-  animation: fadeIn 0.25s var(--ease) both;
+  opacity: 1;
+  transition: opacity .25s var(--ease);
 }
+.checkout-overlay.closing { opacity: 0; }
 
 .checkout-modal {
   background: var(--surface);
@@ -24,7 +26,13 @@
   display: flex;
   flex-direction: column;
   box-shadow: var(--shadow-lg);
-  animation: scaleIn 0.3s var(--ease-premium) both;
+  transform: scale(1);
+  opacity: 1;
+  transition: transform .25s var(--ease), opacity .2s var(--ease);
+}
+.checkout-modal.closing {
+  transform: scale(.95);
+  opacity: 0;
 }
 
 /* Header */
@@ -679,31 +687,29 @@
 .delivery-method-options {
   display: flex;
   gap: 12px;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
-.delivery-option {
+.delivery-method-btn {
   flex: 1;
   padding: 12px;
-  border: 1.5px solid var(--border-soft);
   border-radius: 10px;
-  background: var(--surface-2);
-  cursor: pointer;
-  text-align: center;
-  font-size: 0.82rem;
-  font-weight: 600;
+  border: 2px solid var(--border);
+  background: transparent;
   color: var(--fg-muted);
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
   transition: all 0.2s;
 }
-
-.delivery-option.selected {
+.delivery-method-btn:hover {
+  border-color: var(--gold);
+}
+.delivery-method-btn.selected {
   border-color: var(--gold);
   background: rgba(176, 141, 62, 0.08);
-  color: var(--gold);
-}
-
-.delivery-option:hover {
-  border-color: var(--gold);
+  color: var(--gold-text);
 }
 
 /* ═══ MOBILE ═══ */
@@ -718,47 +724,128 @@
     max-height: 95vh;
     max-height: 95dvh;
     border-radius: 20px 20px 0 0;
-    animation: slideUpMobile 0.3s var(--ease) both;
+    transform: translateY(0);
+  }
+  .checkout-modal.closing {
+    transform: translateY(100%);
+    opacity: 1;
+  }
+
+  /* Grabber handle */
+  .checkout-modal::before {
+    content: "";
+    display: block;
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--fg-dim);
+    opacity: 0.25;
+    margin: 10px auto 0;
+    flex-shrink: 0;
   }
 
   .checkout-header {
-    padding: 20px 16px 12px;
+    padding: 12px 16px 10px;
+  }
+
+  .checkout-title {
+    font-size: 1.15rem;
+  }
+
+  .checkout-subtitle {
+    font-size: 0.8rem;
+  }
+
+  .checkout-close {
+    width: 44px;
+    height: 44px;
+    top: 10px;
+    right: 10px;
   }
 
   .checkout-steps {
-    padding: 12px 16px;
+    padding: 10px 16px;
     overflow-x: auto;
     gap: 0;
   }
 
   .step-label {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
   }
 
   .step-connector {
-    width: 16px;
+    width: 20px;
     margin: 0 4px;
   }
 
   .checkout-body {
     padding: 16px;
+    overflow-y: auto;
+    flex: 1;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Prevent iOS zoom on inputs */
+  .checkout-body input,
+  .checkout-body select,
+  .checkout-body textarea {
+    font-size: 16px !important;
+  }
+
+  /* More generous field spacing */
+  .checkout-field {
+    margin-bottom: 18px;
+  }
+
+  .checkout-field label {
+    font-size: 0.85rem;
+    margin-bottom: 8px;
   }
 
   .checkout-row-2 {
     grid-template-columns: 1fr;
   }
 
+  /* Delivery method buttons */
+  .delivery-method-btn {
+    flex: 1;
+    padding: 14px 12px;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: transparent;
+    color: var(--fg-muted);
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s;
+    min-height: 48px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .delivery-method-btn:active {
+    transform: scale(0.97);
+  }
+  .delivery-method-btn.selected {
+    border-color: var(--gold);
+    background: rgba(176, 141, 62, 0.08);
+    color: var(--gold-text);
+  }
+
   .checkout-footer {
     padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 8px));
     flex-direction: column-reverse;
     gap: 8px;
+    border-top: 1px solid var(--border-soft);
+    flex-shrink: 0;
   }
 
   .checkout-footer .btn-back,
   .checkout-footer .btn-next {
     width: 100%;
     justify-content: center;
-    padding: 14px;
+    padding: 16px;
+    min-height: 52px;
+    font-size: 1rem;
   }
 
   .deposit-grid {
@@ -805,13 +892,13 @@
   border-color: rgba(255, 255, 255, 0.08);
 }
 
-.dark .delivery-option {
+.dark .delivery-method-btn {
   background: var(--surface-2);
   border-color: rgba(255, 255, 255, 0.08);
   color: var(--fg);
 }
 
-.dark .delivery-option.selected {
+.dark .delivery-method-btn.selected {
   background: rgba(201, 168, 76, 0.12);
   border-color: var(--gold);
   color: var(--gold);

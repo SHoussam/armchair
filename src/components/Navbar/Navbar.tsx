@@ -38,8 +38,6 @@ export default function Navbar({
   const [productList, setProductList] = useState<Product[]>(defaultProducts)
   const [searchResults, setSearchResults] = useState<Product[]>([])
   const searchContainerRef = useRef<HTMLDivElement>(null)
-  const [mobileSearchVisible, setMobileSearchVisible] = useState(false)
-  const lastScrollY = useRef(0)
 
   // Sync external search query
   useEffect(() => {
@@ -82,22 +80,6 @@ export default function Navbar({
     }
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
-
-  // Mobile: scroll-up to reveal search bar
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentY = window.scrollY
-      if (currentY < 80) {
-        setMobileSearchVisible(true)
-      } else if (currentY > lastScrollY.current + 10) {
-        setMobileSearchVisible(false)
-      }
-      lastScrollY.current = currentY
-    }
-    setMobileSearchVisible(window.scrollY < 80)
-    window.addEventListener("scroll", handleScroll, { passive: true })
-    return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
   const handleInputChange = (val: string) => {
@@ -288,53 +270,6 @@ export default function Navbar({
           )}
         </div>
 
-      </div>
-
-      {/* Mobile: Scroll-up Search Bar */}
-      <div className={`mobile-search-reveal ${mobileSearchVisible ? "visible" : ""}`}>
-        <div className="mobile-search-inner">
-          <Search className="search-icon" size={18} />
-          <input
-            type="text"
-            className="mobile-search-input"
-            placeholder="Search armchairs, salons, mattresses..."
-            value={searchTerm}
-            onChange={(e) => handleInputChange(e.target.value)}
-            onFocus={() => setIsFocused(true)}
-            aria-label="Search products"
-          />
-          {searchTerm && (
-            <button type="button" className="navbar-search-clear" onClick={handleClear} aria-label="Clear search">
-              <X size={15} />
-            </button>
-          )}
-        </div>
-        {isFocused && searchTerm.trim().length > 0 && (
-          <div className="mobile-search-dropdown">
-            {searchResults.length > 0 ? (
-              <div className="navbar-search-results">
-                {searchResults.slice(0, 5).map((product) => (
-                  <div
-                    key={product.id}
-                    className="navbar-search-item"
-                    onClick={() => handleProductClick(product)}
-                  >
-                    <img src={product.img} alt={product.imgAlt || product.name} className="navbar-search-thumb" />
-                    <div className="navbar-search-item-info">
-                      <div className="navbar-search-item-name">{product.name}</div>
-                      <div className="navbar-search-item-meta">
-                        <span className="navbar-search-item-cat">{product.category}</span>
-                        <span className="navbar-search-item-price">MAD {product.price?.toLocaleString()}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="navbar-search-empty">No furniture found for "{searchTerm}"</div>
-            )}
-          </div>
-        )}
       </div>
 
     </header>
