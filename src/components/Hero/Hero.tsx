@@ -16,14 +16,35 @@ export default function Hero({ onShopClick }: HeroProps) {
   return (
     <section className={`hero${animate ? " hero-animate" : ""}`}>
       <div className="hero-text">
-        <span className="hero-eyebrow hero-mob-order-1">Tanger, Morocco · Since 1998</span>
-        <h1 className="hero-title hero-mob-order-2">
+        {/* Desktop Eyebrow (Unchanged) */}
+        <span className="hero-eyebrow hero-mob-order-1 desktop-only">Tanger, Morocco · Since 1998</span>
+        {/* Mobile Atelier Badge */}
+        <div className="hero-atelier-pill mobile-only hero-mob-order-1">
+          <span className="atelier-dot"></span>
+          <span className="atelier-tag">Atelier Sidi Deris</span>
+          <span className="atelier-sep">/</span>
+          <span className="atelier-city">Tanger</span>
+        </div>
+
+        {/* Desktop Title (Unchanged) */}
+        <h1 className="hero-title hero-mob-order-2 desktop-only">
           Your Home Deserves <em>True</em> Luxury
         </h1>
-        <p className="hero-desc hero-mob-order-3">
+        {/* Mobile Atelier Title */}
+        <h1 className="hero-title hero-mob-order-2 mobile-only hero-title--mobile">
+          Handcrafted Moroccan Salons &amp; Custom Mattresses
+        </h1>
+
+        {/* Desktop Description (Unchanged) */}
+        <p className="hero-desc hero-mob-order-3 desktop-only">
           Premium Moroccan salons, custom mattresses, and fine upholstery — handcrafted in Tanger by
           <strong style={{ color: "var(--gold)", fontWeight: 600 }}> مفروشات عبد اللطيف</strong>.
           Quality you can feel, comfort that lasts a lifetime.
+        </p>
+        {/* Mobile Atelier Description */}
+        <p className="hero-desc hero-mob-order-3 mobile-only hero-desc--mobile">
+          Tailored to the exact centimeter of your living room. Carved wood woodwork, 35 kg/m³ high-resilience foam, and luxury upholstery handcrafted in Tanger by
+          <strong style={{ color: "var(--gold)", fontWeight: 600 }}> مفروشات عبد اللطيف</strong>.
         </p>
 
         <div className="hero-brand hero-mob-order-4">
@@ -50,7 +71,8 @@ export default function Hero({ onShopClick }: HeroProps) {
           </a>
         </div>
 
-        <div className="hero-stats hero-mob-order-6">
+        {/* Desktop Stats (Unchanged) */}
+        <div className="hero-stats hero-mob-order-6 desktop-only">
           <div>
             <p className="stat-num">650+</p>
             <p className="stat-label">Products Listed</p>

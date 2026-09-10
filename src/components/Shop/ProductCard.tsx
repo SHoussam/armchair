@@ -58,14 +58,16 @@ export default function ProductCard({ product, onViewDetail }: ProductCardProps)
 
         {/* Quick Personalize Button */}
         <button className="quick-add" onClick={handlePersonalize}>
-          ⚙ Personalize & Price
+          <span className="desktop-only">⚙ Personalize &amp; Price</span>
+          <span className="mobile-only">Configure &amp; Dimensions</span>
         </button>
       </div>
 
       <div className="product-card-body">
         <div className="product-category">
           {product.category}
-          <span style={{ marginLeft: "6px", color: "var(--gold-text)", fontSize: "0.68rem" }}>· Bespoke</span>
+          <span className="desktop-only" style={{ marginLeft: "6px", color: "var(--gold-text)", fontSize: "0.68rem" }}>· Bespoke</span>
+          <span className="mobile-only product-bespoke-tag">Atelier Sizing</span>
         </div>
         <div className="product-name">{product.name}</div>
         <div className="product-stars">

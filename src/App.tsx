@@ -19,6 +19,7 @@ import { ThemeProvider } from "@/context/ThemeContext"
 import { useCart } from "@/context/CartContext"
 import { useAuth } from "@/context/AuthContext"
 import { Product } from "@/data/data"
+import { useAutoScrollOnMobile } from "@/hooks/useAutoScrollOnMobile"
 
 function ShopPage({ onOrdersClick, onAccountClick }: { onOrdersClick: () => void; onAccountClick: () => void }) {
   const [searchQuery, setSearchQuery] = useState("")
@@ -27,6 +28,7 @@ function ShopPage({ onOrdersClick, onAccountClick }: { onOrdersClick: () => void
   const [authTab, setAuthTab] = useState<"login" | "signup">("login")
   const [wishlistOpen, setWishlistOpen] = useState(false)
   const shopRef = useRef<HTMLDivElement>(null)
+  const testimonialScrollRef = useAutoScrollOnMobile<HTMLDivElement>(3800)
   const { toggleCart } = useCart()
   const { isAuthenticated } = useAuth()
 
@@ -74,7 +76,7 @@ function ShopPage({ onOrdersClick, onAccountClick }: { onOrdersClick: () => void
             <p className="section-eyebrow">Customer Reviews</p>
             <h2 className="section-title">Loved Across Tanger</h2>
           </div>
-          <div className="testimonials-grid">
+          <div className="testimonials-grid" ref={testimonialScrollRef}>
             <div className="testimonial-card">
               <div className="testimonial-quote">"</div>
               <div className="testimonial-stars" aria-label="Rated 5 out of 5">★★★★★</div>

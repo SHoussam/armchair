@@ -216,6 +216,28 @@ body {
 .flex-1 { flex: 1 1 0%; }
 .flex-shrink-0 { flex-shrink: 0; }
 
+/* ── RESPONSIVE VISIBILITY HELPERS (Preserves PC 100%) ── */
+.mobile-only {
+  display: none !important;
+}
+.desktop-only {
+  display: initial;
+}
+@media (max-width: 767px) {
+  .desktop-only {
+    display: none !important;
+  }
+  .mobile-only {
+    display: initial !important;
+  }
+  div.mobile-only, p.mobile-only, section.mobile-only {
+    display: block !important;
+  }
+  .flex.mobile-only {
+    display: flex !important;
+  }
+}
+
 /* ══════════════════════════════════════════════════════════════
    TSK-F01 — Apple Design Accessibility Fixes
    prefers-reduced-motion + focus-visible outline

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react"
 import { products as defaultProducts, categories as defaultCategories, Product, fetchProducts, fetchCategories } from "@/data/data"
+import { useAutoScrollOnMobile } from "@/hooks/useAutoScrollOnMobile"
 import ProductCard from "./ProductCard"
 
 interface ProductGridProps {
@@ -11,6 +12,7 @@ type SortOption = "featured" | "price-asc" | "price-desc" | "rating"
 
 export default function ProductGrid({ searchQuery, onViewDetail }: ProductGridProps) {
   const [productList, setProductList] = useState<Product[]>(defaultProducts)
+  const productScrollRef = useAutoScrollOnMobile<HTMLDivElement>(4200)
   const [categoriesList, setCategoriesList] = useState<string[]>(defaultCategories)
   const [activeCategory, setActiveCategory] = useState("All")
   const [sortBy, setSortBy] = useState<SortOption>("featured")
@@ -195,7 +197,7 @@ export default function ProductGrid({ searchQuery, onViewDetail }: ProductGridPr
           <p className="section-sub" style={{ marginTop: "12px" }}>Try selecting a different category or refining your search term.</p>
         </div>
       ) : (
-        <div className="product-grid" id="productGrid">
+        <div className="product-grid" id="productGrid" ref={productScrollRef}>
           {filtered.map((product, idx) => (
             <div
               key={product.id}
