@@ -1,26 +1,53 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import { MapPin, Search, Navigation, X, ChevronDown, Check } from "lucide-react"
+import { api } from "@/services/api"
+import { debounce } from "@/utils/debounce"
 import type { City } from "@/data/data"
 import "./LocationPicker.css"
+
+interface LocationSuggestion {
+  id?: number | null
+  name?: string
+  city_name?: string
+  city?: string
+  zone_type?: string
+  latitude?: number
+  longitude?: number
+}
 
 interface LocationPickerProps {
   cities: City[]
   selectedCityId: number | string | null
   onSelect: (city: City) => void
   onGpsLocate: (lat: number, lng: number) => void
+  onLocationResolved?: (quote: {
+    locationId: number
+    coords: { lat: number; lng: number }
+    shippingCost: number
+    zone: string
+    estimatedDelivery: string
+  }) => void
   disabled?: boolean
 }
 
-export default function LocationPicker({ cities, selectedCityId, onSelect, onGpsLocate, disabled }: LocationPickerProps) {
+export default function LocationPicker({
+  cities,
+  selectedCityId,
+  onSelect,
+  onGpsLocate,
+  onLocationResolved,
+  disabled,
+}: LocationPickerProps) {
   const [query, setQuery] = useState("")
   const [open, setOpen] = useState(false)
   const [gpsLoading, setGpsLoading] = useState(false)
   const [gpsSuccess, setGpsSuccess] = useState(false)
   const [gpsError, setGpsError] = useState("")
   const [highlightIdx, setHighlightIdx] = useState(-1)
+  const [backendResults, setBackendResults] = useState<LocationSuggestion[]>([])
+  const [searching, setSearching] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const selectedCity = cities.find((c) => String(c.id) === String(selectedCityId)) || null
 
@@ -33,32 +60,79 @@ export default function LocationPicker({ cities, selectedCityId, onSelect, onGps
     }
   }, [selectedCity, open])
 
-  const filtered = query.trim().length > 0
-    ? cities.filter((c) => {
-        const q = query.toLowerCase().trim()
-        return (
-          c.name.toLowerCase().includes(q) ||
-          c.zone.toLowerCase().includes(q)
+  // Backend search with 300ms debounce
+  const searchBackend = useCallback(
+    debounce(async (q: string) => {
+      if (q.trim().length < 2) {
+        setBackendResults([])
+        setSearching(false)
+        return
+      }
+      setSearching(true)
+      try {
+        const data = await api.get<{ success: boolean; data: LocationSuggestion[] }>(
+          `/locations/search?q=${encodeURIComponent(q)}`
         )
-      })
+        if (data.success && Array.isArray(data.data)) {
+          setBackendResults(data.data)
+        }
+      } catch {
+        // Silently fall back to local results
+      } finally {
+        setSearching(false)
+      }
+    }, 300),
+    []
+  )
+
+  // Merge backend results with local city matches
+  const filtered = query.trim().length > 0
+    ? [
+        ...cities.filter((c) => {
+          const q = query.toLowerCase().trim()
+          return c.name.toLowerCase().includes(q) || c.zone.toLowerCase().includes(q)
+        }),
+        ...backendResults
+          .filter((br) => {
+            const brName = (br.name || br.city_name || br.city || "").toLowerCase()
+            return brName && !cities.some((c) => c.name.toLowerCase() === brName)
+          })
+          .map((br) => {
+            const cityName = br.name || br.city_name || br.city || "Unknown Location"
+            const zone = br.zone_type || "national"
+            return {
+              id: br.id ?? cityName,
+              name: cityName,
+              zone,
+              shipping: zone === "tanger" ? 0 : 350,
+              latitude: br.latitude,
+              longitude: br.longitude,
+              is_active: true,
+              isBackendResult: true,
+            }
+          }),
+      ]
     : cities
 
-  const handleQueryChange = useCallback((val: string) => {
-    setQuery(val)
-    setDisplayValue(val)
-    setGpsSuccess(false)
-    setHighlightIdx(-1)
-    setOpen(true)
-    if (debounceRef.current) clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(() => {}, 300)
-  }, [])
+  const handleQueryChange = useCallback(
+    (val: string) => {
+      setQuery(val)
+      setDisplayValue(val)
+      setGpsSuccess(false)
+      setHighlightIdx(-1)
+      setOpen(true)
+      searchBackend(val)
+    },
+    [searchBackend]
+  )
 
-  const handleSelect = (city: City) => {
+  const handleSelect = (city: City & { isBackendResult?: boolean }) => {
     setQuery("")
     setDisplayValue(city.name)
     setGpsSuccess(false)
     setOpen(false)
     setHighlightIdx(-1)
+    setBackendResults([])
     onSelect(city)
     inputRef.current?.blur()
   }
@@ -70,6 +144,7 @@ export default function LocationPicker({ cities, selectedCityId, onSelect, onGps
     setOpen(false)
     setHighlightIdx(-1)
     setGpsError("")
+    setBackendResults([])
     inputRef.current?.focus()
   }
 
@@ -85,12 +160,37 @@ export default function LocationPicker({ cities, selectedCityId, onSelect, onGps
     setGpsLoading(true)
     setGpsError("")
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
+        const lat = pos.coords.latitude
+        const lng = pos.coords.longitude
+        onGpsLocate(lat, lng)
+
+        try {
+          const data = await api.post<{
+            success: boolean
+            data: {
+              location: { id: number }
+              delivery: { shipping_cost: number; zone: string; estimated_delivery: string }
+            }
+          }>("/locations/gps", { latitude: lat, longitude: lng })
+
+          if (data.success && data.data?.location && data.data?.delivery) {
+            onLocationResolved?.({
+              locationId: data.data.location.id,
+              coords: { lat, lng },
+              shippingCost: data.data.delivery.shipping_cost,
+              zone: data.data.delivery.zone,
+              estimatedDelivery: data.data.delivery.estimated_delivery,
+            })
+          }
+        } catch {
+          // GPS quote failed — proceed without it
+        }
+
         setGpsLoading(false)
         setGpsSuccess(true)
         setDisplayValue("")
         setOpen(false)
-        onGpsLocate(pos.coords.latitude, pos.coords.longitude)
       },
       (err) => {
         setGpsLoading(false)
@@ -121,16 +221,17 @@ export default function LocationPicker({ cities, selectedCityId, onSelect, onGps
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (listRef.current && !listRef.current.contains(e.target as Node) && inputRef.current && !inputRef.current.contains(e.target as Node)) {
+      if (
+        listRef.current &&
+        !listRef.current.contains(e.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(e.target as Node)
+      ) {
         setOpen(false)
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
-
-  useEffect(() => {
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
   }, [])
 
   return (
@@ -160,10 +261,12 @@ export default function LocationPicker({ cities, selectedCityId, onSelect, onGps
               ref={inputRef}
               type="text"
               className="location-input"
-              placeholder="Search your city..."
+              placeholder={searching ? "Searching..." : "Search your city..."}
               value={displayValue}
               onChange={(e) => handleQueryChange(e.target.value)}
-              onFocus={() => { if (query.trim()) setOpen(true) }}
+              onFocus={() => {
+                if (query.trim()) setOpen(true)
+              }}
               onKeyDown={handleKeyDown}
               disabled={disabled}
               autoComplete="off"

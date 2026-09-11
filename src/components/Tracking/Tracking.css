@@ -242,12 +242,18 @@
   color: #15803d;
   border: 1px solid #bbf7d0;
 }
+.status-cancelled {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+}
 
 .dark .status-pending { background: rgba(254, 243, 199, 0.15); color: #fde68a; border-color: rgba(253, 230, 138, 0.25); }
 .dark .status-working { background: rgba(224, 242, 254, 0.15); color: #7dd3fc; border-color: rgba(186, 230, 253, 0.25); }
 .dark .status-waiting_for_final_payment { background: rgba(255, 237, 213, 0.15); color: #fdba74; border-color: rgba(254, 215, 170, 0.25); }
 .dark .status-shipping { background: rgba(243, 232, 255, 0.15); color: #d8b4fe; border-color: rgba(233, 213, 255, 0.25); }
 .dark .status-delivered { background: rgba(220, 252, 231, 0.15); color: #86efac; border-color: rgba(187, 247, 208, 0.25); }
+.dark .status-cancelled { background: rgba(254, 226, 226, 0.15); color: #fca5a5; border-color: rgba(252, 165, 165, 0.25); }
 
 .tracking-product-info {
   margin: 24px 0;

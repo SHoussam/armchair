@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useCallback, ReactNode } from "react"
+import React, { createContext, useContext, useReducer, useCallback, useEffect, ReactNode } from "react"
 import { Product } from "@/data/data"
 import {
   SofaPriceBreakdown,
@@ -204,13 +204,46 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
+const CART_STORAGE_KEY = "armchair_cart_items"
+const WISHLIST_STORAGE_KEY = "armchair_wishlist"
+
+function loadSavedCart(): CartItem[] {
+  try {
+    const raw = typeof window !== "undefined" ? localStorage.getItem(CART_STORAGE_KEY) : null
+    return raw ? JSON.parse(raw) : []
+  } catch {
+    return []
+  }
+}
+
+function loadSavedWishlist(): number[] {
+  try {
+    const raw = typeof window !== "undefined" ? localStorage.getItem(WISHLIST_STORAGE_KEY) : null
+    return raw ? JSON.parse(raw) : []
+  } catch {
+    return []
+  }
+}
+
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(cartReducer, {
-    items: [],
+    items: loadSavedCart(),
     isOpen: false,
-    wishlist: [],
+    wishlist: loadSavedWishlist(),
     toast: null,
   })
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(state.items))
+    } catch {}
+  }, [state.items])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(state.wishlist))
+    } catch {}
+  }, [state.wishlist])
 
   const addItem = useCallback((product: Product, colorIdx: number, options: AddItemOptions = {}) => {
     const qty = options.qty ?? 1

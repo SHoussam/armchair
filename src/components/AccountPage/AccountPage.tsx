@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "@/context/AuthContext"
+import { api } from "@/services/api"
 import {
   X,
   User,
@@ -97,53 +98,47 @@ function formatDate(dateStr: string): string {
 
 export default function AccountPage({ isOpen, onClose, onViewOrder }: AccountPageProps) {
   const { user, token, logout } = useAuth()
-  const [orders, setOrders] = useState<OrderHistory[]>(MOCK_ORDERS)
+  const [orders, setOrders] = useState<OrderHistory[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     if (!isOpen || !user) return
 
-    const authToken = token || (typeof window !== "undefined" ? localStorage.getItem("sanctum_token") : null)
-    if (!authToken) {
-      setOrders(MOCK_ORDERS)
+    if (!token) {
+      setOrders([])
       return
     }
 
     setIsLoading(true)
-    fetch("/api/orders", {
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${authToken}`,
-      },
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch orders")
-        return res.json()
-      })
+    api
+      .get<{ success: boolean; data: any[] }>("/orders")
       .then((data) => {
-        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
-          const mapped: OrderHistory[] = data.data.map((ord: any) => ({
-            id: ord.order_number || `ORD-${ord.id}`,
-            date: ord.created_at || new Date().toISOString(),
-            items: Array.isArray(ord.items)
-              ? ord.items.map((item: any) => ({
-                  name: item.product?.name || "Handcrafted Furniture",
-                  qty: item.quantity || 1,
-                  price: Number(item.calculated_unit_price || item.unit_price || item.total_price || 0),
-                }))
-              : [],
-            total: Number(ord.total || ord.total_amount || 0),
-            status: (ord.status || "pending").toLowerCase(),
-            city: ord.city?.name || "Tanger",
-          }))
-          setOrders(mapped)
+        if (data.success && Array.isArray(data.data)) {
+          if (data.data.length === 0) {
+            setOrders([])
+          } else {
+            const mapped: OrderHistory[] = data.data.map((ord: any) => ({
+              id: ord.order_number || `ORD-${ord.id}`,
+              date: ord.created_at || new Date().toISOString(),
+              items: Array.isArray(ord.items)
+                ? ord.items.map((item: any) => ({
+                    name: item.product?.name || "Handcrafted Furniture",
+                    qty: item.quantity || 1,
+                    price: Number(item.calculated_unit_price || item.unit_price || item.total_price || 0),
+                  }))
+                : [],
+              total: Number(ord.total || ord.total_amount || 0),
+              status: (ord.status || "pending").toLowerCase(),
+              city: ord.city?.name || "Tanger",
+            }))
+            setOrders(mapped)
+          }
         } else {
-          setOrders(MOCK_ORDERS)
+          setOrders([])
         }
       })
       .catch(() => {
-        // Fallback to rich mock orders if backend or dev token is unavailable
-        setOrders(MOCK_ORDERS)
+        setOrders([])
       })
       .finally(() => {
         setIsLoading(false)

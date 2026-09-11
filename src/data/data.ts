@@ -38,6 +38,8 @@ export type {
 }
 export { upholsteryStyles }
 
+import { api } from "@/services/api"
+
 export interface Product {
   id: number
   name: string
@@ -731,11 +733,7 @@ export function mapBackendProductToFrontend(bp: BackendProduct): Product {
 
 export async function fetchProducts(): Promise<Product[]> {
   try {
-    const res = await fetch("/api/products", {
-      headers: { Accept: "application/json" },
-    })
-    if (!res.ok) throw new Error(`HTTP error ${res.status}`)
-    const data = await res.json()
+    const data = await api.get<{ success: boolean; data: BackendProduct[] }>("/products")
     if (data.success && Array.isArray(data.data) && data.data.length > 0) {
       return data.data.map((bp: BackendProduct) => mapBackendProductToFrontend(bp))
     }
@@ -747,11 +745,7 @@ export async function fetchProducts(): Promise<Product[]> {
 
 export async function fetchUpholsteryStyles(): Promise<UpholsteryStyle[]> {
   try {
-    const res = await fetch("/api/upholstery-styles", {
-      headers: { Accept: "application/json" },
-    })
-    if (!res.ok) throw new Error(`HTTP error ${res.status}`)
-    const data = await res.json()
+    const data = await api.get<{ success: boolean; data: BackendUpholsteryStyle[] }>("/upholstery-styles")
     if (data.success && Array.isArray(data.data) && data.data.length > 0) {
       return data.data.map((s: BackendUpholsteryStyle) => ({
         id: s.code || String(s.id),
@@ -767,11 +761,7 @@ export async function fetchUpholsteryStyles(): Promise<UpholsteryStyle[]> {
 
 export async function fetchCities(): Promise<City[]> {
   try {
-    const res = await fetch("/api/cities", {
-      headers: { Accept: "application/json" },
-    })
-    if (!res.ok) throw new Error(`HTTP error ${res.status}`)
-    const data = await res.json()
+    const data = await api.get<{ success: boolean; data: BackendCity[] }>("/cities")
     if (data.success && Array.isArray(data.data) && data.data.length > 0) {
       return data.data.map((c: BackendCity) => ({
         id: c.id,
@@ -798,11 +788,7 @@ export async function fetchCities(): Promise<City[]> {
 
 export async function fetchCategories(): Promise<string[]> {
   try {
-    const res = await fetch("/api/categories", {
-      headers: { Accept: "application/json" },
-    })
-    if (!res.ok) throw new Error(`HTTP error ${res.status}`)
-    const data = await res.json()
+    const data = await api.get<{ success: boolean; data: BackendCategory[] }>("/categories")
     if (data.success && Array.isArray(data.data) && data.data.length > 0) {
       const names = data.data.map((c: BackendCategory) => c.name)
       return ["All", ...names]

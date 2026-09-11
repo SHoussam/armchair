@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react"
-import { Search, Package, Truck, CheckCircle, Clock, AlertCircle, X, ArrowLeft } from "lucide-react"
+import { Search, Package, Truck, CheckCircle, Clock, AlertCircle, X, ArrowLeft, XCircle } from "lucide-react"
+import { api } from "@/services/api"
 
-export type OrderStatus = "PENDING" | "WORKING" | "WAITING_FOR_FINAL_PAYMENT" | "SHIPPING" | "DELIVERED"
+export type OrderStatus = "PENDING" | "WORKING" | "WAITING_FOR_FINAL_PAYMENT" | "SHIPPING" | "DELIVERED" | "CANCELLED"
 
 interface TrackedOrder {
   id: string
@@ -48,6 +49,11 @@ const STATUS_LABELS: Record<OrderStatus, { en: string; ar: string; desc: string 
     ar: "تم التوصيل",
     desc: "Your furniture has been delivered",
   },
+  CANCELLED: {
+    en: "Cancelled",
+    ar: "تم إلغاء الطلب",
+    desc: "This order has been cancelled.",
+  },
 }
 
 const STATUS_ICONS: Record<OrderStatus, React.ReactNode> = {
@@ -56,6 +62,7 @@ const STATUS_ICONS: Record<OrderStatus, React.ReactNode> = {
   WAITING_FOR_FINAL_PAYMENT: <AlertCircle size={20} />,
   SHIPPING: <Truck size={20} />,
   DELIVERED: <CheckCircle size={20} />,
+  CANCELLED: <XCircle size={20} />,
 }
 
 const MOCK_ORDERS: TrackedOrder[] = [
@@ -144,12 +151,11 @@ export default function OrderTrackingPage({ onClose, orderId }: OrderTrackingPag
     const trimmed = id.trim().toUpperCase()
 
     try {
-      const res = await fetch(`/api/orders/${encodeURIComponent(trimmed)}`, {
-        headers: { Accept: "application/json" },
-      })
-      const json = await res.json()
+      const json = await api.get<{ success: boolean; data: any }>(`/orders/track/${encodeURIComponent(trimmed)}`).catch(() => 
+        api.get<{ success: boolean; data: any }>(`/orders/${encodeURIComponent(trimmed)}`)
+      )
 
-      if (res.ok && json.success && json.data) {
+      if (json.success && json.data) {
         const data = json.data
         const items = data.items || []
         const firstProduct = items[0]?.product?.name || "Furniture Order"
@@ -177,7 +183,7 @@ export default function OrderTrackingPage({ onClose, orderId }: OrderTrackingPag
         const tracked: TrackedOrder = {
           id: data.order_number || trimmed,
           productName: firstProduct + (items.length > 1 ? ` (+${items.length - 1} items)` : ""),
-          status: STATUS_ORDER.includes(statusKey) ? statusKey : "PENDING",
+          status: statusKey === "CANCELLED" || STATUS_ORDER.includes(statusKey) ? statusKey : "PENDING",
           orderDate: data.created_at ? data.created_at.substring(0, 10) : new Date().toISOString().substring(0, 10),
           estimatedDelivery: estDelivery,
           total: totalAmount,
@@ -338,9 +344,30 @@ export default function OrderTrackingPage({ onClose, orderId }: OrderTrackingPag
             )}
           </div>
 
-          <div className="tracking-timeline-wrapper">
-            <StatusTimeline currentStatus={foundOrder.status} />
-          </div>
+          {foundOrder.status === "CANCELLED" ? (
+            <div className="tracking-cancelled-alert" style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              padding: "16px 20px",
+              background: "#fee2e2",
+              color: "#991b1b",
+              borderRadius: "12px",
+              border: "1px solid #fca5a5",
+              margin: "24px 0",
+              fontWeight: 500
+            }}>
+              <XCircle size={24} style={{ flexShrink: 0, color: "#dc2626" }} />
+              <div>
+                <strong style={{ display: "block", fontSize: "0.95rem" }}>Order Cancelled</strong>
+                <span style={{ fontSize: "0.85rem", opacity: 0.9 }}>This order has been cancelled. If you have questions or requested a refund, please contact our support team.</span>
+              </div>
+            </div>
+          ) : (
+            <div className="tracking-timeline-wrapper">
+              <StatusTimeline currentStatus={foundOrder.status} />
+            </div>
+          )}
 
           <div className="tracking-actions">
             <button

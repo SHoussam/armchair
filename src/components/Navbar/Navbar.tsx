@@ -215,6 +215,15 @@ export default function Navbar({
             <div className="visitor-actions flex items-center">
               <button 
                 type="button"
+                onClick={onOrdersClick}
+                className="btn-login flex items-center"
+                aria-label="Track Order"
+              >
+                <Clock size={16} />
+                <span>Track Order</span>
+              </button>
+              <button 
+                type="button"
                 onClick={() => onAuthClick?.("login")}
                 className="btn-login flex items-center"
               >

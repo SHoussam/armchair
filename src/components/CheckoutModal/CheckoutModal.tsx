@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { useCart } from "@/context/CartContext"
 import { useAuth } from "@/context/AuthContext"
+import { api, ApiError } from "@/services/api"
 import "./CheckoutModal.css"
 import { formatPriceDH } from "@/utils/pricing"
 import { CITIES, City, fetchCities } from "@/data/data"
@@ -56,6 +57,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
   const [address, setAddress] = useState("")
   const [cityId, setCityId] = useState<string | number>(CITIES[0]?.id || 1)
   const [gpsCoords, setGpsCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const [resolvedLocationId, setResolvedLocationId] = useState<number | null>(null)
   const [notes, setNotes] = useState("")
 
   // Validation errors & loading
@@ -181,7 +183,15 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
     return Object.keys(newErrors).length === 0
   }
 
-  const canProceedStep1 = name.trim() && email.trim() && phone.trim() && (deliveryMethod === "pickup" || address.trim()) && cityId && Object.keys(errors).length === 0
+  const hasActiveErrors = Object.values(errors).some((msg) => Boolean(msg && msg.trim()))
+  const canProceedStep1 = Boolean(
+    name.trim() &&
+    email.trim() &&
+    phone.trim() &&
+    (deliveryMethod === "pickup" || address.trim()) &&
+    cityId &&
+    !hasActiveErrors
+  )
   const canProceedStep3 = proofFile !== null
 
   const handleNext = async () => {
@@ -202,6 +212,11 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
         formData.append("shipping_address", shippingAddress)
         formData.append("city_id", String(selectedCity.id))
         formData.append("delivery_method", deliveryMethod)
+        if (resolvedLocationId) formData.append("location_id", String(resolvedLocationId))
+        if (gpsCoords) {
+          formData.append("latitude", String(gpsCoords.lat))
+          formData.append("longitude", String(gpsCoords.lng))
+        }
 
         state.items.forEach((item, index) => {
           formData.append(`items[${index}][product_id]`, String(item.product.id))
@@ -242,30 +257,23 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
           formData.append("proof_image", proofFile)
         }
 
-        const token = typeof window !== "undefined" ? localStorage.getItem("sanctum_token") : null
-        const headers: Record<string, string> = {
-          Accept: "application/json",
-        }
-        if (token) {
-          headers["Authorization"] = `Bearer ${token}`
-        }
+        const data = await api.postForm<{ success: boolean; data: { order_number: string }; message?: string }>(
+          "/orders",
+          formData
+        )
 
-        const res = await fetch("/api/orders", {
-          method: "POST",
-          body: formData,
-          headers,
-        })
-
-        const data = await res.json()
-
-        if (res.ok && data.success && data.data?.order_number) {
+        if (data.success && data.data?.order_number) {
           setOrderId(data.data.order_number)
           setStep(4)
         } else {
           setErrors({ general: data.message || "Failed to place order. Please try again." })
         }
       } catch (err) {
-        setErrors({ general: "Network error occurred while submitting order." })
+        if (err instanceof ApiError) {
+          setErrors({ general: err.message })
+        } else {
+          setErrors({ general: "Network error occurred while submitting order." })
+        }
       } finally {
         setIsSubmitting(false)
       }
@@ -356,10 +364,11 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
 
               <div className="checkout-field">
                 <label htmlFor="co-name">Full Name *</label>
-                <div className="checkout-input-wrap">
+                <div className={`checkout-input-wrap ${errors.name ? "has-error" : ""}`}>
                   <User size={16} className="checkout-input-icon" />
-                  <input id="co-name" type="text" placeholder="Your full name" value={name} onChange={(e) => setName(e.target.value)} required />
+                  <input id="co-name" type="text" placeholder="Your full name" value={name} onChange={(e) => { setName(e.target.value); setErrors(prev => ({ ...prev, name: "" })) }} required />
                 </div>
+                {errors.name && <span className="field-error">{errors.name}</span>}
               </div>
 
               <div className="checkout-row-2">
@@ -388,6 +397,10 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                   selectedCityId={cityId}
                   onSelect={(city) => setCityId(city.id)}
                   onGpsLocate={(lat, lng) => setGpsCoords({ lat, lng })}
+                  onLocationResolved={(quote) => {
+                    setResolvedLocationId(quote.locationId)
+                    setGpsCoords(quote.coords)
+                  }}
                 />
                 {selectedCity.zone === "tanger" && totalPrice >= FREE_SHIPPING_THRESHOLD && (
                   <span className="field-success">Free shipping available!</span>
