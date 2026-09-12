@@ -1,7 +1,9 @@
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 import { Instagram, Facebook, Phone, MapPin, MessageCircle } from "lucide-react"
 
 export default function Footer() {
+  const { t } = useTranslation("footer")
   const [email, setEmail] = useState("")
   const [submitted, setSubmitted] = useState(false)
 
@@ -24,8 +26,7 @@ export default function Footer() {
         <div>
           <p className="footer-brand-name">مفروشات عبداللطيف</p>
           <p className="footer-brand-desc">
-            Premium Moroccan salons, mattresses, and home furnishings — handcrafted with passion in Tanger since 1998.
-            Visit us or reach out on WhatsApp for a free consultation.
+            {t("brandDesc")}
           </p>
           <div className="footer-social">
             <a
@@ -54,19 +55,19 @@ export default function Footer() {
 
         {/* Shop */}
         <div>
-          <h3 className="footer-col-title">Shop</h3>
+          <h3 className="footer-col-title">{t("shopTitle")}</h3>
           <ul className="footer-links">
-            <li><a href="#shop" onClick={handleCategoryClick}>All Products</a></li>
-            <li><a href="#shop" onClick={handleCategoryClick}>Moroccan Salons</a></li>
-            <li><a href="#shop" onClick={handleCategoryClick}>Mattresses</a></li>
-            <li><a href="#shop" onClick={handleCategoryClick}>Chairs &amp; Sofas</a></li>
-            <li><a href="#shop" onClick={handleCategoryClick}>Accessories</a></li>
+            <li><a href="#shop" onClick={handleCategoryClick}>{t("allProducts")}</a></li>
+            <li><a href="#shop" onClick={handleCategoryClick}>{t("moroccanSalons")}</a></li>
+            <li><a href="#shop" onClick={handleCategoryClick}>{t("mattresses")}</a></li>
+            <li><a href="#shop" onClick={handleCategoryClick}>{t("chairsSofas")}</a></li>
+            <li><a href="#shop" onClick={handleCategoryClick}>{t("accessories")}</a></li>
           </ul>
         </div>
 
         {/* Contact */}
         <div>
-          <h3 className="footer-col-title">Contact Us</h3>
+          <h3 className="footer-col-title">{t("contactUs")}</h3>
           <ul className="footer-links">
             <li>
               <a href="tel:+212666896776" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -75,7 +76,7 @@ export default function Footer() {
             </li>
             <li>
               <a href="https://wa.me/212666896776" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--wa)" }}>
-                <MessageCircle size={13} /> WhatsApp
+                <MessageCircle size={13} /> {t("whatsapp")}
               </a>
             </li>
             <li>
@@ -85,7 +86,7 @@ export default function Footer() {
             </li>
             <li>
               <span style={{ display: "flex", alignItems: "center", gap: "8px", opacity: .65 }}>
-                <MapPin size={13} /> Sidi Deris, Tanger 9000
+                <MapPin size={13} /> {t("address")}
               </span>
             </li>
           </ul>
@@ -93,33 +94,33 @@ export default function Footer() {
 
         {/* Newsletter */}
         <div>
-          <h3 className="footer-col-title">Newsletter</h3>
-          <p className="footer-brand-desc">Get notified about new collections and exclusive offers.</p>
+          <h3 className="footer-col-title">{t("newsletter")}</h3>
+          <p className="footer-brand-desc">{t("newsletterDesc")}</p>
           <form onSubmit={handleSubmit} className="footer-newsletter-form">
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              placeholder="your@email.com"
+              placeholder={t("newsletterPlaceholder")}
               className="footer-newsletter-input"
               aria-label="Newsletter email"
             />
             <button type="submit" className="footer-newsletter-btn">
-              {submitted ? "✓" : "Join"}
+              {submitted ? "✓" : t("newsletterJoin")}
             </button>
           </form>
           {submitted && (
             <p style={{ fontSize: ".74rem", color: "var(--gold)", marginTop: "8px" }}>
-              Welcome to the family! شكراً
+              {t("newsletterSuccess")} شكراً
             </p>
           )}
         </div>
       </div>
 
       <div className="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} مفروشات عبداللطيف — Abdellatif Furnishings. All rights reserved.</p>
-        <p>Sidi Deris, Tanger 9000, Morocco</p>
+        <p>&copy; {new Date().getFullYear()} مفروشات عبداللطيف — {t("copyright")}</p>
+        <p>{t("addressFull")}</p>
       </div>
     </footer>
   )

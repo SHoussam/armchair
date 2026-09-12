@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import { useCart } from "@/context/CartContext"
 import { useAuth } from "@/context/AuthContext"
 import { api, ApiError } from "@/services/api"
@@ -39,13 +40,14 @@ const STORE_RIB = {
 }
 
 const STEPS = [
-  { id: 1, label: "Address", icon: MapPin },
-  { id: 2, label: "Summary", icon: CreditCard },
-  { id: 3, label: "Payment", icon: FileCheck },
-  { id: 4, label: "Confirm", icon: CheckCircle2 },
+  { id: 1, labelKey: "steps.address", icon: MapPin },
+  { id: 2, labelKey: "steps.summary", icon: CreditCard },
+  { id: 3, labelKey: "steps.payment", icon: FileCheck },
+  { id: 4, labelKey: "steps.confirm", icon: CheckCircle2 },
 ]
 
 export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
+  const { t } = useTranslation("checkout")
   const { state, totalPrice, clearCart, closeCart } = useCart()
   const { user } = useAuth()
 
@@ -169,20 +171,20 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
     const newErrors: Record<string, string> = {}
 
     if (!name.trim()) {
-      newErrors.name = "Name is required"
+      newErrors.name = t("errors.nameRequired")
     }
     if (!email.trim()) {
-      newErrors.email = "Email is required"
+      newErrors.email = t("errors.emailRequired")
     } else if (!validateEmail(email)) {
-      newErrors.email = "Please enter a valid email"
+      newErrors.email = t("errors.emailInvalid")
     }
     if (!phone.trim()) {
-      newErrors.phone = "Phone is required"
+      newErrors.phone = t("errors.phoneRequired")
     } else if (!validatePhone(phone)) {
-      newErrors.phone = "Enter a valid Moroccan phone (e.g., 0666123456 or +212666123456)"
+      newErrors.phone = t("errors.phoneInvalid")
     }
     if (deliveryMethod === "delivery" && !address.trim()) {
-      newErrors.address = "Address is required for delivery"
+      newErrors.address = t("errors.addressRequired")
     }
 
     setErrors(newErrors)
@@ -218,7 +220,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
         } else if (phone.trim()) {
           formData.append("customer_phone", phone.trim())
         }
-        const shippingAddress = deliveryMethod === "pickup" ? "Pickup at store" : `${address}, ${selectedCity.name}`
+        const shippingAddress = deliveryMethod === "pickup" ? t("fields.pickup") : `${address}, ${selectedCity.name}`
         formData.append("shipping_address", shippingAddress)
         formData.append("city_id", String(selectedCity.id))
         formData.append("delivery_method", deliveryMethod)
@@ -276,13 +278,13 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
           setOrderId(data.data.order_number)
           setStep(4)
         } else {
-          setErrors({ general: data.message || "Failed to place order. Please try again." })
+          setErrors({ general: data.message || t("errors.generalSubmitFailed") })
         }
       } catch (err) {
         if (err instanceof ApiError) {
           setErrors({ general: err.message })
         } else {
-          setErrors({ general: "Network error occurred while submitting order." })
+          setErrors({ general: t("errors.networkError") })
         }
       } finally {
         setIsSubmitting(false)
@@ -305,16 +307,16 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       const price = formatPriceDH(i.unitPrice * i.qty)
       return `- ${i.product.name} x${i.qty} = ${price}`
     }).join("%0A")
-    const msg = `*New Order: ${orderId}*%0A%0A` +
-      `*Customer:* ${name}%0A` +
-      `*Phone:* ${phone}%0A` +
-      `*Address:* ${address}, ${selectedCity.name}%0A%0A` +
-      `*Items:*%0A${items}%0A%0A` +
-      `*Subtotal:* ${formatPriceDH(totalPrice)}%0A` +
-      `*Shipping:* ${shipping === 0 ? "Free" : formatPriceDH(shipping)}%0A` +
-      `*Total:* ${formatPriceDH(grandTotal)}%0A` +
-      `*Advance (30%):* ${formatPriceDH(advanceAmount)}%0A` +
-      `*Balance (70%):* ${formatPriceDH(balanceAmount)}`
+    const msg = `*${t("whatsapp.newOrder")}: ${orderId}*%0A%0A` +
+      `*${t("whatsapp.customer")}:* ${name}%0A` +
+      `*${t("whatsapp.phone")}:* ${phone}%0A` +
+      `*${t("whatsapp.address")}:* ${address}, ${selectedCity.name}%0A%0A` +
+      `*${t("whatsapp.items")}:*%0A${items}%0A%0A` +
+      `*${t("whatsapp.subtotal")}:* ${formatPriceDH(totalPrice)}%0A` +
+      `*${t("whatsapp.shipping")}:* ${shipping === 0 ? t("freeShippingText") : formatPriceDH(shipping)}%0A` +
+      `*${t("whatsapp.total")}:* ${formatPriceDH(grandTotal)}%0A` +
+      `*${t("whatsapp.advance")}:* ${formatPriceDH(advanceAmount)}%0A` +
+      `*${t("whatsapp.balance")}:* ${formatPriceDH(balanceAmount)}`
     return `https://wa.me/212666896776?text=${msg}`
   }
 
@@ -331,11 +333,11 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       <div className={`checkout-modal ${closing ? "closing" : ""}`}>
         {/* Header */}
         <div className="checkout-header">
-          <button className="checkout-close" onClick={onClose} aria-label="Close checkout">
+          <button className="checkout-close" onClick={onClose} aria-label={t("closeAria")}>
             <X size={18} />
           </button>
-          <h2 className="checkout-title">Checkout</h2>
-          <p className="checkout-subtitle">Complete your order in a few steps</p>
+          <h2 className="checkout-title">{t("title")}</h2>
+          <p className="checkout-subtitle">{t("subtitle")}</p>
         </div>
 
         {/* Step Indicator */}
@@ -349,7 +351,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                 <div className="step-circle">
                   {isDone ? <CheckCircle2 size={16} /> : <Icon size={16} />}
                 </div>
-                <span className="step-label">{s.label}</span>
+                <span className="step-label">{t(s.labelKey)}</span>
                 {i < STEPS.length - 1 && <div className="step-connector" />}
               </div>
             )
@@ -367,48 +369,48 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
           {/* ── STEP 1: Address ── */}
           {step === 1 && (
             <div className="checkout-step-content">
-              <h3 className="step-content-title">
+                <h3 className="step-content-title">
                 <MapPin size={18} />
-                Contact & Delivery Address
+                {t("step1Title")}
               </h3>
 
               {user && (
                 <div style={{ background: "rgba(176,141,62,0.08)", border: "1px solid rgba(176,141,62,0.25)", borderRadius: "8px", padding: "10px 14px", marginBottom: "16px", display: "flex", alignItems: "center", gap: "10px", fontSize: "13px", color: "var(--color-primary, #b08d3e)" }}>
                   <UserCheck size={18} style={{ flexShrink: 0 }} />
-                  <span>Authenticated as <strong>{user.name}</strong> ({user.email}). Your order will be securely linked to your account.</span>
+                  <span>{t("authNote")} <strong>{user.name}</strong> ({user.email}). {t("authSecureNote")}</span>
                 </div>
               )}
 
               <div className="checkout-field">
-                <label htmlFor="co-name">Full Name *</label>
+                  <label htmlFor="co-name">{t("fields.fullName")} *</label>
                 <div className={`checkout-input-wrap ${errors.name ? "has-error" : ""}`}>
                   <User size={16} className="checkout-input-icon" />
-                  <input id="co-name" type="text" placeholder="Your full name" value={name} onChange={(e) => { setName(e.target.value); setErrors(prev => ({ ...prev, name: "" })) }} required />
+                  <input id="co-name" type="text" placeholder={t("placeholders.name")} value={name} onChange={(e) => { setName(e.target.value); setErrors(prev => ({ ...prev, name: "" })) }} required />
                 </div>
                 {errors.name && <span className="field-error">{errors.name}</span>}
               </div>
 
               <div className="checkout-row-2">
                 <div className="checkout-field">
-                  <label htmlFor="co-email">Email *</label>
-                  <div className={`checkout-input-wrap ${errors.email ? "has-error" : ""}`}>
-                    <Mail size={16} className="checkout-input-icon" />
-                    <input id="co-email" type="email" placeholder="you@example.com" value={email} onChange={(e) => { setEmail(e.target.value); setErrors(prev => ({ ...prev, email: "" })) }} required />
-                  </div>
-                  {errors.email && <span className="field-error">{errors.email}</span>}
+                  <label htmlFor="co-email">{t("fields.email")} *</label>
+                <div className={`checkout-input-wrap ${errors.email ? "has-error" : ""}`}>
+                  <Mail size={16} className="checkout-input-icon" />
+                  <input id="co-email" type="email" placeholder={t("placeholders.email")} value={email} onChange={(e) => { setEmail(e.target.value); setErrors(prev => ({ ...prev, email: "" })) }} required />
+                </div>
+                {errors.email && <span className="field-error">{errors.email}</span>}
                 </div>
                 <div className="checkout-field">
-                  <label htmlFor="co-phone">Phone * <span className="field-hint">(Moroccan)</span></label>
-                  <div className={`checkout-input-wrap ${errors.phone ? "has-error" : ""}`}>
-                    <Phone size={16} className="checkout-input-icon" />
-                    <input id="co-phone" type="tel" placeholder="0666 123 456" value={phone} onChange={(e) => { setPhone(e.target.value); setErrors(prev => ({ ...prev, phone: "" })) }} required />
-                  </div>
-                  {errors.phone && <span className="field-error">{errors.phone}</span>}
+                  <label htmlFor="co-phone">{t("fields.phone")} * <span className="field-hint">({t("fields.phoneHint")})</span></label>
+                <div className={`checkout-input-wrap ${errors.phone ? "has-error" : ""}`}>
+                  <Phone size={16} className="checkout-input-icon" />
+                  <input id="co-phone" type="tel" placeholder={t("placeholders.phone")} value={phone} onChange={(e) => { setPhone(e.target.value); setErrors(prev => ({ ...prev, phone: "" })) }} required />
+                </div>
+                {errors.phone && <span className="field-error">{errors.phone}</span>}
                 </div>
               </div>
 
               <div className="checkout-field">
-                <label htmlFor="co-city">City *</label>
+                <label htmlFor="co-city">{t("fields.city")} *</label>
                 <LocationPicker
                   cities={citiesList}
                   selectedCityId={cityId}
@@ -420,42 +422,42 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                   }}
                 />
                 {selectedCity.zone === "tanger" && totalPrice >= FREE_SHIPPING_THRESHOLD && (
-                  <span className="field-success">Free shipping available!</span>
+                  <span className="field-success">{t("freeShipping")}</span>
                 )}
               </div>
 
               <div className="checkout-field">
-                <label>Delivery Method *</label>
-                <div className="delivery-method-options">
-                  <button
-                    type="button"
-                    className={`delivery-method-btn ${deliveryMethod === "delivery" ? "selected" : ""}`}
-                    onClick={() => setDeliveryMethod("delivery")}
-                  >
-                    Delivery
-                  </button>
-                  <button
-                    type="button"
-                    className={`delivery-method-btn ${deliveryMethod === "pickup" ? "selected" : ""}`}
-                    onClick={() => setDeliveryMethod("pickup")}
-                  >
-                    Pickup (Free)
-                  </button>
-                </div>
+                <label>{t("fields.deliveryMethod")} *</label>
+              <div className="delivery-method-options">
+                <button
+                  type="button"
+                  className={`delivery-method-btn ${deliveryMethod === "delivery" ? "selected" : ""}`}
+                  onClick={() => setDeliveryMethod("delivery")}
+                >
+                  {t("fields.delivery")}
+                </button>
+                <button
+                  type="button"
+                  className={`delivery-method-btn ${deliveryMethod === "pickup" ? "selected" : ""}`}
+                  onClick={() => setDeliveryMethod("pickup")}
+                >
+                  {t("fields.pickup")}
+                </button>
+              </div>
               </div>
 
               <div className="checkout-field">
-                <label htmlFor="co-address">Street Address *</label>
-                <div className={`checkout-input-wrap ${errors.address ? "has-error" : ""}`}>
-                  <Home size={16} className="checkout-input-icon" />
-                  <input id="co-address" type="text" placeholder="Street, apartment, building..." value={address} onChange={(e) => { setAddress(e.target.value); setErrors(prev => ({ ...prev, address: "" })) }} required={deliveryMethod === "delivery"} />
-                </div>
+                <label htmlFor="co-address">{t("fields.streetAddress")} *</label>
+              <div className={`checkout-input-wrap ${errors.address ? "has-error" : ""}`}>
+                <Home size={16} className="checkout-input-icon" />
+                <input id="co-address" type="text" placeholder={t("placeholders.address")} value={address} onChange={(e) => { setAddress(e.target.value); setErrors(prev => ({ ...prev, address: "" })) }} required={deliveryMethod === "delivery"} />
+              </div>
                 {errors.address && <span className="field-error">{errors.address}</span>}
               </div>
 
               <div className="checkout-field">
-                <label htmlFor="co-notes">Order Notes (optional)</label>
-                <textarea id="co-notes" className="checkout-textarea" placeholder="Special instructions, landmarks, preferred delivery time..." value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} />
+                <label htmlFor="co-notes">{t("fields.orderNotes")}</label>
+              <textarea id="co-notes" className="checkout-textarea" placeholder={t("placeholders.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} />
               </div>
             </div>
           )}
@@ -465,7 +467,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
             <div className="checkout-step-content">
               <h3 className="step-content-title">
                 <CreditCard size={18} />
-                Order Summary & Deposit
+                {t("step2Title")}
               </h3>
 
               <div className="checkout-items-list">
@@ -487,33 +489,33 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
 
               <div className="checkout-totals">
                 <div className="checkout-total-row">
-                  <span>Subtotal</span>
+                  <span>{t("subtotal")}</span>
                   <span>{formatPriceDH(totalPrice)}</span>
                 </div>
                 <div className="checkout-total-row">
-                  <span>Shipping to {selectedCity.name}</span>
-                  <span>{shipping === 0 ? "Free" : formatPriceDH(shipping)}</span>
+                  <span>{t("shippingTo")} {selectedCity.name}</span>
+                  <span>{shipping === 0 ? t("freeShippingText") : formatPriceDH(shipping)}</span>
                 </div>
                 <div className="checkout-total-row grand">
-                  <span>Total</span>
+                  <span>{t("total")}</span>
                   <span>{formatPriceDH(grandTotal)}</span>
                 </div>
               </div>
 
               <div className="deposit-box">
                 <div className="deposit-header">
-                  <span className="deposit-badge">Deposit Required</span>
+                  <span className="deposit-badge">{t("depositBadge")}</span>
                 </div>
                 <div className="deposit-grid">
                   <div className="deposit-item">
-                    <span className="deposit-label">Advance (30%)</span>
+                    <span className="deposit-label">{t("advanceLabel")}</span>
                     <span className="deposit-value advance">{formatPriceDH(advanceAmount)}</span>
-                    <span className="deposit-desc">Pay now to start production</span>
+                    <span className="deposit-desc">{t("advanceDesc")}</span>
                   </div>
                   <div className="deposit-item">
-                    <span className="deposit-label">Balance (70%)</span>
+                    <span className="deposit-label">{t("balanceLabel")}</span>
                     <span className="deposit-value balance">{formatPriceDH(balanceAmount)}</span>
-                    <span className="deposit-desc">Due before shipping</span>
+                    <span className="deposit-desc">{t("balanceDesc")}</span>
                   </div>
                 </div>
               </div>
@@ -525,14 +527,14 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
             <div className="checkout-step-content">
               <h3 className="step-content-title">
                 <FileCheck size={18} />
-                Payment Details & Upload
+                {t("step3Title")}
               </h3>
 
               <div className="rib-box">
                 <div className="rib-header">
-                  <span className="rib-title">Store Bank Details (RIB)</span>
+                  <span className="rib-title">{t("ribTitle")}</span>
                   <button className="rib-copy-btn" onClick={copyRib}>
-                    {ribCopied ? <><CheckCircle2 size={14} /> Copied</> : <><Copy size={14} /> Copy</>}
+                    {ribCopied ? <><CheckCircle2 size={14} /> {t("ribCopied")}</> : <><Copy size={14} /> {t("ribCopy")}</>}
                   </button>
                 </div>
                 <div className="rib-grid">
@@ -548,8 +550,8 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
               </div>
 
               <div className="upload-box">
-                <label className="upload-label">Upload Transfer Receipt *</label>
-                <p className="upload-hint">Take a photo or select a screenshot of your bank transfer confirmation</p>
+                <label className="upload-label">{t("uploadLabel")} *</label>
+              <p className="upload-hint">{t("uploadHint")}</p>
                 {proofPreview ? (
                   <div className="upload-preview">
                     {proofFile?.type === "application/pdf" ? (
@@ -557,33 +559,33 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                         <FileText size={32} style={{ color: "#ef4444", flexShrink: 0 }} />
                         <div style={{ textAlign: "left", overflow: "hidden" }}>
                           <p style={{ fontWeight: 600, fontSize: "14px", margin: 0, whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>{proofFile.name}</p>
-                          <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>PDF document ({(proofFile.size / 1024).toFixed(0)} KB)</p>
+                          <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>{t("pdfDoc")} ({(proofFile.size / 1024).toFixed(0)} KB)</p>
                         </div>
                       </div>
                     ) : (
                       <img src={proofPreview} alt="Transfer proof" />
                     )}
                     <button className="upload-remove" onClick={() => { setProofFile(null); setProofPreview(null) }}>
-                      <X size={14} /> Remove
+                      <X size={14} /> {t("uploadRemove")}
                     </button>
                   </div>
                 ) : (
                   <label className="upload-dropzone" htmlFor="co-proof">
                     <Upload size={32} className="upload-icon" />
-                    <span className="upload-text">Tap to select image or PDF</span>
-                    <span className="upload-hint-text">JPG, PNG, PDF — max 5MB</span>
+                    <span className="upload-text">{t("uploadDropText")}</span>
+                    <span className="upload-hint-text">{t("uploadDropHint")}</span>
                     <input id="co-proof" type="file" accept="image/jpeg,image/png,image/jpg,application/pdf" onChange={handleFileChange} hidden />
                   </label>
                 )}
               </div>
 
               <div className="payment-instructions">
-                <h4>How to Pay:</h4>
+                <h4>{t("howToPayTitle")}</h4>
                 <ol>
-                  <li>Transfer <strong>{formatPriceDH(advanceAmount)}</strong> to the account above</li>
-                  <li>Take a photo of your transfer confirmation</li>
-                  <li>Upload the photo using the button above</li>
-                  <li>Click "Place Order" and we'll verify your payment</li>
+                  <li>Transfer <strong>{formatPriceDH(advanceAmount)}</strong> {t("howToPaySteps")[0]}</li>
+                  <li>{t("howToPaySteps")[1]}</li>
+                  <li>{t("howToPaySteps")[2]}</li>
+                  <li>{t("howToPaySteps")[3]}</li>
                 </ol>
               </div>
             </div>
@@ -596,29 +598,29 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                 <CheckCircle2 size={48} />
               </div>
               <h3 className="step-content-title" style={{ justifyContent: "center", textAlign: "center" }}>
-                Order Placed Successfully!
+                {t("orderPlaced")}
               </h3>
               <p className="confirm-subtitle">
-                Your order <strong>{orderId}</strong> has been submitted. We will verify your payment and begin production.
+                {t("orderSubmitted", { orderId })}
               </p>
 
               <div className="confirm-card">
                 <div className="confirm-row">
-                  <span className="confirm-lbl">Order ID</span>
+                  <span className="confirm-lbl">{t("orderId")}</span>
                   <span className="confirm-val">{orderId}</span>
                 </div>
                 <div className="confirm-row">
-                  <span className="confirm-lbl">Advance Due</span>
+                  <span className="confirm-lbl">{t("advanceDue")}</span>
                   <span className="confirm-val gold">{formatPriceDH(advanceAmount)}</span>
                 </div>
                 <div className="confirm-row">
-                  <span className="confirm-lbl">Delivery To</span>
+                  <span className="confirm-lbl">{t("deliveryTo")}</span>
                   <span className="confirm-val">{selectedCity.name}</span>
                 </div>
               </div>
 
               <p className="confirm-note">
-                Send your transfer receipt on WhatsApp to confirm your order faster.
+                {t("confirmNote")}
               </p>
 
               <a
@@ -628,7 +630,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                 className="confirm-whatsapp-btn"
               >
                 <MessageCircle size={18} />
-                Confirm on WhatsApp
+                {t("confirmWhatsApp")}
               </a>
             </div>
           )}
@@ -638,7 +640,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
         <div className="checkout-footer">
           {step > 1 && step < 4 && (
             <button className="btn-back" onClick={handleBack} disabled={isSubmitting}>
-              <ChevronLeft size={16} /> Back
+              <ChevronLeft size={16} /> {t("btnBack")}
             </button>
           )}
           {step < 4 ? (
@@ -647,12 +649,12 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
               onClick={handleNext}
               disabled={(step === 1 && !canProceedStep1) || (step === 3 && (!canProceedStep3 || isSubmitting))}
             >
-              {isSubmitting ? "Submitting..." : step === 3 ? "Place Order" : "Continue"}
+              {isSubmitting ? t("btnSubmitting") : step === 3 ? t("btnPlaceOrder") : t("btnContinue")}
               {step < 3 && <ChevronRight size={16} />}
             </button>
           ) : (
             <button className="btn-next" onClick={handleFinish}>
-              <CheckCircle2 size={16} /> Done
+              <CheckCircle2 size={16} /> {t("btnDone")}
             </button>
           )}
         </div>

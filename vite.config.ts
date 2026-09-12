@@ -14,8 +14,13 @@ export default defineConfig(({ mode }) => {
       alias: {
         "@": path.resolve(__dirname, "./src"),
       },
+      dedupe: ["react", "react-dom"],
+    },
+    optimizeDeps: {
+      include: ["react", "react-dom", "i18next", "react-i18next"],
     },
     server: {
+      host: true,
       proxy: {
         "/api": {
           target: backendTarget,

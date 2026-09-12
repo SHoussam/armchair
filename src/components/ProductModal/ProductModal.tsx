@@ -93,8 +93,32 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
   const [accessoryFillId, setAccessoryFillId] = useState("high_density_foam")
   const [headrestTilt, setHeadrestTilt] = useState(30)
 
+  // Mobile bottom-sheet expansion on scroll & reduced motion accessibility
+  const [expanded, setExpanded] = useState(false)
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+  const [headerVisible, setHeaderVisible] = useState(true)
+  const lastScrollY = useRef(0)
+  const modalInnerRef = useRef<HTMLDivElement | null>(null)
+  const bodyScrollRef = useRef<HTMLDivElement | null>(null)
+
+  // Accessibility: detect prefers-reduced-motion
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
+    setPrefersReducedMotion(mediaQuery.matches)
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setPrefersReducedMotion(e.matches)
+    }
+    mediaQuery.addEventListener("change", handleChange)
+    return () => mediaQuery.removeEventListener("change", handleChange)
+  }, [])
+
   // Reset state when product changes
   useEffect(() => {
+    setExpanded(false)
+    setHeaderVisible(true)
+    lastScrollY.current = 0
     if (product) {
       setSelectedColorIdx(0)
       setSelectedStyleId(upholsteryStyles[0].id)
@@ -163,6 +187,58 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
     window.addEventListener("keydown", handleKey)
     return () => window.removeEventListener("keydown", handleKey)
   }, [onClose])
+
+  // Mobile scroll/swipe-to-expand: scrolls or swipes expand bottom sheet to full screen
+  const touchStartY = useRef(0)
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (window.innerWidth >= 768) return
+    const currentY = e.touches[0].clientY
+    const diff = touchStartY.current - currentY // positive = swiping up
+    const el = modalInnerRef.current
+    if (!expanded && diff > 25) {
+      setExpanded(true)
+    } else if (expanded && diff < -35 && el && el.scrollTop <= 5) {
+      setExpanded(false)
+    }
+
+    if (expanded && el) {
+      if (diff > 12 && el.scrollTop > 50) {
+        setHeaderVisible(false)
+      } else if (diff < -12) {
+        setHeaderVisible(true)
+      }
+    }
+  }
+
+  const handleScroll = (e: React.UIEvent<HTMLElement>) => {
+    if (window.innerWidth >= 768) return
+    const el = e.currentTarget
+    const currentScroll = el.scrollTop
+
+    if (!expanded && currentScroll > 20) {
+      setExpanded(true)
+    }
+
+    if (expanded) {
+      const scrollDiff = currentScroll - lastScrollY.current
+      if (currentScroll <= 20) {
+        setHeaderVisible(true)
+      } else if (scrollDiff > 6 && currentScroll > 35) {
+        setHeaderVisible(false)
+      } else if (scrollDiff < -6) {
+        setHeaderVisible(true)
+      }
+    } else {
+      setHeaderVisible(true)
+    }
+
+    lastScrollY.current = currentScroll
+  }
 
   // Auto-switch to SVG blueprint when user customizes anything
   useEffect(() => {
@@ -413,9 +489,23 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
       aria-modal="true"
       aria-label={`Product configurator for ${product.name}`}
     >
-      <div className="modal modal-sofa-wide">
-        <div className="modal-sheet-grabber" aria-hidden="true" />
-        <div className="modal-inner">
+      <div
+        className={`modal modal-sofa-wide ${expanded ? "expanded" : ""} ${
+          headerVisible ? "header-visible" : "header-hidden"
+        }`}
+      >
+        <div
+          className="modal-sheet-grabber"
+          aria-hidden="true"
+          onClick={() => setExpanded(!expanded)}
+        />
+        <div
+          className="modal-inner"
+          ref={modalInnerRef}
+          onScroll={handleScroll}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+        >
           {/* Left Column: Interactive Vector Visualizer - sticky on mobile */}
           <div className="modal-img-col">
             {configType === "sofa" && (
@@ -542,7 +632,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
           </div>
 
           {/* Right Column: Configuration Controls */}
-          <div className="modal-body">
+          <div className="modal-body" ref={bodyScrollRef}>
             <button className="modal-close" onClick={onClose} aria-label="Close configurator">
               <X size={18} strokeWidth={2.5} />
             </button>

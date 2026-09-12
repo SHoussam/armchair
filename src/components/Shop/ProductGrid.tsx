@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import { products as defaultProducts, categories as defaultCategories, Product, fetchProducts, fetchCategories } from "@/data/data"
 import { useAutoScrollOnMobile } from "@/hooks/useAutoScrollOnMobile"
 import ProductCard from "./ProductCard"
@@ -11,6 +12,7 @@ interface ProductGridProps {
 type SortOption = "featured" | "price-asc" | "price-desc" | "rating"
 
 export default function ProductGrid({ searchQuery, onViewDetail }: ProductGridProps) {
+  const { t } = useTranslation("shop")
   const [productList, setProductList] = useState<Product[]>(defaultProducts)
   const productScrollRef = useAutoScrollOnMobile<HTMLDivElement>(4200)
   const [categoriesList, setCategoriesList] = useState<string[]>(defaultCategories)
@@ -101,9 +103,9 @@ export default function ProductGrid({ searchQuery, onViewDetail }: ProductGridPr
     <section id="shop" ref={sectionRef}>
       {/* Section header */}
       <div className="section-header">
-        <p className="section-eyebrow">Our Selection</p>
-        <h2 className="section-title">The Collection</h2>
-        <p className="section-sub">Handcrafted Moroccan salons, luxury armchairs, mattresses & furnishings</p>
+        <p className="section-eyebrow">{t("eyebrow")}</p>
+        <h2 className="section-title">{t("title")}</h2>
+        <p className="section-sub">{t("subtitle")}</p>
       </div>
 
       {/* Filter bar */}
@@ -127,7 +129,7 @@ export default function ProductGrid({ searchQuery, onViewDetail }: ProductGridPr
           <button
             className="cat-dropdown-trigger"
             onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Filter by category"
+            aria-label={t("filterAria")}
           >
             <span>{activeCategory}</span>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -146,14 +148,14 @@ export default function ProductGrid({ searchQuery, onViewDetail }: ProductGridPr
                   ref={searchInputRef}
                   type="text"
                   className="cat-search-input"
-                  placeholder="Search category..."
+                  placeholder={t("searchCategory")}
                   value={catSearch}
                   onChange={(e) => setCatSearch(e.target.value)}
                 />
               </div>
               <ul className="cat-list">
                 {filteredCategories.length === 0 ? (
-                  <li className="cat-item cat-empty">No match found</li>
+                  <li className="cat-item cat-empty">{t("noMatch")}</li>
                 ) : (
                   filteredCategories.map((cat) => (
                     <li key={cat}>
@@ -181,20 +183,20 @@ export default function ProductGrid({ searchQuery, onViewDetail }: ProductGridPr
           className="sort-select"
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as SortOption)}
-          aria-label="Sort products"
+          aria-label={t("sortAria")}
         >
-          <option value="featured">Featured</option>
-          <option value="price-asc">Price: Low → High</option>
-          <option value="price-desc">Price: High → Low</option>
-          <option value="rating">Top Rated</option>
+          <option value="featured">{t("sortFeatured")}</option>
+          <option value="price-asc">{t("sortPriceAsc")}</option>
+          <option value="price-desc">{t("sortPriceDesc")}</option>
+          <option value="rating">{t("sortTopRated")}</option>
         </select>
       </div>
 
       {/* Grid */}
       {filtered.length === 0 ? (
         <div style={{ textAlign: "center", padding: "80px 0" }}>
-          <p className="section-title" style={{ fontSize: "1.4rem" }}>No furniture found</p>
-          <p className="section-sub" style={{ marginTop: "12px" }}>Try selecting a different category or refining your search term.</p>
+          <p className="section-title" style={{ fontSize: "1.4rem" }}>{t("noFurniture")}</p>
+          <p className="section-sub" style={{ marginTop: "12px" }}>{t("noFurnitureDesc")}</p>
         </div>
       ) : (
         <div className="product-grid" id="productGrid" ref={productScrollRef}>

@@ -1,0 +1,302 @@
+
+const ar = {
+  checkout: {
+    title: "إتمام الطلب",
+    subtitle: "أكمل طلبك في بضع خطوات بسيطة",
+    closeAria: "إغلاق صفحة إتمام الطلب",
+    steps: {
+      address: "العنوان",
+      summary: "الملخص",
+      payment: "الدفع",
+      confirm: "التأكيد",
+    },
+    step1Title: "بيانات الاتصال وعنوان التوصيل",
+    step2Title: "ملخص الطلب والدفعة المقدمة",
+    step3Title: "تفاصيل الدفع ورفع الإيصال",
+    step4Title: "تم تقديم الطلب بنجاح!",
+    fields: {
+      fullName: "الاسم الكامل",
+      email: "البريد الإلكتروني",
+      phone: "رقم الهاتف",
+      phoneHint: "رقم مغربي",
+      city: "المدينة",
+      deliveryMethod: "طريقة التوصيل",
+      delivery: "التوصيل",
+      pickup: "الاستلام من المتجر (مجاني)",
+      streetAddress: "عنوان التوصيل",
+      orderNotes: "ملاحظات الطلب (اختياري)",
+    },
+    placeholders: {
+      name: "اسمك الكامل",
+      email: "you@example.com",
+      phone: "0666 123 456",
+      address: "الشارع، الشقة، المبنى...",
+      notes: "تعليمات خاصة، معالم، الوقت المفضل...",
+    },
+    errors: {
+      nameRequired: "الاسم مطلوب",
+      emailRequired: "البريد الإلكتروني مطلوب",
+      emailInvalid: "يرجى إدخال بريد إلكتروني صالح",
+      phoneRequired: "رقم الهاتف مطلوب",
+      phoneInvalid:
+        "أدخل رقم هاتف مغربي صالح (مثال: 0666123456 أو +212666123456)",
+      addressRequired: "العنوان مطلوب للتوصيل",
+      generalSubmitFailed: "فشل تقديم الطلب. يرجى المحاولة مرة أخرى.",
+      networkError: "حدث خطأ في الشبكة أثناء تقديم الطلب.",
+    },
+    freeShipping: "التوصيل المجاني متاح!",
+    itemsTitle: "محتويات الطلب",
+    subtotal: "المجموع الفرعي",
+    shippingTo: "التوصيل إلى",
+    total: "المجموع",
+    freeShippingText: "مجاني",
+    depositBadge: "الدفعة المقدمة مطلوبة",
+    advanceLabel: "الدفعة المقدمة (30%)",
+    advanceDesc: "ادفع الآن لبدء الإنتاج",
+    balanceLabel: "الرصيد (70%)",
+    balanceDesc: "مستحق قبل الشحن",
+    ribTitle: "تفاصيل الحساب البنكي للمتجر (RIB)",
+    ribCopy: "نسخ",
+    ribCopied: "تم النسخ",
+    uploadLabel: "رفع إيصال التحويل البنكي",
+    uploadHint: "التقط صورة أو اختر لقطة شاشة لتأكيد التحويل البنكي",
+    uploadDropText: "اضغط لاختيار صورة أو ملف PDF",
+    uploadDropHint: "JPG، PNG، PDF — الحد الأقصى 5 ميغابايت",
+    uploadRemove: "إزالة",
+    pdfDoc: "مستند PDF",
+    howToPayTitle: "طريقة الدفع:",
+    howToPaySteps: [
+      "حوّل مبلغ الدفعة المقدمة إلى الحساب أعلاه",
+      "التقط صورة لتأكيد التحويل",
+      "ارفع الصورة باستخدام الزر أعلاه",
+      'اضغط على "تقديم الطلب" وسنتحقق من عملية الدفع',
+    ],
+    authNote: "تم تسجيل الدخول باسم",
+    authSecureNote: "سيتم ربط طلبك بحسابك بشكل آمن.",
+    orderPlaced: "تم تقديم الطلب بنجاح!",
+    orderSubmitted: "تم تقديم طلبك. سنتحقق من الدفع ونبدأ الإنتاج.",
+    orderId: "رقم الطلب",
+    advanceDue: "الدفعة المقدمة المستحقة",
+    deliveryTo: "عنوان التوصيل",
+    confirmNote:
+      "أرسل إيصال التحويل عبر واتساب لتأكيد طلبك بشكل أسرع.",
+    confirmWhatsApp: "تأكيد عبر واتساب",
+    btnBack: "رجوع",
+    btnContinue: "متابعة",
+    btnPlaceOrder: "تقديم الطلب",
+    btnSubmitting: "جارٍ تقديم الطلب...",
+    btnDone: "تم",
+    whatsapp: {
+      newOrder: "طلب جديد",
+      customer: "العميل",
+      phone: "رقم الهاتف",
+      address: "العنوان",
+      items: "محتويات الطلب",
+      subtotal: "المجموع الفرعي",
+      shipping: "التوصيل",
+      total: "المجموع",
+      advance: "الدفعة المقدمة (30%)",
+      balance: "الرصيد (70%)",
+    },
+  },
+
+  nav: {
+    catalog: "الكتالوج",
+    wishlist: "المفضلة",
+    cart: "السلة",
+    profile: "حسابي",
+    orders: "الطلبات",
+    trackOrder: "تتبع الطلب",
+    logIn: "تسجيل الدخول",
+    signUp: "إنشاء حساب",
+    home: "الرئيسية",
+    searchPlaceholder: "ابحث عن كراسي، صالونات، مراتب...",
+    searchNoResults: "لم يتم العثور على أثاث لـ",
+    darkMode: "التبديل إلى الوضع الداكن",
+    lightMode: "التبديل إلى الوضع الفاتح",
+  },
+
+  auth: {
+    login: "تسجيل الدخول",
+    signup: "إنشاء حساب",
+    logout: "تسجيل الخروج",
+    forgotPassword: "نسيت كلمة المرور",
+    confirmPassword: "تأكيد كلمة المرور",
+    resetPassword: "إعادة تعيين كلمة المرور",
+    newPassword: "كلمة المرور الجديدة",
+    currentPassword: "كلمة المرور الحالية",
+    welcomeBack: "مرحبًا بعودتك",
+    createAccount: "أنشئ حسابك",
+    fullName: "الاسم الكامل",
+    email: "البريد الإلكتروني",
+    phone: "رقم الهاتف",
+    password: "كلمة المرور",
+    submit: "إرسال",
+    backToLogin: "العودة إلى تسجيل الدخول",
+    loginTitle: "سجّل الدخول إلى حسابك",
+    signupTitle: "أنشئ حسابًا جديدًا",
+    forgotTitle: "هل نسيت كلمة المرور؟",
+    resetTitle: "أعد تعيين كلمة المرور",
+  },
+
+  common: {
+    freeShippingThreshold: "توصيل مجاني للطلبات التي تتجاوز 800 درهم",
+    done: "تم",
+    cancel: "إلغاء",
+    save: "حفظ",
+    loading: "جارٍ التحميل...",
+    error: "خطأ",
+    success: "تم بنجاح",
+    currency: "درهم",
+  },
+
+
+hero: {
+  eyebrowFull: "طنجة، المغرب · منذ 1998",
+
+  atelierTag: "ورشة سيدي دريس",
+  atelierCity: "طنجة",
+
+  desktopTitlePart1: "منزلك يستحق",
+  desktopTitleEm: "فخامةً تُشبهك",
+  desktopTitlePart2: "",
+
+  mobileTitle: "صالونات مغربية مصنوعة يدويًا ومراتب حسب الطلب",
+
+  desktopDesc1:
+    "صالونات مغربية فاخرة، ومراتب حسب الطلب، وتشطيبات راقية — تُصنع يدويًا في طنجة بشغف على يد",
+
+  desktopDesc2:
+    "جودة تلمسها، وراحة تدوم.",
+
+  mobileDesc1:
+    "مصممة بدقة لتناسب مساحة صالونك، بالسنتيمتر. نحت خشبي، ورغوة عالية المرونة بكثافة 35 كغ/م³، وتشطيبات فاخرة — تُصنع يدويًا في طنجة على يد",
+
+  browse: "تصفح المجموعة",
+  whatsapp: "تواصل معنا",
+
+  statProducts: "منتجًا معروضًا",
+  statCustomers: "عميلًا سعيدًا",
+  statCraftsmanship: "من الحرفية",
+
+  badgeLocation: "الموقع",
+  badgeCity: "سيدي دريس، طنجة",
+
+  imageAlt:
+    "مجموعة صالون مغربي فاخر في غرفة معيشة أنيقة",
+},
+
+
+
+  footer: {
+    title: "مفروشات عبداللطيف",
+    subtitle: "أثاث مغربي مصنوع يدويًا منذ البداية.",
+    brandDesc:
+      "صالونات مغربية فاخرة ومراتب وأثاث — مصنوعة يدويًا بشغف في طنجة منذ 1998. زورنا أو تواصل معنا عبر واتساب للحصول على استشارة مجانية.",
+    shopTitle: "المتجر",
+    allProducts: "جميع المنتجات",
+    moroccanSalons: "صالونات مغربية",
+    mattresses: "مراتب",
+    chairsSofas: "كراسي وأرائك",
+    accessories: "إكسسوارات",
+    contactUs: "تواصل معنا",
+    phone: "الهاتف",
+    whatsapp: "واتساب",
+    instagram: "إنستغرام",
+    address: "سيدي دريس، طنجة 9000",
+    newsletter: "النشرة الإخبارية",
+    newsletterDesc: "اطّلع على المجموعات الجديدة والعروض الحصرية.",
+    newsletterPlaceholder: "you@example.com",
+    newsletterJoin: "اشترك",
+    newsletterSuccess: "مرحبًا بك في العائلة!",
+    copyright: "مفروشات عبداللطيف. جميع الحقوق محفوظة.",
+    addressFull: "سيدي دريس، طنجة 9000، المغرب",
+    visitUs: "زورنا",
+    findUs: "معلومات عن فرعنا في طنجة",
+    findUsDesc:
+      "قم بزيارة صالة العرض لدينا للاطلاع على مجموعتنا الكاملة من الصالونات والمراتب والأثاث المغربي.",
+  },
+
+  cta: {
+    title: "غيّر منزلك اليوم",
+    subtitle:
+      "تصفح مجموعتنا من الصالونات والمراتب والأثاث المغربي الفاخر. تواصل معنا عبر واتساب للحصول على استشارة مجانية وعروض أسعار مخصصة.",
+    browse: "تصفح المجموعة",
+    whatsapp: "تحدث معنا عبر واتساب",
+  },
+
+  testimonials: {
+    eyebrow: "آراء العملاء",
+    title: "محبوب في جميع أنحاء طنجة",
+  },
+
+  features: {
+    deliveryTitle: "توصيل في طنجة",
+    deliverySub: "توصيل مجاني على الطلبات الكبيرة",
+    returnsTitle: "إرجاع سهل",
+    returnsSub: "سياسة إرجاع بسيطة وبدون تعقيد",
+    qualityTitle: "جودة مضمونة",
+    qualitySub: "مواد فاخرة فقط",
+    customTitle: "طلبات مخصصة",
+    customSub: "قطع مصممة حسب المقاس",
+    atelierTitle: "ورشة سيدي دريس",
+    atelierSub: "مباشرة من الورشة · بدون وسطاء",
+    precisionTitle: "دقة بالسنتيمتر",
+    precisionSub: "قياس مخصص ليتناسب مع مساحة الغرفة",
+    foamTitle: "رغوة عالية المرونة 35 كغ/م³",
+    foamSub: "رغوة عالية المرونة لتوفير راحة ودعم يدومان",
+    whiteGloveTitle: "خدمة VIP في طنجة",
+    whiteGloveSub: "توصيل مباشر وتركيب في المنزل",
+  },
+
+  shop: {
+    eyebrow: "اختياراتنا",
+    title: "المجموعة",
+    subtitle:
+      "صالونات مغربية مصنوعة يدويًا، كراسي فاخرة، مراتب وأثاث",
+    searchCategory: "ابحث في الفئات...",
+    noMatch: "لا توجد نتائج",
+    sortFeatured: "مميزة",
+    sortPriceAsc: "السعر: من الأقل إلى الأعلى",
+    sortPriceDesc: "السعر: من الأعلى إلى الأقل",
+    sortTopRated: "الأعلى تقييمًا",
+    noFurniture: "لم يتم العثور على أثاث",
+    noFurnitureDesc:
+      "حاول اختيار فئة مختلفة أو تحسين كلمات البحث.",
+    filterAria: "تصفية حسب الفئة",
+    sortAria: "ترتيب المنتجات",
+  },
+
+  cart: {
+    title: "سلة التسوق",
+    closeAria: "إغلاق سلة التسوق",
+    empty: "سلة التسوق فارغة.",
+    seat: "مقعد",
+    leftChaise: "كرسي استرخاء يسار",
+    rightChaise: "كرسي استرخاء يمين",
+    headrest: "مسند رأس",
+    headrests: "مساند رأس",
+    cmWide: "سم عرض",
+    remove: "إزالة",
+    subtotal: "المجموع الفرعي",
+    shipping: "التوصيل",
+    shippingCalc: "يُحسب عند إتمام الطلب",
+    total: "المجموع",
+    proceedToCheckout: "متابعة لإتمام الطلب",
+  },
+
+  wishlist: {
+    title: "المفضلة",
+    closeAria: "إغلاق المفضلة",
+    emptyTitle: "قائمة المفضلة فارغة",
+    emptyDesc:
+      "اضغط على رمز القلب في أي صالون أو كرسي أو مرتبة لحفظها في قائمة المفضلة هنا.",
+    browseCollection: "تصفح المجموعة",
+    remove: "إزالة",
+    from: "يبدأ من",
+    personalizeOrder: "تخصيص وطلب",
+  },
+};
+
+export default ar;
+

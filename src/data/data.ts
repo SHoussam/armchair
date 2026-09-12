@@ -142,6 +142,12 @@ export interface BackendProduct {
   dimension?: BackendDimension
   colors?: BackendColor[]
   configurations?: BackendProductConfiguration[]
+  config?: ProductCustomConfig | null
+  sofa_config?: any
+  bed_config?: any
+  chair_config?: any
+  mattress_config?: any
+  accessory_config?: any
 }
 
 export interface BackendUpholsteryStyle {
@@ -440,6 +446,29 @@ export function mapBackendProductToFrontend(bp: BackendProduct): Product {
     const num = Number(val)
     if (isNaN(num) || num <= 0) return fallback
     return num > 10 ? Number((num / 100).toFixed(2)) : num
+  }
+
+  if (bp.config && typeof bp.config === "object") {
+    return {
+      id: bp.id,
+      name: bp.name,
+      nameAr,
+      category: categoryName,
+      price: basePriceNum,
+      oldPrice: bp.old_price !== undefined && bp.old_price !== null ? Number(bp.old_price) : null,
+      badge,
+      rating,
+      reviews,
+      colors: colorsList,
+      colorNames: colorNamesList,
+      colorIds: colorIdsList,
+      desc: bp.description || "Handcrafted bespoke furniture with luxury finishing.",
+      features: productFeatures,
+      img: imageSrc,
+      imgAlt: bp.name,
+      config: bp.config,
+      get sofaConfig() { return this.config?.type === "sofa" ? (this.config as SofaConfig) : undefined },
+    }
   }
 
   if (isSofa) {

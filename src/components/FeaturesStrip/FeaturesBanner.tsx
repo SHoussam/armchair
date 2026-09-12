@@ -1,7 +1,9 @@
 import { Truck, RotateCcw, ShieldCheck, Star, Ruler, Hammer, Sparkles, MapPin } from "lucide-react"
+import { useTranslation } from "react-i18next"
 import { useAutoScrollOnMobile } from "@/hooks/useAutoScrollOnMobile"
 
 export default function FeaturesBanner() {
+  const { t } = useTranslation("features")
   const scrollRef = useAutoScrollOnMobile<HTMLElement>(3200)
 
   return (
@@ -12,8 +14,8 @@ export default function FeaturesBanner() {
           <Truck size={18} />
         </div>
         <div>
-          <p className="feature-text-title">Delivery in Tanger</p>
-          <p className="feature-text-sub">Free delivery on large orders</p>
+          <p className="feature-text-title">{t("deliveryTitle")}</p>
+          <p className="feature-text-sub">{t("deliverySub")}</p>
         </div>
       </div>
 
@@ -22,8 +24,8 @@ export default function FeaturesBanner() {
           <RotateCcw size={18} />
         </div>
         <div>
-          <p className="feature-text-title">Easy Returns</p>
-          <p className="feature-text-sub">Hassle-free return policy</p>
+          <p className="feature-text-title">{t("returnsTitle")}</p>
+          <p className="feature-text-sub">{t("returnsSub")}</p>
         </div>
       </div>
 
@@ -32,8 +34,8 @@ export default function FeaturesBanner() {
           <ShieldCheck size={18} />
         </div>
         <div>
-          <p className="feature-text-title">Quality Guaranteed</p>
-          <p className="feature-text-sub">Premium materials only</p>
+          <p className="feature-text-title">{t("qualityTitle")}</p>
+          <p className="feature-text-sub">{t("qualitySub")}</p>
         </div>
       </div>
 
@@ -42,8 +44,8 @@ export default function FeaturesBanner() {
           <Star size={18} />
         </div>
         <div>
-          <p className="feature-text-title">Custom Orders</p>
-          <p className="feature-text-sub">Made-to-measure available</p>
+          <p className="feature-text-title">{t("customTitle")}</p>
+          <p className="feature-text-sub">{t("customSub")}</p>
         </div>
       </div>
 
@@ -53,8 +55,8 @@ export default function FeaturesBanner() {
           <MapPin size={17} />
         </div>
         <div>
-          <p className="feature-text-title">Atelier Sidi Deris</p>
-          <p className="feature-text-sub">Workshop direct · Zero middlemen</p>
+          <p className="feature-text-title">{t("atelierTitle")}</p>
+          <p className="feature-text-sub">{t("atelierSub")}</p>
         </div>
       </div>
 
@@ -63,8 +65,8 @@ export default function FeaturesBanner() {
           <Ruler size={17} />
         </div>
         <div>
-          <p className="feature-text-title">Centimeter Precision</p>
-          <p className="feature-text-sub">Custom sizing to your room layout</p>
+          <p className="feature-text-title">{t("precisionTitle")}</p>
+          <p className="feature-text-sub">{t("precisionSub")}</p>
         </div>
       </div>
 
@@ -73,8 +75,8 @@ export default function FeaturesBanner() {
           <Sparkles size={17} />
         </div>
         <div>
-          <p className="feature-text-title">35 kg/m³ HR Foam</p>
-          <p className="feature-text-sub">High-resilience orthopaedic core</p>
+          <p className="feature-text-title">{t("foamTitle")}</p>
+          <p className="feature-text-sub">{t("foamSub")}</p>
         </div>
       </div>
 
@@ -83,8 +85,8 @@ export default function FeaturesBanner() {
           <Truck size={17} />
         </div>
         <div>
-          <p className="feature-text-title">Tanger White-Glove</p>
-          <p className="feature-text-sub">Direct delivery &amp; in-home installation</p>
+          <p className="feature-text-title">{t("whiteGloveTitle")}</p>
+          <p className="feature-text-sub">{t("whiteGloveSub")}</p>
         </div>
       </div>
     </section>

@@ -281,6 +281,21 @@ select:focus-visible,
    TSK-F06 — Apple Type Scale (rem-based)
    ══════════════════════════════════════════════════════════════ */
 
+/* ═══ RTL Support for Arabic ═══ */
+html[dir="rtl"] .checkout-modal,
+html[dir="rtl"] .checkout-body,
+html[dir="rtl"] .checkout-step-content {
+  direction: rtl;
+  text-align: right;
+}
+html[dir="rtl"] .checkout-footer {
+  flex-direction: row-reverse;
+}
+html[dir="rtl"] .navbar-right,
+html[dir="rtl"] .checkout-steps {
+  flex-direction: row-reverse;
+}
+
 :root {
   --text-xs: 0.6875rem;
   --text-sm: 0.75rem;

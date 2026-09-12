@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from "react"
+import { useTranslation } from "react-i18next"
 import { Search, Heart, Clock, User, LogIn, UserPlus, X, ShoppingBag, Sun, Moon } from "lucide-react"
 import { Product, products as defaultProducts, fetchProducts } from "@/data/data"
 import { useCart } from "@/context/CartContext"
 import { useTheme } from "@/context/ThemeContext"
 import { useAuth } from "@/context/AuthContext"
+import LanguageDropdown from "../LanguageDropdown/LanguageDropdown"
 
 interface NavbarProps {
   isAuthenticated: boolean
@@ -30,6 +32,7 @@ export default function Navbar({
   onCartClick,
   onCatalogClick
 }: NavbarProps) {
+  const { t } = useTranslation("nav")
   const { totalItems, state: cartState } = useCart()
   const { theme, toggleTheme } = useTheme()
   const { logout } = useAuth()
@@ -39,12 +42,10 @@ export default function Navbar({
   const [searchResults, setSearchResults] = useState<Product[]>([])
   const searchContainerRef = useRef<HTMLDivElement>(null)
 
-  // Sync external search query
   useEffect(() => {
     setSearchTerm(searchQuery)
   }, [searchQuery])
 
-  // Fetch live products for autocomplete
   useEffect(() => {
     let isMounted = true
     fetchProducts().then((prods) => {
@@ -55,7 +56,6 @@ export default function Navbar({
     return () => { isMounted = false }
   }, [])
 
-  // Filter live search results as user types
   useEffect(() => {
     const q = searchTerm.toLowerCase().trim()
     if (!q) {
@@ -71,7 +71,6 @@ export default function Navbar({
     setSearchResults(matches)
   }, [searchTerm, productList])
 
-  // Close dropdown on click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
@@ -100,7 +99,7 @@ export default function Navbar({
   return (
     <header className="top-navbar">
       <div className="top-navbar-container flex items-center justify-between">
-        
+
         {/* Left: Brand */}
         <div className="navbar-left flex items-center">
           <a
@@ -118,7 +117,7 @@ export default function Navbar({
           </a>
         </div>
 
-        {/* Center: Real In-Bar Search (desktop only via CSS) */}
+        {/* Center: Search */}
         <div className={`navbar-center flex items-center justify-center ${!isAuthenticated ? "expanded" : "compact"}`}>
           <div className="navbar-search-wrapper" ref={searchContainerRef}>
             <div className="navbar-search-bar">
@@ -126,7 +125,7 @@ export default function Navbar({
               <input
                 type="text"
                 className="navbar-search-input"
-                placeholder="Search armchairs, salons, mattresses..."
+                placeholder={t("searchPlaceholder")}
                 value={searchTerm}
                 onChange={(e) => handleInputChange(e.target.value)}
                 onFocus={() => setIsFocused(true)}
@@ -144,7 +143,6 @@ export default function Navbar({
               )}
             </div>
 
-            {/* In-bar search suggestions dropdown */}
             {isFocused && searchTerm.trim().length > 0 && (
               <div className="navbar-search-dropdown">
                 {searchResults.length > 0 ? (
@@ -177,7 +175,7 @@ export default function Navbar({
                   </div>
                 ) : (
                   <div className="navbar-search-empty">
-                    No furniture found for "{searchTerm}"
+                    {t("searchNoResults")} "{searchTerm}"
                   </div>
                 )}
               </div>
@@ -187,84 +185,82 @@ export default function Navbar({
 
         {/* Right: Actions */}
         <div className="navbar-right flex items-center">
-          {/* Dark / Light Mode Switcher */}
           <button
             type="button"
             className="nav-icon-btn theme-toggle-btn"
             onClick={toggleTheme}
-            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-            title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            aria-label={theme === "dark" ? t("lightMode") : t("darkMode")}
+            title={theme === "dark" ? t("lightMode") : t("darkMode")}
           >
             {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
 
-          {/* Desktop Cart Button */}
+          <LanguageDropdown />
+
           <button
             type="button"
             className="nav-cart-btn flex items-center"
             onClick={onCartClick}
-            aria-label={`Shopping cart with ${totalItems} items`}
+            aria-label={t("cart")}
           >
             <ShoppingBag size={18} />
-            <span className="nav-cart-label">Cart</span>
+            <span className="nav-cart-label">{t("cart")}</span>
             {totalItems > 0 && <span className="nav-badge">{totalItems}</span>}
           </button>
 
           {!isAuthenticated ? (
-            /* Visitor State */
             <div className="visitor-actions flex items-center">
-              <button 
+              <button
                 type="button"
                 onClick={onOrdersClick}
                 className="btn-login flex items-center"
-                aria-label="Track Order"
+                aria-label={t("trackOrder")}
               >
                 <Clock size={16} />
-                <span>Track Order</span>
+                <span>{t("trackOrder")}</span>
               </button>
-              <button 
+              <button
                 type="button"
                 onClick={() => onAuthClick?.("login")}
                 className="btn-login flex items-center"
               >
                 <LogIn size={16} />
-                <span>Log In</span>
+                <span>{t("logIn")}</span>
               </button>
-              <button 
+              <button
                 type="button"
                 onClick={() => onAuthClick?.("signup")}
                 className="btn-signup flex items-center"
               >
                 <UserPlus size={16} />
-                <span>Sign Up</span>
+                <span>{t("signUp")}</span>
               </button>
             </div>
           ) : (
-            /* Customer State */
             <div className="customer-actions flex items-center">
-              <button 
+              <button
                 type="button"
                 onClick={onWishlistClick}
                 className="nav-item-btn flex items-center"
-                aria-label="Wishlist"
+                aria-label={t("wishlist")}
               >
                 <Heart size={18} />
-                <span className="nav-item-label">Wishlist</span>
+                <span className="nav-item-label">{t("wishlist")}</span>
                 {cartState.wishlist.length > 0 && (
                   <span className="nav-badge-pill">{cartState.wishlist.length}</span>
                 )}
               </button>
-              <button 
+              <button
                 type="button"
                 onClick={onOrdersClick}
-                className="nav-item-btn flex items-center" 
-                aria-label="History"
+                className="nav-item-btn flex items-center"
+                aria-label={t("orders")}
               >
                 <Clock size={18} />
-                <span className="nav-item-label">History</span>
+                <span className="nav-item-label">{t("orders")}</span>
               </button>
               <div className="nav-divider" />
-              <a 
+              <a
                 href={`${import.meta.env.BASE_URL || "/armchair/"}account`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -273,7 +269,7 @@ export default function Navbar({
                 className="btn-profile flex items-center"
               >
                 <User size={17} />
-                <span>Profile</span>
+                <span>{t("profile")}</span>
               </a>
             </div>
           )}
@@ -284,4 +280,3 @@ export default function Navbar({
     </header>
   );
 }
-
