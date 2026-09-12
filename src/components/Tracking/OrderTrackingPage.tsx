@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { Search, Package, Truck, CheckCircle, Clock, AlertCircle, X, ArrowLeft, XCircle } from "lucide-react"
 import { api } from "@/services/api"
+import { useAuth } from "@/context/AuthContext"
 
 export type OrderStatus = "PENDING" | "WORKING" | "WAITING_FOR_FINAL_PAYMENT" | "SHIPPING" | "DELIVERED" | "CANCELLED"
 
@@ -15,6 +16,7 @@ interface TrackedOrder {
   depositPaid: number
 }
 
+// Linear production pipeline (excludes CANCELLED, which is a terminal exception state handled separately)
 const STATUS_ORDER: OrderStatus[] = [
   "PENDING",
   "WORKING",
@@ -140,6 +142,7 @@ interface OrderTrackingPageProps {
 }
 
 export default function OrderTrackingPage({ onClose, orderId }: OrderTrackingPageProps) {
+  const { token } = useAuth()
   const [searchId, setSearchId] = useState(orderId || "")
   const [foundOrder, setFoundOrder] = useState<TrackedOrder | null>(null)
   const [notFound, setNotFound] = useState(false)
@@ -151,12 +154,9 @@ export default function OrderTrackingPage({ onClose, orderId }: OrderTrackingPag
     const trimmed = id.trim().toUpperCase()
 
     try {
-      const json = await api.get<{ success: boolean; data: any }>(`/orders/track/${encodeURIComponent(trimmed)}`).catch(() => 
-        api.get<{ success: boolean; data: any }>(`/orders/${encodeURIComponent(trimmed)}`)
-      )
-
-      if (json.success && json.data) {
-        const data = json.data
+      const publicData = await api.get<{ success: boolean; data: any }>(`/orders/track/${encodeURIComponent(trimmed)}`)
+      if (publicData.success && publicData.data) {
+        const data = publicData.data
         const items = data.items || []
         const firstProduct = items[0]?.product?.name || "Furniture Order"
         const statusKey = (data.status as OrderStatus) || "PENDING"
@@ -192,23 +192,60 @@ export default function OrderTrackingPage({ onClose, orderId }: OrderTrackingPag
 
         setFoundOrder(tracked)
         setNotFound(false)
+        setIsLoading(false)
         return
       }
-    } catch (e) {
-      // API error fallback to local search
-    } finally {
-      setIsLoading(false)
+    } catch {
+      // Public tracking endpoint failed; proceed to auth-protected fallback only if authenticated
     }
 
-    // Fallback to local mock orders
-    const mockFound = MOCK_ORDERS.find((o) => o.id === trimmed)
-    if (mockFound) {
-      setFoundOrder(mockFound)
-      setNotFound(false)
-    } else {
-      setFoundOrder(null)
-      setNotFound(true)
+    if (token) {
+      try {
+        const authData = await api.get<{ success: boolean; data: any }>(`/orders/${encodeURIComponent(trimmed)}`)
+        if (authData.success && authData.data) {
+          const data = authData.data
+          const items = data.items || []
+          const firstProduct = items[0]?.product?.name || "Furniture Order"
+          const statusKey = (data.status as OrderStatus) || "PENDING"
+          const totalAmount = parseFloat(data.total) || 0
+          let depositAmount = 0
+          if (Array.isArray(data.payments) && data.payments.length > 0) {
+            depositAmount = data.payments
+              .filter((p: any) => p.status === "verified")
+              .reduce((sum: number, p: any) => sum + (parseFloat(p.amount) || 0), 0)
+          } else if (statusKey !== "PENDING") {
+            depositAmount = Math.round(totalAmount * 0.3)
+          }
+          const estDelivery = data.estimated_delivery
+            ? new Date(data.estimated_delivery).toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })
+            : "2-3 weeks from payment confirmation"
+          const tracked: TrackedOrder = {
+            id: data.order_number || trimmed,
+            productName: firstProduct + (items.length > 1 ? ` (+${items.length - 1} items)` : ""),
+            status: statusKey === "CANCELLED" || STATUS_ORDER.includes(statusKey) ? statusKey : "PENDING",
+            orderDate: data.created_at ? data.created_at.substring(0, 10) : new Date().toISOString().substring(0, 10),
+            estimatedDelivery: estDelivery,
+            total: totalAmount,
+            depositPaid: depositAmount,
+          }
+          setFoundOrder(tracked)
+          setNotFound(false)
+          setIsLoading(false)
+          return
+        }
+      } catch {
+        // Auth-protected lookup also failed
+      }
     }
+
+    // Do not silently fall back to mock orders; show a clear "not found" message
+    setFoundOrder(null)
+    setNotFound(true)
+    setIsLoading(false)
   }
 
   // Auto-search when orderId prop is provided

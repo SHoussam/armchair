@@ -18,6 +18,8 @@ import {
   Copy,
   Phone,
   User,
+  UserCheck,
+  FileText,
   Mail,
   Home,
   MessageCircle,
@@ -138,9 +140,13 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
     const file = e.target.files?.[0]
     if (file) {
       setProofFile(file)
-      const reader = new FileReader()
-      reader.onload = (ev) => setProofPreview(ev.target?.result as string)
-      reader.readAsDataURL(file)
+      if (file.type === "application/pdf") {
+        setProofPreview(file.name)
+      } else {
+        const reader = new FileReader()
+        reader.onload = (ev) => setProofPreview(ev.target?.result as string)
+        reader.readAsDataURL(file)
+      }
     }
   }
 
@@ -205,9 +211,13 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       setErrors({})
       try {
         const formData = new FormData()
-        formData.append("customer_name", name)
-        formData.append("customer_email", email)
-        formData.append("customer_phone", phone)
+        if (!user) {
+          formData.append("customer_name", name.trim())
+          formData.append("customer_email", email.trim())
+          formData.append("customer_phone", phone.trim())
+        } else if (phone.trim()) {
+          formData.append("customer_phone", phone.trim())
+        }
         const shippingAddress = deliveryMethod === "pickup" ? "Pickup at store" : `${address}, ${selectedCity.name}`
         formData.append("shipping_address", shippingAddress)
         formData.append("city_id", String(selectedCity.id))
@@ -361,6 +371,13 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                 <MapPin size={18} />
                 Contact & Delivery Address
               </h3>
+
+              {user && (
+                <div style={{ background: "rgba(176,141,62,0.08)", border: "1px solid rgba(176,141,62,0.25)", borderRadius: "8px", padding: "10px 14px", marginBottom: "16px", display: "flex", alignItems: "center", gap: "10px", fontSize: "13px", color: "var(--color-primary, #b08d3e)" }}>
+                  <UserCheck size={18} style={{ flexShrink: 0 }} />
+                  <span>Authenticated as <strong>{user.name}</strong> ({user.email}). Your order will be securely linked to your account.</span>
+                </div>
+              )}
 
               <div className="checkout-field">
                 <label htmlFor="co-name">Full Name *</label>
@@ -535,7 +552,17 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                 <p className="upload-hint">Take a photo or select a screenshot of your bank transfer confirmation</p>
                 {proofPreview ? (
                   <div className="upload-preview">
-                    <img src={proofPreview} alt="Transfer proof" />
+                    {proofFile?.type === "application/pdf" ? (
+                      <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "14px", background: "rgba(0,0,0,0.03)", border: "1px solid rgba(0,0,0,0.08)", borderRadius: "8px", width: "100%", boxSizing: "border-box" }}>
+                        <FileText size={32} style={{ color: "#ef4444", flexShrink: 0 }} />
+                        <div style={{ textAlign: "left", overflow: "hidden" }}>
+                          <p style={{ fontWeight: 600, fontSize: "14px", margin: 0, whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>{proofFile.name}</p>
+                          <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>PDF document ({(proofFile.size / 1024).toFixed(0)} KB)</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <img src={proofPreview} alt="Transfer proof" />
+                    )}
                     <button className="upload-remove" onClick={() => { setProofFile(null); setProofPreview(null) }}>
                       <X size={14} /> Remove
                     </button>
@@ -543,9 +570,9 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                 ) : (
                   <label className="upload-dropzone" htmlFor="co-proof">
                     <Upload size={32} className="upload-icon" />
-                    <span className="upload-text">Tap to select image</span>
-                    <span className="upload-hint-text">JPG, PNG — max 5MB</span>
-                    <input id="co-proof" type="file" accept="image/*" onChange={handleFileChange} hidden />
+                    <span className="upload-text">Tap to select image or PDF</span>
+                    <span className="upload-hint-text">JPG, PNG, PDF — max 5MB</span>
+                    <input id="co-proof" type="file" accept="image/jpeg,image/png,image/jpg,application/pdf" onChange={handleFileChange} hidden />
                   </label>
                 )}
               </div>

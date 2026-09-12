@@ -189,6 +189,22 @@ export default function AuthModal({ isOpen, onClose, initialTab = "login" }: Aut
     }
   }
 
+  const validatePasswordRules = (pwd: string): string | null => {
+    if (pwd.length < 8) {
+      return "Password must be at least 8 characters."
+    }
+    if (!/[A-Z]/.test(pwd)) {
+      return "Password must contain at least one uppercase letter (A-Z)."
+    }
+    if (!/[0-9]/.test(pwd)) {
+      return "Password must contain at least one number (0-9)."
+    }
+    if (!/[@$!%*#?&]/.test(pwd)) {
+      return "Password must contain at least one special character (@$!%*#?&)."
+    }
+    return null
+  }
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
@@ -198,8 +214,9 @@ export default function AuthModal({ isOpen, onClose, initialTab = "login" }: Aut
       return
     }
 
-    if (signupPassword.length < 8) {
-      setError("Password must be at least 8 characters.")
+    const pwdError = validatePasswordRules(signupPassword)
+    if (pwdError) {
+      setError(pwdError)
       return
     }
 
@@ -218,7 +235,10 @@ export default function AuthModal({ isOpen, onClose, initialTab = "login" }: Aut
       showToast("Account created successfully! Welcome to مفروشات عبد اللطيف.")
       handleClose()
     } else {
-      setError(result.error || "Registration failed.")
+      const fieldError = result.errors
+        ? (Object.values(result.errors).flat()[0] as string | undefined)
+        : undefined
+      setError(fieldError || result.error || "Registration failed.")
     }
   }
 
@@ -250,13 +270,14 @@ export default function AuthModal({ isOpen, onClose, initialTab = "login" }: Aut
     e.preventDefault()
     setError("")
 
-    if (resetPassword !== resetConfirm) {
-      setError("Passwords do not match.")
+    const pwdError = validatePasswordRules(resetPassword)
+    if (pwdError) {
+      setError(pwdError)
       return
     }
 
-    if (resetPassword.length < 8) {
-      setError("Password must be at least 8 characters.")
+    if (resetPassword !== resetConfirm) {
+      setError("Passwords do not match.")
       return
     }
 
@@ -271,7 +292,10 @@ export default function AuthModal({ isOpen, onClose, initialTab = "login" }: Aut
       setView("reset-success")
     } catch (err) {
       if (err instanceof ApiError) {
-        setError(err.message)
+        const fieldError = err.errors
+          ? (Object.values(err.errors).flat()[0] as string | undefined)
+          : undefined
+        setError(fieldError || err.message)
       } else {
         setError("Failed to reset password.")
       }
@@ -568,6 +592,10 @@ export default function AuthModal({ isOpen, onClose, initialTab = "login" }: Aut
               </div>
             </div>
 
+            <p className="auth-field-hint" style={{ fontSize: "12px", color: "var(--color-muted, #71717a)", margin: "-0.5rem 0 1rem", lineHeight: "1.4" }}>
+              Password must be 8+ characters and contain at least one uppercase letter (A-Z), one number (0-9), and one symbol (@$!%*#?&).
+            </p>
+
             <button type="submit" className="auth-submit" disabled={isLoading}>
               {isLoading ? (
                 <span className="auth-spinner" />
@@ -689,6 +717,10 @@ export default function AuthModal({ isOpen, onClose, initialTab = "login" }: Aut
                 />
               </div>
             </div>
+
+            <p className="auth-field-hint" style={{ fontSize: "12px", color: "var(--color-muted, #71717a)", margin: "-0.5rem 0 1rem", lineHeight: "1.4" }}>
+              Password must be 8+ characters and contain at least one uppercase letter (A-Z), one number (0-9), and one symbol (@$!%*#?&).
+            </p>
 
             <button type="submit" className="auth-submit" disabled={resetLoading}>
               {resetLoading ? (
