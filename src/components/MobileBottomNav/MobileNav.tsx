@@ -57,6 +57,15 @@ export default function MobileNav({ onCatalogClick, onWishlistClick, onCartClick
         {totalItems > 0 && <span className="mobile-bottom-nav-badge">{totalItems}</span>}
         <span>{t("cart")}</span>
       </button>
+      <button
+        type="button"
+        className="mobile-bottom-nav-item"
+        onClick={onProfileClick}
+        aria-label={isAuthenticated ? t("profile") : t("logIn")}
+      >
+        <User size={20} />
+        <span>{isAuthenticated ? t("profile") : t("logIn")}</span>
+      </button>
     </nav>
   )
 }

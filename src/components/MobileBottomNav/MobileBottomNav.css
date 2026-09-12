@@ -32,14 +32,14 @@
   border: none;
   cursor: pointer;
   color: var(--fg-dim);
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 500;
-  padding: 4px 8px;
+  padding: 4px 4px;
   border-radius: 10px;
   position: relative;
   transition: color 0.2s var(--ease-apple), transform 0.15s var(--ease-apple);
   -webkit-tap-highlight-color: transparent;
-  min-width: 48px;
+  min-width: 40px;
   min-height: 44px;
   font-family: var(--font-body);
 }
