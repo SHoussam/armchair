@@ -8,7 +8,7 @@
  * Ready to be swapped with a single backend API call (e.g. GET /api/products).
  */
 
-import sofaImg from "./L.jpg"
+import sofaImg from "./L.jpeg"
 import chairImg from "./chare.jpg"
 import { upholsteryStyles } from "./types"
 import type {
