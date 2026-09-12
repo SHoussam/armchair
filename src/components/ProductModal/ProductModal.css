@@ -902,9 +902,15 @@
 .upholstery-card {
   background: var(--surface);
   border: 1.5px solid var(--border-soft);
-  border-radius: 12px; padding: 12px 10px;
+  border-radius: 12px; padding: 10px 8px;
   cursor: pointer; text-align: center;
   transition: all .25s var(--ease);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  min-height: 64px;
 }
 .upholstery-card:hover {
   border-color: rgba(201,168,76,.3);
@@ -915,11 +921,11 @@
   box-shadow: 0 0 0 1px rgba(201,168,76,.1);
 }
 .upholstery-label {
-  font-size: .72rem; font-weight: 600; color: var(--fg);
-  margin-bottom: 2px;
+  font-size: .75rem; font-weight: 600; color: var(--fg);
+  line-height: 1.25;
 }
 .upholstery-price {
-  font-size: .62rem; color: var(--fg-dim);
+  font-size: .68rem; color: var(--fg-dim);
 }
 .upholstery-card.selected .upholstery-label { color: var(--gold); }
 

@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react"
+import { useTranslation } from "react-i18next"
 import { X } from "lucide-react"
 import {
   Product,
@@ -11,6 +12,9 @@ import {
   ChairConfig,
   AccessoryConfig,
   SeatSize,
+  getLocalizedProductName,
+  getLocalizedCategoryName,
+  getLocalizedStyleLabel,
 } from "@/data/data"
 import { useCart } from "@/context/CartContext"
 import { renderStars } from "@/utils/helpers"
@@ -35,7 +39,13 @@ interface ProductModalProps {
 }
 
 export default function ProductModal({ product, onClose }: ProductModalProps) {
+  const { t, i18n } = useTranslation("configurator")
   const { addItem, showToast } = useCart()
+
+  const localizedProductName = product ? getLocalizedProductName(product, i18n.language) : ""
+  const localizedCategoryName = product
+    ? getLocalizedCategoryName(product.category, i18n.language, product.categoryAr, product.categoryFr)
+    : ""
 
   // Dynamic Upholstery Styles from Backend
   const [stylesList, setStylesList] = useState<UpholsteryStyle[]>(upholsteryStyles)
@@ -422,7 +432,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
       addItem(product, selectedColorIdx, {
         qty,
         styleId: selectedStyle.id,
-        styleLabel: selectedStyle.label,
+        styleLabel: getLocalizedStyleLabel(selectedStyle, i18n.language),
         seatSize,
         length1: sofaL1,
         length2: sofaL2,
@@ -431,47 +441,47 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
         unitPrice: sofaPricing.finalPrice,
         priceBreakdown: sofaPricing,
       })
-      showToast(`${product.name} (${seatSize}cm · ${sofaL1.toFixed(2)}m × ${sofaL2.toFixed(2)}m) added to cart`)
+      showToast(`${localizedProductName} (${seatSize}cm · ${sofaL1.toFixed(2)}m × ${sofaL2.toFixed(2)}m) ${t("addedToCartToast")}`)
     } else if (config.type === "mattress" && mattressPricing) {
       addItem(product, selectedColorIdx, {
         qty,
         styleId: selectedStyle.id,
-        styleLabel: selectedStyle.label,
+        styleLabel: getLocalizedStyleLabel(selectedStyle, i18n.language),
         unitPrice: mattressPricing.finalPrice,
         priceBreakdown: mattressPricing,
       })
-      showToast(`${product.name} (${mattressPricing.sizeLabel}) added to cart`)
+      showToast(`${localizedProductName} (${mattressPricing.sizeLabel}) ${t("addedToCartToast")}`)
     } else if (config.type === "bed" && bedPricing) {
       addItem(product, selectedColorIdx, {
         qty,
         styleId: selectedStyle.id,
-        styleLabel: selectedStyle.label,
+        styleLabel: getLocalizedStyleLabel(selectedStyle, i18n.language),
         length1: bedPricing.width,
         length2: bedPricing.length,
         unitPrice: bedPricing.finalPrice,
         priceBreakdown: bedPricing,
       })
-      showToast(`${product.name} (${bedPricing.sizeLabel}) added to cart`)
+      showToast(`${localizedProductName} (${bedPricing.sizeLabel}) ${t("addedToCartToast")}`)
     } else if (config.type === "chair" && chairPricing) {
       addItem(product, selectedColorIdx, {
         qty,
         styleId: selectedStyle.id,
-        styleLabel: selectedStyle.label,
+        styleLabel: getLocalizedStyleLabel(selectedStyle, i18n.language),
         length1: chairWidth,
         length2: (product.config as ChairConfig)?.baseWidth || 0.85,
         unitPrice: chairPricing.finalPrice,
         priceBreakdown: chairPricing,
       })
-      showToast(`${product.name} (${Math.round(chairWidth * 100)}cm width) added to cart`)
+      showToast(`${localizedProductName} (${Math.round(chairWidth * 100)}cm) ${t("addedToCartToast")}`)
     } else if (config.type === "accessory" && accessoryPricing) {
       addItem(product, selectedColorIdx, {
         qty,
         styleId: selectedStyle.id,
-        styleLabel: selectedStyle.label,
+        styleLabel: getLocalizedStyleLabel(selectedStyle, i18n.language),
         unitPrice: accessoryPricing.finalPrice,
         priceBreakdown: accessoryPricing,
       })
-      showToast(`${product.name} (${accessoryPricing.packLabel}) added to cart`)
+      showToast(`${localizedProductName} (${accessoryPricing.packLabel}) ${t("addedToCartToast")}`)
     }
 
     onClose()
@@ -487,7 +497,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
       onClick={handleBgClick}
       role="dialog"
       aria-modal="true"
-      aria-label={`Product configurator for ${product.name}`}
+      aria-label={`${t("title")}: ${localizedProductName}`}
     >
       <div
         className={`modal modal-sofa-wide ${expanded ? "expanded" : ""} ${
@@ -639,16 +649,16 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
 
             {/* ── Header ── */}
             <div className="modal-category-row">
-              <span className="modal-category">{product.category}</span>
-              <span className="modal-badge-custom">Bespoke</span>
+              <span className="modal-category">{localizedCategoryName}</span>
+              <span className="modal-badge-custom">{t("bespoke")}</span>
             </div>
 
-            <h2 className="modal-name">{product.name}</h2>
+            <h2 className="modal-name">{localizedProductName}</h2>
 
             <div className="modal-stars">
               {renderStars(product.rating)}{" "}
               <span>
-                {product.rating} · {product.reviews} reviews
+                {product.rating} · {product.reviews} {t("reviews")}
               </span>
             </div>
 
@@ -657,8 +667,8 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
               <span className="modal-price-tag">
                 {configType === "sofa" && sofaPricing &&
                   (sofaPricing.extraMeters > 0
-                    ? `Base ${formatPriceDH(sofaPricing.basePrice)} + extras`
-                    : `Starting price · ${seatSize} cm module`)}
+                    ? t("basePlusExtras", { base: formatPriceDH(sofaPricing.basePrice) })
+                    : t("startingPriceTag", { size: seatSize }))}
                 {configType === "mattress" && mattressPricing && mattressPricing.sizeLabel}
                 {configType === "bed" && bedPricing && bedPricing.sizeLabel}
                 {configType === "chair" && `${Math.round(chairWidth * 100)} cm wide`}
@@ -674,8 +684,8 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                   <div className="config-step-header">
                     <div>
                       <span className="config-step-number">01</span>
-                      <h3 className="config-step-title">Module Size</h3>
-                      <p className="config-step-desc">Determines the starting price and per-meter rate.</p>
+                      <h3 className="config-step-title">{t("moduleSize")}</h3>
+                      <p className="config-step-desc">{t("moduleSizeDesc")}</p>
                     </div>
                   </div>
                   <div className="seat-size-grid">
@@ -707,7 +717,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                     <div>
                       <span className="config-step-number">02</span>
                       <h3 className="config-step-title">
-                        Dimensions
+                        {t("dimensions")}
                         <span style={{ color: 'var(--gold)', fontWeight: 600, marginLeft: 8, fontSize: '.95rem' }}>
                           {sofaL1.toFixed(2)} m × {sofaL2.toFixed(2)} m
                         </span>
@@ -723,14 +733,14 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                           setSofaL2((product.config as SofaConfig).baseLength2)
                         }}
                       >
-                        Reset
+                        {t("reset")}
                       </button>
                     )}
                   </div>
 
                   <div className="dimension-control-row">
                     <div className="dim-header">
-                      <span className="dim-name">Horizontal Length</span>
+                      <span className="dim-name">{t("horizontalLength")}</span>
                       <span className="dim-badge">{Math.round(sofaL1 * 100)} cm ({sofaL1.toFixed(2)} m)</span>
                     </div>
                     <input
@@ -750,7 +760,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
 
                   <div className="dimension-control-row">
                     <div className="dim-header">
-                      <span className="dim-name">Chaise / Vertical Length</span>
+                      <span className="dim-name">{t("verticalLength")}</span>
                       <span className="dim-badge">{Math.round(sofaL2 * 100)} cm ({sofaL2.toFixed(2)} m)</span>
                     </div>
                     <input
@@ -774,33 +784,33 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                   <div className="config-step-header">
                     <div>
                       <span className="config-step-number">03</span>
-                      <h3 className="config-step-title">Configuration</h3>
-                      <p className="config-step-desc">Choose chaise orientation and headrest count.</p>
+                      <h3 className="config-step-title">{t("chaiseLounge")}</h3>
+                      <p className="config-step-desc">{t("headrestsDesc")}</p>
                     </div>
                   </div>
 
                   <div className="orientation-selector-row">
-                    <span className="sub-label">Chaise Position</span>
+                    <span className="sub-label">{t("chaisePosition")}</span>
                     <div className="orientation-buttons">
                       <button
                         type="button"
                         className={`orient-btn ${chaiseOrientation === "left" ? "active" : ""}`}
                         onClick={() => setChaiseOrientation("left")}
                       >
-                        Left Chaise
+                        {t("leftChaise")}
                       </button>
                       <button
                         type="button"
                         className={`orient-btn ${chaiseOrientation === "right" ? "active" : ""}`}
                         onClick={() => setChaiseOrientation("right")}
                       >
-                        Right Chaise
+                        {t("rightChaise")}
                       </button>
                     </div>
                   </div>
 
                   <div style={{ marginTop: 16 }}>
-                    <span className="sub-label" style={{ display: 'block', marginBottom: 8 }}>Headrests</span>
+                    <span className="sub-label" style={{ display: 'block', marginBottom: 8 }}>{t("headrests")}</span>
                     <div className="headrest-btn-group">
                       {[0, 1, 2, 3, 4].map((count) => (
                         <button
@@ -809,14 +819,14 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                           className={`headrest-pill ${headrests === count ? "active" : ""}`}
                           onClick={() => setHeadrests(count)}
                         >
-                          {count === 0 ? "None" : count}
+                          {count === 0 ? t("none") : count}
                         </button>
                       ))}
                     </div>
                   </div>
 
                   <div style={{ marginTop: 16 }}>
-                    <span className="sub-label" style={{ display: 'block', marginBottom: 8 }}>Armrests</span>
+                    <span className="sub-label" style={{ display: 'block', marginBottom: 8 }}>{t("armrests")}</span>
                     <div style={{ display: 'flex', gap: 10 }}>
                       <button
                         type="button"
@@ -824,7 +834,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                         onClick={() => setArmrestHorizontal(!armrestHorizontal)}
                         style={{ flex: 1 }}
                       >
-                        {armrestHorizontal ? "✓ " : ""}Horizontal End
+                        {armrestHorizontal ? "✓ " : ""}{t("horizontalEnd")}
                       </button>
                       <button
                         type="button"
@@ -832,7 +842,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                         onClick={() => setArmrestChaise(!armrestChaise)}
                         style={{ flex: 1 }}
                       >
-                        {armrestChaise ? "✓ " : ""}Chaise End
+                        {armrestChaise ? "✓ " : ""}{t("chaiseEnd")}
                       </button>
                     </div>
                   </div>
@@ -847,14 +857,14 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                   <div className="config-step-header">
                     <div>
                       <span className="config-step-number">01</span>
-                      <h3 className="config-step-title">Dimensions</h3>
+                      <h3 className="config-step-title">{t("dimensions")}</h3>
                     </div>
                     <button
                       type="button"
                       className="reset-dim-btn"
                       onClick={() => setIsCustomMattressSize(!isCustomMattressSize)}
                     >
-                      {isCustomMattressSize ? "Standard" : "Custom"}
+                      {isCustomMattressSize ? t("standard") : t("custom")}
                     </button>
                   </div>
 
@@ -888,7 +898,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                     <div className="custom-dim-panel">
                       <div className="dimension-control-row">
                         <div className="dim-header">
-                          <span className="dim-name">Width</span>
+                          <span className="dim-name">{t("width")}</span>
                           <span className="dim-badge">{Math.round(mattressWidth * 100)} cm</span>
                         </div>
                         <input
@@ -903,7 +913,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                       </div>
                       <div className="dimension-control-row">
                         <div className="dim-header">
-                          <span className="dim-name">Length</span>
+                          <span className="dim-name">{t("length")}</span>
                           <span className="dim-badge">{Math.round(mattressLength * 100)} cm</span>
                         </div>
                         <input
@@ -924,24 +934,24 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                   <div className="config-step-header">
                     <div>
                       <span className="config-step-number">02</span>
-                      <h3 className="config-step-title">Height Profile</h3>
+                      <h3 className="config-step-title">{t("heightProfile")}</h3>
                     </div>
                   </div>
                   <div className="seat-size-grid">
-                    {(product.config as MattressConfig).thicknessOptions.map((t) => {
-                      const isSelected = mattressThicknessId === t.id
+                    {(product.config as MattressConfig).thicknessOptions.map((tOpt) => {
+                      const isSelected = mattressThicknessId === tOpt.id
                       return (
                         <button
-                          key={t.id}
+                          key={tOpt.id}
                           type="button"
                           className={`seat-size-card ${isSelected ? "selected" : ""}`}
-                          onClick={() => setMattressThicknessId(t.id)}
+                          onClick={() => setMattressThicknessId(tOpt.id)}
                         >
                           <div className="seat-card-top">
-                            <span className="seat-size-number">{t.thicknessCm} cm</span>
+                            <span className="seat-size-number">{tOpt.thicknessCm} cm</span>
                             <span className="seat-check">✓</span>
                           </div>
-                          <div className="seat-card-rate">{t.label.split("—")[1] || "Standard"}</div>
+                          <div className="seat-card-rate">{tOpt.label.split("—")[1] || t("standard")}</div>
                         </button>
                       )
                     })}
@@ -952,7 +962,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                   <div className="config-step-header">
                     <div>
                       <span className="config-step-number">03</span>
-                      <h3 className="config-step-title">Core Support</h3>
+                      <h3 className="config-step-title">{t("coreSupport")}</h3>
                     </div>
                   </div>
                   <select
@@ -973,7 +983,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                   <div className="config-step-header">
                     <div>
                       <span className="config-step-number">04</span>
-                      <h3 className="config-step-title">Firmness</h3>
+                      <h3 className="config-step-title">{t("firmness")}</h3>
                     </div>
                   </div>
                   <div className="headrest-btn-group">
@@ -999,7 +1009,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                   <div className="config-step-header">
                     <div>
                       <span className="config-step-number">01</span>
-                      <h3 className="config-step-title">Bed Size & Dimensions</h3>
+                      <h3 className="config-step-title">{t("dimensions")}</h3>
                     </div>
                     {(product.config as BedConfig).allowCustomDimensions && (
                       <button
@@ -1007,7 +1017,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                         className="reset-dim-btn"
                         onClick={() => setIsCustomBedSize(!isCustomBedSize)}
                       >
-                        {isCustomBedSize ? "Standard" : "Custom"}
+                        {isCustomBedSize ? t("standard") : t("custom")}
                       </button>
                     )}
                   </div>
@@ -1046,7 +1056,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                     <div className="custom-dim-panel">
                       <div className="dimension-control-row">
                         <div className="dim-header">
-                          <span className="dim-name">Width</span>
+                          <span className="dim-name">{t("width")}</span>
                           <span className="dim-badge">{Math.round(bedWidth * 100)} cm</span>
                         </div>
                         <input
@@ -1061,7 +1071,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                       </div>
                       <div className="dimension-control-row">
                         <div className="dim-header">
-                          <span className="dim-name">Length</span>
+                          <span className="dim-name">{t("length")}</span>
                           <span className="dim-badge">{Math.round(bedLength * 100)} cm</span>
                         </div>
                         <input
@@ -1082,7 +1092,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                   <div className="config-step-header">
                     <div>
                       <span className="config-step-number">02</span>
-                      <h3 className="config-step-title">Headboard Style</h3>
+                      <h3 className="config-step-title">{t("headboardStyle")}</h3>
                     </div>
                   </div>
                   <div className="headboard-style-grid">
@@ -1101,7 +1111,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                           </div>
                           <div className="headboard-card-footer">
                             <span className={`headboard-price-badge ${hb.supplement > 0 ? "supplement" : "included"}`}>
-                              {hb.supplement > 0 ? `+${hb.supplement} DH` : "Included"}
+                              {hb.supplement > 0 ? `+${hb.supplement} DH` : t("included")}
                             </span>
                           </div>
                         </button>
@@ -1121,7 +1131,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                       <div>
                         <span className="config-step-number">01</span>
                         <h3 className="config-step-title">
-                          Width
+                          {t("armchairWidth")}
                           <span style={{ color: 'var(--gold)', fontWeight: 600, marginLeft: 8, fontSize: '.95rem' }}>
                             {Math.round(chairWidth * 100)} cm
                           </span>
@@ -1133,7 +1143,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                           className="reset-dim-btn"
                           onClick={() => setChairWidth((product.config as ChairConfig).baseWidth)}
                         >
-                          Reset
+                          {t("reset")}
                         </button>
                       )}
                     </div>
@@ -1161,7 +1171,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                     <div className="config-step-header">
                       <div>
                         <span className="config-step-number">02</span>
-                        <h3 className="config-step-title">Leg Finish</h3>
+                        <h3 className="config-step-title">{t("legFinish")}</h3>
                       </div>
                     </div>
                     <div className="seat-size-grid">
@@ -1189,7 +1199,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                             </div>
                             <div className="seat-card-base">{leg.label}</div>
                             <div className="seat-card-rate">
-                              {leg.supplement > 0 ? `+${leg.supplement} DH` : "Included"}
+                              {leg.supplement > 0 ? `+${leg.supplement} DH` : t("included")}
                             </div>
                           </button>
                         )
@@ -1203,18 +1213,18 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                     <div className="config-step-header">
                       <div>
                         <span className="config-step-number">03</span>
-                        <h3 className="config-step-title">Tufting</h3>
+                        <h3 className="config-step-title">{t("tuftingStyle")}</h3>
                       </div>
                     </div>
                     <div className="headrest-btn-group">
-                      {(product.config as ChairConfig).tuftingStyles.map((t) => (
+                      {(product.config as ChairConfig).tuftingStyles.map((tOpt) => (
                         <button
-                          key={t.id}
+                          key={tOpt.id}
                           type="button"
-                          className={`headrest-pill ${chairTuftingId === t.id ? "active" : ""}`}
-                          onClick={() => setChairTuftingId(t.id)}
+                          className={`headrest-pill ${chairTuftingId === tOpt.id ? "active" : ""}`}
+                          onClick={() => setChairTuftingId(tOpt.id)}
                         >
-                          {t.label} {t.supplement > 0 ? `(+${t.supplement} DH)` : ""}
+                          {tOpt.label} {tOpt.supplement > 0 ? `(+${tOpt.supplement} DH)` : ""}
                         </button>
                       ))}
                     </div>
@@ -1230,7 +1240,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                   <div className="config-step-header">
                     <div>
                       <span className="config-step-number">01</span>
-                      <h3 className="config-step-title">Pack Quantity</h3>
+                      <h3 className="config-step-title">{t("packQuantity")}</h3>
                     </div>
                   </div>
                   <div className="seat-size-grid">
@@ -1260,8 +1270,8 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                       <span className="config-step-number">02</span>
                       <h3 className="config-step-title">
                         {(product.config as AccessoryConfig).accessorySubtype === "headrest" || product.name.toLowerCase().includes("headrest")
-                          ? "Headrest Profile"
-                          : "Cushion Size"}
+                          ? t("headrestProfile")
+                          : t("cushionSize")}
                       </h3>
                     </div>
                   </div>
@@ -1284,18 +1294,18 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                     <div className="config-step-header">
                       <div>
                         <span className="config-step-number">03</span>
-                        <h3 className="config-step-title">Incline Adjustment Angle</h3>
+                        <h3 className="config-step-title">{t("inclineAngle")}</h3>
                       </div>
                     </div>
                     <div className="headrest-btn-group">
-                      {(product.config as AccessoryConfig).tiltAngles!.map((t) => (
+                      {(product.config as AccessoryConfig).tiltAngles!.map((tOpt) => (
                         <button
-                          key={t.id}
+                          key={tOpt.id}
                           type="button"
-                          className={`headrest-pill ${headrestTilt === t.degrees ? "active" : ""}`}
-                          onClick={() => setHeadrestTilt(t.degrees)}
+                          className={`headrest-pill ${headrestTilt === tOpt.degrees ? "active" : ""}`}
+                          onClick={() => setHeadrestTilt(tOpt.degrees)}
                         >
-                          {t.label}
+                          {tOpt.label}
                         </button>
                       ))}
                     </div>
@@ -1305,7 +1315,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                     <div className="config-step-header">
                       <div>
                         <span className="config-step-number">03</span>
-                        <h3 className="config-step-title">Filling</h3>
+                        <h3 className="config-step-title">{t("filling")}</h3>
                       </div>
                     </div>
                     <select
@@ -1333,7 +1343,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                     {configType === "sofa" ? "04" : configType === "bed" ? "03" : configType === "mattress" ? "05" : configType === "chair" ? "04" : "04"}
                   </span>
                   <h3 className="config-step-title">
-                    Color & Finish
+                    {t("colorFinish")}
                     <span className="modal-color-name" style={{ marginLeft: 8 }}>
                       {product.colorNames[selectedColorIdx]}
                     </span>
@@ -1363,7 +1373,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                     <span className="config-step-number">
                       {configType === "sofa" ? "05" : configType === "bed" ? "04" : configType === "chair" ? "05" : "05"}
                     </span>
-                    <h3 className="config-step-title">Upholstery Grade</h3>
+                    <h3 className="config-step-title">{t("upholsteryGrade")}</h3>
                   </div>
                 </div>
                 <div className="upholstery-grid">
@@ -1376,11 +1386,11 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
                         className={`upholstery-card ${isSelected ? "selected" : ""}`}
                         onClick={() => setSelectedStyleId(style.id)}
                       >
-                        <span className="upholstery-label">{style.label}</span>
+                        <span className="upholstery-label">{getLocalizedStyleLabel(style, i18n.language)}</span>
                         <span className="upholstery-price">
                           {style.multiplier > 1
                             ? `+${Math.round((style.multiplier - 1) * 100)}%`
-                            : "Standard"}
+                            : t("standard")}
                         </span>
                       </button>
                     )
@@ -1393,18 +1403,18 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
             {configType === "sofa" && (
               <div className="sofa-base-info-banner">
                 <div className="base-info-header">
-                  <span className="base-title">Reference Base</span>
+                  <span className="base-title">{t("referenceBase")}</span>
                 </div>
                 <div className="base-info-grid">
                   <div className="base-info-item">
-                    <span className="base-lbl">Standard</span>
+                    <span className="base-lbl">{t("standard")}</span>
                     <span className="base-val">
                       {Math.round((product.config as SofaConfig).baseLength1 * 100)} ×{" "}
                       {Math.round((product.config as SofaConfig).baseLength2 * 100)} cm ({(product.config as SofaConfig).baseLength1.toFixed(2)} m × {(product.config as SofaConfig).baseLength2.toFixed(2)} m)
                     </span>
                   </div>
                   <div className="base-info-item">
-                    <span className="base-lbl">Starting from</span>
+                    <span className="base-lbl">{t("startingFrom")}</span>
                     <span className="base-val gold">
                       {formatPriceDH((product.config as SofaConfig).seatPricing[seatSize].basePrice)}
                     </span>
@@ -1414,7 +1424,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
             )}
 
             <p className="modal-note">
-              Free delivery on orders over 800 DH · Handcrafted to custom specifications
+              {t("freeDeliveryNote")}
             </p>
           </div>
         </div>
@@ -1423,7 +1433,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
         <div className="sticky-summary-bar">
           <div className="summary-bar-left">
             <div className="summary-bar-config">
-              <div className="summary-bar-title">Your Configuration</div>
+              <div className="summary-bar-title">{t("yourConfiguration")}</div>
               <div className="summary-bar-details">{summaryText}</div>
             </div>
             <div className="summary-bar-price">{formatPriceDH(currentUnitPrice)}</div>
@@ -1447,7 +1457,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
               </button>
             </div>
             <button className="modal-add-btn" onClick={handleAddToCart}>
-              Add to Cart — {formatPriceDH(currentTotalPrice)}
+              {t("addToCart")} — {formatPriceDH(currentTotalPrice)}
             </button>
           </div>
         </div>

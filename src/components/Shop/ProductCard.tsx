@@ -1,6 +1,7 @@
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 import { Heart } from "lucide-react"
-import { Product } from "@/data/data"
+import { Product, getLocalizedProductName, getLocalizedCategoryName } from "@/data/data"
 import { useCart } from "@/context/CartContext"
 import { renderStars } from "@/utils/helpers"
 
@@ -10,11 +11,14 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, onViewDetail }: ProductCardProps) {
+  const { t, i18n } = useTranslation("productCard")
   const { toggleWishlist, isWishlisted, showToast } = useCart()
   const [selectedColorIdx, setSelectedColorIdx] = useState(0)
   const [imgLoaded, setImgLoaded] = useState(false)
 
   const wished = isWishlisted(product.id)
+  const localizedName = getLocalizedProductName(product, i18n.language)
+  const localizedCat = getLocalizedCategoryName(product.category, i18n.language, product.categoryAr, product.categoryFr)
 
   const handlePersonalize = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -24,7 +28,7 @@ export default function ProductCard({ product, onViewDetail }: ProductCardProps)
   const handleWishlist = (e: React.MouseEvent) => {
     e.stopPropagation()
     toggleWishlist(product.id)
-    showToast(!wished ? "Removed from wishlist" : "Added to wishlist ♥")
+    showToast(!wished ? t("removedWishlist") : t("addedWishlist"))
   }
 
   const handleColorSelect = (e: React.MouseEvent, idx: number) => {
@@ -46,7 +50,7 @@ export default function ProductCard({ product, onViewDetail }: ProductCardProps)
       <div className="product-card-img">
         <img
           src={product.img}
-          alt={product.imgAlt}
+          alt={product.imgAlt || localizedName}
           className={imgLoaded ? "loaded" : ""}
           onLoad={() => setImgLoaded(true)}
         />
@@ -58,24 +62,26 @@ export default function ProductCard({ product, onViewDetail }: ProductCardProps)
 
         {/* Quick Personalize Button */}
         <button className="quick-add" onClick={handlePersonalize}>
-          <span className="desktop-only">⚙ Personalize &amp; Price</span>
-          <span className="mobile-only">Configure &amp; Dimensions</span>
+          <span className="desktop-only">{t("personalizeDesktop")}</span>
+          <span className="mobile-only">{t("personalizeMobile")}</span>
         </button>
       </div>
 
       <div className="product-card-body">
         <div className="product-category">
-          {product.category}
-          <span className="desktop-only" style={{ marginLeft: "6px", color: "var(--gold-text)", fontSize: "0.68rem" }}>· Bespoke</span>
-          <span className="mobile-only product-bespoke-tag">Atelier Sizing</span>
+          {localizedCat}
+          <span className="desktop-only" style={{ marginInlineStart: "6px", color: "var(--gold-text)", fontSize: "0.68rem" }}>
+            {t("bespokeTag")}
+          </span>
+          <span className="mobile-only product-bespoke-tag">{t("atelierSizing")}</span>
         </div>
-        <div className="product-name">{product.name}</div>
+        <div className="product-name">{localizedName}</div>
         <div className="product-stars">
           {renderStars(product.rating)} <span>({product.reviews})</span>
         </div>
         <div className="product-price-row">
           <span className="product-price">
-            From {product.price.toLocaleString()} MAD
+            {t("fromPrice")} {product.price.toLocaleString()} MAD
           </span>
           {product.oldPrice && (
             <span className="product-price-old">{product.oldPrice.toLocaleString()} MAD</span>
@@ -101,7 +107,7 @@ export default function ProductCard({ product, onViewDetail }: ProductCardProps)
       <button
         className={`wishlist-btn ${wished ? "active" : ""}`}
         onClick={handleWishlist}
-        aria-label={wished ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
+        aria-label={wished ? `Remove ${localizedName} from wishlist` : `Add ${localizedName} to wishlist`}
       >
         <Heart size={19} fill={wished ? "currentColor" : "none"} strokeWidth={2} />
       </button>

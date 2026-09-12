@@ -113,12 +113,14 @@ export type ProductCustomConfig = SofaConfig | ChairConfig | MattressConfig | Be
 export interface UpholsteryStyle {
   id: string
   label: string
+  labelAr?: string
+  labelFr?: string
   multiplier: number
 }
 
 export const upholsteryStyles: UpholsteryStyle[] = [
-  { id: "standard", label: "Standard Fabric", multiplier: 1 },
-  { id: "premium", label: "Premium Velvet", multiplier: 1.22 },
-  { id: "signature", label: "Signature Leather", multiplier: 1.45 },
-  { id: "linen", label: "Belgian Linen", multiplier: 1.30 },
+  { id: "standard", label: "Standard Fabric", labelAr: "قماش كلاسيكي ممتاز", labelFr: "Tissu Standard Supérieur", multiplier: 1 },
+  { id: "premium", label: "Premium Velvet", labelAr: "مخمل ملكي فاخر", labelFr: "Velours Royal Premium", multiplier: 1.22 },
+  { id: "signature", label: "Signature Leather", labelAr: "جلد فاخر عالي الجودة", labelFr: "Cuir Signature", multiplier: 1.45 },
+  { id: "linen", label: "Belgian Linen", labelAr: "كتان بلجيكي طبيعي", labelFr: "Lin Belge Naturel", multiplier: 1.30 },
 ]

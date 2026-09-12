@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import { Heart, X, Trash2, ArrowRight } from "lucide-react"
-import { Product, products as defaultProducts, fetchProducts } from "@/data/data"
+import { Product, products as defaultProducts, fetchProducts, getLocalizedProductName, getLocalizedCategoryName } from "@/data/data"
 import { useCart } from "@/context/CartContext"
 import "./WishlistDrawer.css"
 
@@ -17,6 +18,7 @@ export default function WishlistDrawer({
   onSelectProduct,
   onBrowseClick,
 }: WishlistDrawerProps) {
+  const { t, i18n } = useTranslation("wishlist")
   const { state, toggleWishlist, showToast } = useCart()
   const [productList, setProductList] = useState<Product[]>(defaultProducts)
 
@@ -60,7 +62,8 @@ export default function WishlistDrawer({
 
   const handleRemove = (product: Product) => {
     toggleWishlist(product.id)
-    showToast(`Removed ${product.name} from wishlist`)
+    const pName = getLocalizedProductName(product, i18n.language)
+    showToast(`${pName} - ${t("remove")}`)
   }
 
   const handlePersonalize = (product: Product) => {
@@ -76,13 +79,13 @@ export default function WishlistDrawer({
         aria-hidden="true"
       />
 
-      <aside className={`wishlist-drawer ${isOpen ? "open" : ""}`} aria-label="Saved Wishlist">
+      <aside className={`wishlist-drawer ${isOpen ? "open" : ""}`} aria-label={t("title")}>
         <div className="wishlist-header">
           <div className="wishlist-header-title">
             <Heart size={20} className="wishlist-heart-icon" />
-            <h3>Saved Wishlist ({wishlistedProducts.length})</h3>
+            <h3>{t("title")} ({wishlistedProducts.length})</h3>
           </div>
-          <button className="wishlist-close" onClick={onClose} aria-label="Close wishlist">
+          <button className="wishlist-close" onClick={onClose} aria-label={t("closeAria")}>
             <X size={20} />
           </button>
         </div>
@@ -93,9 +96,9 @@ export default function WishlistDrawer({
               <div className="wishlist-empty-icon">
                 <Heart size={36} />
               </div>
-              <div className="wishlist-empty-title">Your wishlist is empty</div>
+              <div className="wishlist-empty-title">{t("emptyTitle")}</div>
               <p className="wishlist-empty-text">
-                Tap the heart on any salon, armchair, or mattress to save your favorites here.
+                {t("emptyDesc")}
               </p>
               <button
                 className="wishlist-explore-btn"
@@ -104,50 +107,55 @@ export default function WishlistDrawer({
                   onBrowseClick()
                 }}
               >
-                Browse Collection
+                {t("browseCollection")}
               </button>
             </div>
           ) : (
-            wishlistedProducts.map((product) => (
-              <div key={product.id} className="wishlist-card">
-                <img
-                  src={product.img}
-                  alt={product.imgAlt || product.name}
-                  className="wishlist-card-img"
-                />
-                <div className="wishlist-card-content">
-                  <div>
-                    <div className="wishlist-card-header">
-                      <span className="wishlist-card-cat">{product.category}</span>
+            wishlistedProducts.map((product) => {
+              const productName = getLocalizedProductName(product, i18n.language)
+              const categoryName = getLocalizedCategoryName(product.category, i18n.language, product.categoryAr, product.categoryFr)
+
+              return (
+                <div key={product.id} className="wishlist-card">
+                  <img
+                    src={product.img}
+                    alt={product.imgAlt || productName}
+                    className="wishlist-card-img"
+                  />
+                  <div className="wishlist-card-content">
+                    <div>
+                      <div className="wishlist-card-header">
+                        <span className="wishlist-card-cat">{categoryName}</span>
+                        <button
+                          className="wishlist-card-remove"
+                          onClick={() => handleRemove(product)}
+                          aria-label={`${t("remove")} ${productName}`}
+                          title={t("remove")}
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
+                      <div className="wishlist-card-name" title={productName}>
+                        {productName}
+                      </div>
+                      <div className="wishlist-card-price">
+                        {t("from")} {product.price?.toLocaleString()} DH
+                      </div>
+                    </div>
+
+                    <div className="wishlist-card-actions">
                       <button
-                        className="wishlist-card-remove"
-                        onClick={() => handleRemove(product)}
-                        aria-label={`Remove ${product.name} from wishlist`}
-                        title="Remove"
+                        className="wishlist-btn-order"
+                        onClick={() => handlePersonalize(product)}
                       >
-                        <Trash2 size={15} />
+                        <span>{t("personalizeOrder")}</span>
+                        <ArrowRight size={13} />
                       </button>
                     </div>
-                    <div className="wishlist-card-name" title={product.name}>
-                      {product.name}
-                    </div>
-                    <div className="wishlist-card-price">
-                      From {product.price?.toLocaleString()} DH
-                    </div>
-                  </div>
-
-                  <div className="wishlist-card-actions">
-                    <button
-                      className="wishlist-btn-order"
-                      onClick={() => handlePersonalize(product)}
-                    >
-                      <span>Personalize & Order</span>
-                      <ArrowRight size={13} />
-                    </button>
                   </div>
                 </div>
-              </div>
-            ))
+              )
+            })
           )}
         </div>
       </aside>

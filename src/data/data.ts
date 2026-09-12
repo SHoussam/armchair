@@ -43,8 +43,11 @@ import { api } from "@/services/api"
 export interface Product {
   id: number
   name: string
-  nameAr: string
+  nameAr?: string
+  nameFr?: string
   category: string
+  categoryAr?: string
+  categoryFr?: string
   price: number
   oldPrice: number | null
   badge: string | null
@@ -64,6 +67,8 @@ export interface Product {
 export interface City {
   id: number | string
   name: string
+  nameAr?: string
+  nameFr?: string
   zone: string
   shipping: number
   latitude?: number
@@ -75,6 +80,8 @@ export interface City {
 export interface BackendCategory {
   id: number
   name: string
+  name_ar?: string | null
+  name_fr?: string | null
   slug: string
   description?: string
   is_active?: boolean
@@ -128,6 +135,7 @@ export interface BackendProduct {
   category_id: number
   name: string
   name_ar?: string | null
+  name_fr?: string | null
   slug: string
   description: string
   features?: string[] | null
@@ -154,6 +162,8 @@ export interface BackendUpholsteryStyle {
   id: number
   code: string
   name: string
+  name_ar?: string | null
+  name_fr?: string | null
   multiplier: number | string
   description?: string | null
   is_active?: boolean
@@ -163,6 +173,8 @@ export interface BackendUpholsteryStyle {
 export interface BackendCity {
   id: number
   name: string
+  name_ar?: string | null
+  name_fr?: string | null
   zone_type: "tanger" | "national" | "international" | string
   latitude: string | number
   longitude: string | number
@@ -436,7 +448,10 @@ export function mapBackendProductToFrontend(bp: BackendProduct): Product {
     : ["Solid beechwood frame", "High-density HR foam", "Custom leg finishes", "Tufting craftsmanship"]
 
   const productFeatures = Array.isArray(bp.features) && bp.features.length > 0 ? bp.features : fallbackFeatures
-  const nameAr = bp.name_ar || (isSofa ? "صالون ملكي على شكل L" : "كرسي مريح فاخر")
+  const nameAr = bp.name_ar || (isSofa ? "صالون ملكي على شكل L" : isBed ? "سرير ملكي منجد فاخر" : isAccessory ? "مسند رأس قابل للتعديل للصالون" : "كرسي مريح فاخر")
+  const nameFr = bp.name_fr || (isSofa ? "Salon Marocain Royal en L" : isBed ? "Lit Rembourré Royal" : isAccessory ? "Appui-tête Ergonomique Réglable" : "Fauteuil & Canapé en Velours")
+  const categoryAr = bp.category?.name_ar || (isSofa ? "صالونات مغربية" : isBed ? "أسرة فاخرة" : isMattress ? "مراتب طبية" : isAccessory ? "إكسسوارات ومساند" : "كراسي وأرائك")
+  const categoryFr = bp.category?.name_fr || (isSofa ? "Salons Marocains" : isBed ? "Lits Rembourrés" : isMattress ? "Matelas Orthopédiques" : isAccessory ? "Accessoires & Coussins" : "Fauteuils & Chaises")
   const badge = bp.badge !== undefined && bp.badge !== null ? bp.badge : (isSofa ? "Best Seller" : "Featured")
   const rating = bp.rating ? Number(bp.rating) : (isSofa ? 4.9 : 4.8)
   const reviews = bp.reviews !== undefined && bp.reviews !== null ? Number(bp.reviews) : (isSofa ? 87 : 55)
@@ -453,7 +468,10 @@ export function mapBackendProductToFrontend(bp: BackendProduct): Product {
       id: bp.id,
       name: bp.name,
       nameAr,
+      nameFr,
       category: categoryName,
+      categoryAr,
+      categoryFr,
       price: basePriceNum,
       oldPrice: bp.old_price !== undefined && bp.old_price !== null ? Number(bp.old_price) : null,
       badge,
@@ -779,6 +797,8 @@ export async function fetchUpholsteryStyles(): Promise<UpholsteryStyle[]> {
       return data.data.map((s: BackendUpholsteryStyle) => ({
         id: s.code || String(s.id),
         label: s.name,
+        labelAr: s.name_ar || undefined,
+        labelFr: s.name_fr || undefined,
         multiplier: typeof s.multiplier === "string" ? parseFloat(s.multiplier) : s.multiplier,
       }))
     }
@@ -795,6 +815,8 @@ export async function fetchCities(): Promise<City[]> {
       return data.data.map((c: BackendCity) => ({
         id: c.id,
         name: c.name,
+        nameAr: c.name_ar || undefined,
+        nameFr: c.name_fr || undefined,
         zone: c.zone_type,
         shipping:
           typeof c.shipping_cost === "number"
@@ -827,4 +849,56 @@ export async function fetchCategories(): Promise<string[]> {
   }
   return categories
 }
+
+// ─────────────────────────────────────────────
+// LOCALIZATION GETTERS & HELPERS
+// ─────────────────────────────────────────────
+
+export function getLocalizedProductName(product: Product, lang: string): string {
+  if (lang.startsWith("ar") && product.nameAr) return product.nameAr
+  if (lang.startsWith("fr") && product.nameFr) return product.nameFr
+  return product.name
+}
+
+export function getLocalizedCategoryName(
+  category: string,
+  lang: string,
+  catAr?: string,
+  catFr?: string
+): string {
+  if (lang.startsWith("ar") && catAr) return catAr
+  if (lang.startsWith("fr") && catFr) return catFr
+  const mapAr: Record<string, string> = {
+    All: "الكل",
+    Salons: "صالونات مغربية",
+    Chairs: "كراسي وأرائك",
+    Beds: "أسرة فاخرة",
+    Mattresses: "مراتب طبية",
+    Accessories: "إكسسوارات ومساند",
+  }
+  const mapFr: Record<string, string> = {
+    All: "Tous",
+    Salons: "Salons Marocains",
+    Chairs: "Fauteuils & Chaises",
+    Beds: "Lits Rembourrés",
+    Mattresses: "Matelas Orthopédiques",
+    Accessories: "Accessoires & Coussins",
+  }
+  if (lang.startsWith("ar") && mapAr[category]) return mapAr[category]
+  if (lang.startsWith("fr") && mapFr[category]) return mapFr[category]
+  return category
+}
+
+export function getLocalizedStyleLabel(style: UpholsteryStyle, lang: string): string {
+  if (lang.startsWith("ar") && style.labelAr) return style.labelAr
+  if (lang.startsWith("fr") && style.labelFr) return style.labelFr
+  return style.label
+}
+
+export function getLocalizedCityName(city: City, lang: string): string {
+  if (lang.startsWith("ar") && city.nameAr) return city.nameAr
+  if (lang.startsWith("fr") && city.nameFr) return city.nameFr
+  return city.name
+}
+
 

@@ -1,6 +1,13 @@
 import { useState, useRef, useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import { products as defaultProducts, categories as defaultCategories, Product, fetchProducts, fetchCategories } from "@/data/data"
+import {
+  products as defaultProducts,
+  categories as defaultCategories,
+  Product,
+  fetchProducts,
+  fetchCategories,
+  getLocalizedCategoryName,
+} from "@/data/data"
 import { useAutoScrollOnMobile } from "@/hooks/useAutoScrollOnMobile"
 import ProductCard from "./ProductCard"
 
@@ -12,7 +19,7 @@ interface ProductGridProps {
 type SortOption = "featured" | "price-asc" | "price-desc" | "rating"
 
 export default function ProductGrid({ searchQuery, onViewDetail }: ProductGridProps) {
-  const { t } = useTranslation("shop")
+  const { t, i18n } = useTranslation("shop")
   const [productList, setProductList] = useState<Product[]>(defaultProducts)
   const productScrollRef = useAutoScrollOnMobile<HTMLDivElement>(4200)
   const [categoriesList, setCategoriesList] = useState<string[]>(defaultCategories)
@@ -119,7 +126,7 @@ export default function ProductGrid({ searchQuery, onViewDetail }: ProductGridPr
               data-filter={cat.toLowerCase()}
               onClick={() => setActiveCategory(cat)}
             >
-              {cat}
+              {getLocalizedCategoryName(cat, i18n.language)}
             </button>
           ))}
         </div>
@@ -131,7 +138,7 @@ export default function ProductGrid({ searchQuery, onViewDetail }: ProductGridPr
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={t("filterAria")}
           >
-            <span>{activeCategory}</span>
+            <span>{getLocalizedCategoryName(activeCategory, i18n.language)}</span>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="6 9 12 15 18 9" />
             </svg>
@@ -163,7 +170,7 @@ export default function ProductGrid({ searchQuery, onViewDetail }: ProductGridPr
                         className={`cat-item ${activeCategory === cat ? "active" : ""}`}
                         onClick={() => handleSelectCategory(cat)}
                       >
-                        {cat}
+                        {getLocalizedCategoryName(cat, i18n.language)}
                         {activeCategory === cat && (
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                             <polyline points="20 6 9 17 4 12" />

@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import { useCart } from "@/context/CartContext"
+import { getLocalizedProductName } from "@/data/data"
 import CheckoutModal from "@/components/CheckoutModal/CheckoutModal"
 
 export default function CartDrawer() {
+  const { t, i18n } = useTranslation("cart")
   const { state, removeItem, updateQty, closeCart, clearCart, totalPrice, totalItems, showToast } = useCart()
   const [checkoutOpen, setCheckoutOpen] = useState(false)
 
@@ -50,8 +53,8 @@ export default function CartDrawer() {
       >
         {/* Header */}
         <div className="cart-header">
-          <h3>Your Cart ({totalItems})</h3>
-          <button className="cart-close" onClick={closeCart} aria-label="Close cart">
+          <h3>{t("title")} ({totalItems})</h3>
+          <button className="cart-close" onClick={closeCart} aria-label={t("closeAria")}>
             ✕
           </button>
         </div>
@@ -67,20 +70,21 @@ export default function CartDrawer() {
                   <path d="M16 10a4 4 0 0 1-8 0" />
                 </svg>
               </div>
-              <p>Your cart is empty.</p>
+              <p>{t("empty")}</p>
             </div>
           ) : (
             state.items.map((item) => {
               const p = item.product
+              const productName = getLocalizedProductName(p, i18n.language)
               const colorName = p.colorNames[item.colorIdx]
               const colorHex = p.colors[item.colorIdx]
               const breakdown = item.priceBreakdown
 
               return (
                 <div key={item.key} className="cart-item">
-                  <img className="cart-item-img" src={p.img} alt={p.imgAlt} />
+                  <img className="cart-item-img" src={p.img} alt={p.imgAlt || productName} />
                   <div className="cart-item-info">
-                    <div className="cart-item-name">{p.name}</div>
+                    <div className="cart-item-name">{productName}</div>
 
                     <div className="cart-item-color" style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
                       <span
@@ -98,19 +102,19 @@ export default function CartDrawer() {
                       {breakdown?.type === "sofa" && (
                         <>
                           <span>·</span>
-                          <span style={{ color: "var(--gold)" }}>{item.seatSize} cm seat</span>
+                          <span style={{ color: "var(--gold)" }}>{item.seatSize} cm {t("seat")}</span>
                           <span>·</span>
                           <span>{item.length1?.toFixed(2)}m × {item.length2?.toFixed(2)}m</span>
                           {item.chaiseOrientation && (
                             <>
                               <span>·</span>
-                              <span>{item.chaiseOrientation === "left" ? "Left chaise" : "Right chaise"}</span>
+                              <span>{item.chaiseOrientation === "left" ? t("leftChaise") : t("rightChaise")}</span>
                             </>
                           )}
                           {item.headrests !== undefined && item.headrests > 0 && (
                             <>
                               <span>·</span>
-                              <span>{item.headrests} {item.headrests === 1 ? "headrest" : "headrests"}</span>
+                              <span>{item.headrests} {item.headrests === 1 ? t("headrest") : t("headrests")}</span>
                             </>
                           )}
                         </>
@@ -130,7 +134,7 @@ export default function CartDrawer() {
                       {breakdown?.type === "chair" && (
                         <>
                           <span>·</span>
-                          <span style={{ color: "var(--gold)" }}>{Math.round(breakdown.customWidth * 100)} cm wide</span>
+                          <span style={{ color: "var(--gold)" }}>{Math.round(breakdown.customWidth * 100)} {t("cmWide")}</span>
                           <span>·</span>
                           <span>{breakdown.legLabel}</span>
                           <span>·</span>
@@ -178,7 +182,7 @@ export default function CartDrawer() {
                       <button
                         className="qty-btn"
                         onClick={() => updateQty(item.key, item.qty - 1)}
-                        aria-label={`Decrease quantity of ${p.name}`}
+                        aria-label={`Decrease quantity of ${productName}`}
                       >
                         −
                       </button>
@@ -186,16 +190,16 @@ export default function CartDrawer() {
                       <button
                         className="qty-btn"
                         onClick={() => updateQty(item.key, item.qty + 1)}
-                        aria-label={`Increase quantity of ${p.name}`}
+                        aria-label={`Increase quantity of ${productName}`}
                       >
                         +
                       </button>
                       <button
                         className="cart-item-remove"
                         onClick={() => removeItem(item.key)}
-                        aria-label={`Remove ${p.name} from cart`}
+                        aria-label={`Remove ${productName} from cart`}
                       >
-                        Remove
+                        {t("remove")}
                       </button>
                     </div>
                   </div>
@@ -209,22 +213,22 @@ export default function CartDrawer() {
         {state.items.length > 0 && (
           <div className="cart-footer" id="cartFooter">
             <div className="cart-subtotal">
-              <span>Subtotal</span>
+              <span>{t("subtotal")}</span>
               <span id="cartSubtotal">MAD {totalPrice.toLocaleString()}</span>
             </div>
             <div className="cart-subtotal">
-              <span>Shipping</span>
-              <span id="cartShipping">Calculated at checkout</span>
+              <span>{t("shipping")}</span>
+              <span id="cartShipping">{t("shippingCalc")}</span>
             </div>
             <div className="cart-total">
-              <span>Total</span>
+              <span>{t("total")}</span>
               <span id="cartTotal">MAD {totalPrice.toLocaleString()}</span>
             </div>
             <button
               className="checkout-btn"
               onClick={handleCheckout}
             >
-              Proceed to Checkout
+              {t("proceedToCheckout")}
             </button>
           </div>
         )}
