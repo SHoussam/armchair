@@ -236,7 +236,6 @@ export const products: Product[] = [
     colorIds: [1, 2, 3, 4],
     desc: "Handcrafted L-shaped Moroccan salon with plush foam cushions and elegant carved wooden frame. Starting configuration at 2.70 m × 2.00 m with 70 cm modules, fully customizable to your living room dimensions.",
     features: ["Solid carved wood frame", "High-density foam cushions", "Removable covers", "Custom fabric options"],
-    img: ONLINE_MOCK_IMAGES.royalSalon,
     img: sofaImg,
     imgAlt: "Elegant L-shaped Moroccan sofa set in beige fabric with decorative cushions",
     config: {
